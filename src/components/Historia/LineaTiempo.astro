@@ -1,19 +1,18 @@
 ---
-import { HISTORIA, HISTORIA_INTRO } from '../../constants/historia';
+import { HISTORIA, HISTORIA_INTRO, FILTROS_HITO } from '../../constants/historia';
 import TimelineGaleria from './TimelineGaleria';
 
-// A cada hito con foto le asignamos su posición dentro de la galería (mismo orden
-// que TimelineGaleria.tsx). Los que no tienen foto quedan con `galeriaIdx: null`.
+// tipo por defecto + índice en la galería (mismo orden que TimelineGaleria.tsx).
 let cuentaImg = 0;
 const hitos = HISTORIA.map((hito) => ({
   ...hito,
+  tipo: hito.tipo ?? 'historia',
   galeriaIdx: hito.imagen ? cuentaImg++ : null,
 }));
 ---
 
 <section class="relative bg-white text-slate-900">
   <div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
-    <!-- Encabezado (alineado a la izquierda, sin centrar todo) -->
     <header class="max-w-2xl">
       <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#454ca5]">
         {HISTORIA_INTRO.kicker}
@@ -26,8 +25,29 @@ const hitos = HISTORIA.map((hito) => ({
       </p>
     </header>
 
-    <ol class="relative mt-16 lg:mt-24" data-linea-tiempo>
-      <!-- Riel base + avance de scroll -->
+    <!-- Filtro: Historia / Reconocimiento (mismo timeline, cambia el contenido) -->
+    <div
+      class="mt-8 inline-flex rounded-full border border-slate-200 bg-slate-50 p-1"
+      role="tablist"
+      aria-label="Filtrar línea de tiempo"
+      data-filtros
+    >
+      {
+        FILTROS_HITO.map((f, i) => (
+          <button
+            type="button"
+            role="tab"
+            data-filtro-btn={f.id}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            class="cursor-pointer rounded-full px-5 py-2 text-[13px] font-semibold tracking-wide text-slate-500 transition-colors hover:text-slate-900 aria-selected:bg-[#454ca5] aria-selected:text-white"
+          >
+            {f.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <ol class="relative mt-14 lg:mt-16" data-linea-tiempo>
       <span aria-hidden="true" class="absolute left-3 top-2 bottom-8 w-px bg-slate-200"></span>
       <span
         aria-hidden="true"
@@ -39,6 +59,7 @@ const hitos = HISTORIA.map((hito) => ({
         hitos.map((hito, i) => (
           <li
             data-hito
+            data-tipo={hito.tipo}
             class="relative pb-14 pl-10 last:pb-0 lg:grid lg:grid-cols-[5rem_19rem_1fr] lg:items-start lg:gap-x-10 lg:pl-12"
           >
             <span
@@ -46,7 +67,6 @@ const hitos = HISTORIA.map((hito) => ({
               class="absolute left-3 top-[6px] h-3 w-3 -translate-x-1/2 rounded-full border-2 border-[#454ca5] bg-white"
             />
 
-            {/* Año + etapa */}
             <div class="mb-4 lg:mb-0 lg:pt-[2px] lg:text-right">
               <div class="text-2xl font-bold tracking-tight lg:text-[1.7rem]">{hito.anio}</div>
               <div class="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400">
@@ -54,7 +74,6 @@ const hitos = HISTORIA.map((hito) => ({
               </div>
             </div>
 
-            {/* Imagen — si hay foto, abre la galería a pantalla completa */}
             {hito.imagen ? (
               <button
                 type="button"
@@ -86,7 +105,6 @@ const hitos = HISTORIA.map((hito) => ({
               </figure>
             )}
 
-            {/* Contenido */}
             <div class="lg:pt-[2px]">
               <span class="font-mono text-xs text-slate-400">{String(i + 1).padStart(2, '0')}</span>
               <h3 class="mt-1 text-lg font-bold tracking-tight lg:text-xl">{hito.titulo}</h3>
@@ -98,8 +116,7 @@ const hitos = HISTORIA.map((hito) => ({
         ))
       }
 
-      <!-- Cierre abierto -->
-      <li class="relative pl-10 lg:pl-12">
+      <li class="relative pl-10 lg:pl-12" data-hito data-tipo="historia">
         <span
           aria-hidden="true"
           class="absolute left-3 top-1 h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-[#454ca5] ring-4 ring-white"
@@ -111,13 +128,15 @@ const hitos = HISTORIA.map((hito) => ({
     </ol>
   </div>
 
-  {/* Galería a pantalla completa para las fotos de la línea de tiempo */}
   <TimelineGaleria client:idle />
 </section>
 
 <style>
+  [data-hito].oculto {
+    display: none;
+  }
   @media (prefers-reduced-motion: no-preference) {
-    [data-linea-tiempo][data-anim] [data-hito] {
+    [data-linea-tiempo][data-anim] [data-hito]:not(.oculto) {
       opacity: 0;
       transform: translateY(1.25rem);
       transition: opacity 0.7s ease, transform 0.7s ease;
@@ -131,12 +150,14 @@ const hitos = HISTORIA.map((hito) => ({
 
 <script>
   const ol = document.querySelector<HTMLElement>('[data-linea-tiempo]');
-  if (ol) {
-    const hitos = Array.from(ol.querySelectorAll<HTMLElement>('[data-hito]'));
-    const riel = ol.querySelector<HTMLElement>('[data-riel-avance]');
+  const filtros = document.querySelector<HTMLElement>('[data-filtros]');
 
-    // Aparición progresiva (solo si hay JS y el usuario no pidió menos movimiento)
+  if (ol) {
+    const riel = ol.querySelector<HTMLElement>('[data-riel-avance]');
+    const todos = () => Array.from(ol.querySelectorAll<HTMLElement>('[data-hito]'));
+
     ol.setAttribute('data-anim', '');
+
     const io = new IntersectionObserver(
       (entradas) => {
         entradas.forEach((e) => {
@@ -148,28 +169,45 @@ const hitos = HISTORIA.map((hito) => ({
       },
       { rootMargin: '0px 0px -12% 0px', threshold: 0.12 },
     );
-    hitos.forEach((h) => io.observe(h));
+    todos().forEach((h) => io.observe(h));
 
-    // Avance del riel según el scroll dentro de la lista
-    if (riel) {
-      let pendiente = false;
-      const actualizar = () => {
+    const actualizarRiel = () => {
+      if (!riel) return;
+      const r = ol.getBoundingClientRect();
+      const avance = Math.min(Math.max((window.innerHeight * 0.55 - r.top) / r.height, 0), 1);
+      riel.style.transform = `scaleY(${avance})`;
+    };
+    let pendiente = false;
+    const alScroll = () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(() => {
         pendiente = false;
-        const r = ol.getBoundingClientRect();
-        const avance = Math.min(
-          Math.max((window.innerHeight * 0.55 - r.top) / r.height, 0),
-          1,
+        actualizarRiel();
+      });
+    };
+    window.addEventListener('scroll', alScroll, { passive: true });
+    window.addEventListener('resize', alScroll, { passive: true });
+    actualizarRiel();
+
+    // ── Filtro Historia / Reconocimiento ──
+    if (filtros) {
+      const botones = Array.from(filtros.querySelectorAll<HTMLElement>('[data-filtro-btn]'));
+      const aplicar = (tipo: string) => {
+        botones.forEach((b) =>
+          b.setAttribute('aria-selected', String(b.dataset.filtroBtn === tipo)),
         );
-        riel.style.transform = `scaleY(${avance})`;
+        todos().forEach((li) => {
+          const visible = li.getAttribute('data-tipo') === tipo;
+          li.classList.toggle('oculto', !visible);
+          if (visible) li.classList.add('is-visible'); // se muestra sin re-animar
+        });
+        actualizarRiel();
       };
-      const alScroll = () => {
-        if (pendiente) return;
-        pendiente = true;
-        requestAnimationFrame(actualizar);
-      };
-      window.addEventListener('scroll', alScroll, { passive: true });
-      window.addEventListener('resize', alScroll, { passive: true });
-      actualizar();
+      botones.forEach((b) =>
+        b.addEventListener('click', () => aplicar(b.dataset.filtroBtn || 'historia')),
+      );
+      aplicar('historia');
     }
   }
 </script>

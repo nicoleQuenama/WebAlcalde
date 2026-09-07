@@ -10,7 +10,11 @@
  *    Si dejás `imagen` vacío, esa tarjeta muestra un marcador y NO abre la galería.
  */
 
+export type TipoHito = 'historia' | 'reconocimiento';
+
 export interface Hito {
+  /** Pestaña a la que pertenece. Por defecto 'historia'. */
+  tipo?: TipoHito;
   /** Año o rango: "1955", "1993–2000", "Años 70". */
   anio: string;
   /** Etiqueta corta de etapa: "Origen", "Gestión municipal", "Elección nacional"… */
@@ -21,6 +25,11 @@ export interface Hito {
   imagen?: string;
   imagenAlt?: string;
 }
+
+export const FILTROS_HITO: { id: TipoHito; label: string }[] = [
+  { id: 'historia', label: 'Historia' },
+  { id: 'reconocimiento', label: 'Reconocimiento' },
+];
 
 export interface IntroHistoria {
   kicker: string;
@@ -157,5 +166,32 @@ export const HISTORIA: Hito[] = [
       'La gestión gira en torno a la movilidad, la infraestructura y la modernización de ' +
       'servicios, bajo la idea de una Cochabamba más conectada y eficiente.',
     imagen: PH_A,
+  },
+
+  // ── Pestaña "Reconocimiento" ────────────────────────────────────────
+  // ⚠️ PLACEHOLDERS. Reemplazá por reconocimientos reales (institución, motivo, año)
+  //    y sacá los que no correspondan. Cada uno lleva `tipo: 'reconocimiento'`.
+  {
+    tipo: 'reconocimiento',
+    anio: '—',
+    etapa: 'Reconocimiento',
+    titulo: 'Reconocimiento 1 — completar',
+    descripcion:
+      'Cargá acá el reconocimiento: institución que lo otorga, motivo y año. ' +
+      'Ejemplo: distinción por gestión municipal, hermanamiento de ciudades, condecoración.',
+  },
+  {
+    tipo: 'reconocimiento',
+    anio: '—',
+    etapa: 'Reconocimiento',
+    titulo: 'Reconocimiento 2 — completar',
+    descripcion: 'Institución, motivo y año del reconocimiento.',
+  },
+  {
+    tipo: 'reconocimiento',
+    anio: '—',
+    etapa: 'Reconocimiento',
+    titulo: 'Reconocimiento 3 — completar',
+    descripcion: 'Institución, motivo y año del reconocimiento.',
   },
 ];

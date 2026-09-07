@@ -1,11 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import HeroManfred from '../components/Hero/HeroManfred.astro';
-import LineaTiempo from '../components/Historia/LineaTiempo.astro';
 import FlipBook from '../components/FlipBook/FlipBook';
 import Book from '../components/Book/Book';
-import ImageSlider from '../components/ImageSlider/ImageSlider';
-import ValueCards from '../components/ValueCards/ValueCards';
+import Ejes from '../components/Home/Ejes.astro';
+import Explora from '../components/Home/Explora.astro';
 import CableCarScroll from '../components/Teleferico/CableCarScroll';
 
 const ALCALDE =
@@ -19,7 +18,6 @@ const fotos = {
   alcalde2: ALCALDE + 'DSC_0802.jpg',
   alcalde3: ALCALDE + '6P9A0583.jpg',
   alcalde4: ALCALDE + 'IMG_0643.jpg',
-  alcalde5: ALCALDE + 'DSC_0807.jpg',
   gente1: GENTE + '6P9A5493.jpg',
   gente2: GENTE + 'IMG_5001.jpg',
   gente3: GENTE + 'IMG_7166.jpg',
@@ -66,15 +64,10 @@ const videoList = [
 <Layout title="Inicio">
 	<HeroManfred />
 
-	<!-- Contenido que sube sobre el hero fijo. id="contenido" = destino del botón "Sobre Mí".
-	     scroll-mt-24 deja aire para el header fijo. relative z-10 + fondo opaco = tapa el hero. -->
+	<!-- Sube sobre el hero fijo. id="contenido" = destino del botón "Sobre Mí". -->
 	<div id="contenido" class="relative z-10 scroll-mt-24 bg-white">
-		<LineaTiempo />
-
-		<!-- Secciones traídas de main: libro digital, comparador antes/después y tarjetas de valor.
-		     OJO: estos componentes venían pensados para fondo oscuro; sobre este fondo blanco
-		     puede que necesiten un ajuste de color (ver el <h2 con text-white de abajo). -->
-		<section class="w-full max-w-5xl mx-auto px-4 py-16 flex flex-col gap-10">
+		<!-- 1. Libro digital -->
+		<section class="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-20">
 			<FlipBook
 				client:idle
 				width={350}
@@ -117,32 +110,15 @@ const videoList = [
 					},
 				]}
 			>
-				<Book
-					coverImage="/cocha.jpg"
-					alcalde={alcalde}
-					gente={gente}
-					videos={videoList}
-				/>
+				<Book coverImage="/cocha.jpg" alcalde={alcalde} gente={gente} videos={videoList} />
 			</FlipBook>
-
-			<section class="mt-4">
-				<header class="text-left">
-					<h2 class="text-2xl font-bold tracking-wide text-slate-900">La ciudad en transformación</h2>
-					<p class="mt-1 text-slate-500">Desliza para comparar el antes y el después.</p>
-				</header>
-				<ImageSlider
-					client:visible
-					beforeImage={fotos.alcalde1}
-					afterImage={fotos.alcalde2}
-					beforeLabel="Antes"
-					afterLabel="Después"
-				/>
-			</section>
-
-			<section class="mt-4">
-				<ValueCards client:visible />
-			</section>
 		</section>
+
+		<!-- 2. Ejes de gestión -->
+		<Ejes />
+
+		<!-- 3. Explorá (accesos a Sobre / Gestión / Noticias) -->
+		<Explora />
 	</div>
 
 	<CableCarScroll client:visible />
