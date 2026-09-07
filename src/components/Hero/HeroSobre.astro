@@ -1,0 +1,49 @@
+---
+import HeroCards from './HeroCard.tsx';
+---
+
+<section class="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden bg-slate-900 pt-20">
+  
+  <!-- Fondo borroso general -->
+  <div class="absolute inset-0 z-0">
+    <div 
+      class="absolute inset-0 bg-cover bg-center scale-110 blur-xl opacity-60" 
+      style="background-image: url('/multimedia/cochaPanoramica.jpeg');">
+    </div>
+    <div class="absolute inset-0 bg-indigo-950/60 mix-blend-multiply"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900/90"></div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <div class="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+    
+    <!-- Columna Izquierda: Cartas Interactivas -->
+    <div class="w-full flex justify-center">
+      <HeroCards client:load />
+    </div>
+
+    <!-- Columna Derecha: Textos con Animaciones en Secuencia -->
+    <div class="text-center lg:text-left flex flex-col items-center lg:items-start space-y-6">
+      
+      <!-- 1. Máquina de Escribir -->
+      <div class="w-fit">
+        <p class="typewriter-text text-purple-300 font-bold uppercase tracking-[0.2em] text-sm lg:text-base pr-2">
+          Conoce más de
+        </p>
+      </div>
+      
+      <!-- 2. Escritura Fluida (a mano) -->
+      <div class="w-fit max-w-full">
+        <h1 class="handwriting-text text-4xl sm:text-5xl lg:text-7xl font-serif text-white drop-shadow-lg leading-tight pr-2">
+          Manfred Reyes Villa
+        </h1>
+      </div>
+      
+      <!-- 3. Aparición Suave -->
+      <p class="fade-up-delay text-slate-300 text-lg sm:text-xl lg:text-2xl font-light italic border-l-4 border-purple-500 pl-6">
+        "Construyendo una ciudad inteligente"
+      </p>
+    </div>
+
+  </div>
+</section>
