@@ -21,7 +21,7 @@
 }
 
 .wrap:focus-visible {
-  outline: 2px solid var(--accent, #c9a96e);
+  outline: 2px solid var(--accent, #ab6ec9);
   outline-offset: 4px;
   border-radius: 18px;
 }

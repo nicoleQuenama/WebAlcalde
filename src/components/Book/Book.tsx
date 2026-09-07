@@ -30,11 +30,6 @@ const s = (c: string) =>
   : c === 'backTitle' ? 'back-title'
   : (styles[c as keyof typeof styles] ?? c);
 
-/**
- * Contenido del libro digital (portada, páginas interiores y contraportada).
- * Pensado para usarse como `children` de <FlipBook />. Trae su propio CSS
- * module para que el componente (y sus estilos) se muevan juntos.
- */
 export default function Book({ coverImage, alcalde, gente, videos }: BookProps) {
   const [a1, a2, a3, a4] = alcalde;
   const [g1, g2, g3, g4, g5] = gente;
@@ -59,9 +54,7 @@ export default function Book({ coverImage, alcalde, gente, videos }: BookProps) 
         <div className={s('pageInner')}>
           <h3 className={s('pageTitle')} data-reveal>Introducción</h3>
           <p className={s('pageText')} data-reveal>
-            Manual interactivo de la ciudad de Cochabamba. Descubre obras de
-            infraestructura, servicios digitales y el trabajo del alcalde con
-            la comunidad.
+            Libro digital que muestra la gestión de la Alcaldía de Cochabamba, con obras, servicios y proyectos que transforman la ciudad y mejoran la calidad de vida de sus habitantes.
           </p>
 
           <figure className={s('mediaInline')}>
