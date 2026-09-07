@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap');
+
+/* 1. Animación Máquina de Escribir ("Conoce más de") */
+.typewriter-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 4px solid #d8b4fe;
+  width: 0;
+  /* Animación más lenta (2.5s) */
+  animation: typing-conoce 2.5s steps(15, end) forwards, blink 0.8s step-end infinite;
+}
+
+/* 2. Animación Escritura a Mano ("Manfred Reyes Villa") */
+.handwriting-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  /* Comienza 2.5s después de la primera */
+  animation: typing-manfred 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) 2.5s forwards;
+}
+
+/* 3. Aparición de la cita (flotando hacia arriba) */
+.fade-up-delay {
+  opacity: 0;
+  transform: translateY(20px);
+  /* Aparece 5.5s después de que cargó todo */
+  animation: fadeUp 1.5s ease-out 5.5s forwards;
+}
+
+/* === DEFINICIÓN DE MOVIMIENTOS === */
+
+/* El uso de 'ch' permite revelar el texto letra por letra de forma perfecta */
+@keyframes typing-conoce {
+  to { width: 14ch; } 
+}
+
+@keyframes typing-manfred {
+  to { width: 20ch; } 
+}
+
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: #d8b4fe; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
