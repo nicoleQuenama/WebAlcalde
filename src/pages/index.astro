@@ -1,11 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import HeroManfred from '../components/Hero/HeroManfred.astro';
 import FlipBook from '../components/FlipBook/FlipBook';
 import Book from '../components/Book/Book';
 import Ejes from '../components/Home/Ejes.astro';
 import Explora from '../components/Home/Explora.astro';
 import CableCarScroll from '../components/Teleferico/CableCarScroll';
+import HeroSobre from '../components/Hero/HeroSobre.astro';
 
 const ALCALDE =
   '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.1%20Fotograf%C3%ADas%20del%20alcalde/';
@@ -62,8 +62,7 @@ const videoList = [
 ---
 
 <Layout title="Inicio">
-	<HeroManfred />
-
+	<HeroSobre/>
 	<!-- Sube sobre el hero fijo. id="contenido" = destino del botón "Sobre Mí". -->
 	<div id="contenido" class="relative z-10 scroll-mt-24 bg-white">
 		<!-- 1. Libro digital -->
