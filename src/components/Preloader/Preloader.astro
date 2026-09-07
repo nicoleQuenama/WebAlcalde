@@ -1,0 +1,126 @@
+---
+import styles from './Preloader.module.css';
+
+interface Props {
+  minDuration?: number;
+  cabinColor?: string;
+  ghostColor?: string;
+}
+
+const { minDuration = 400, cabinColor = '#ffc31e', ghostColor = 'rgba(255,255,255,0.22)' } = Astro.props;
+/**
+ * Pantalla de carga minimalista: cabina del teleférico cruzando mientras
+ * las letras M.R.V se rellenan de blanco de izquierda a derecha (GSAP).
+ * El cuevre ocurre cuando la página cargó Y pasó el tiempo mínimo Y la
+ * animación terminó. Reduced-motion muestra las letras llenas al instante.
+ */
+---
+<div
+  class={styles.overlay}
+  data-preloader
+  data-min-duration={minDuration}
+  role="status"
+  aria-live="polite"
+  aria-label="Cargando"
+>
+  <div class={styles.scene}>
+    <span class={styles.cable} aria-hidden="true"></span>
+    <span class={styles.cabin} data-cabin aria-hidden="true">
+      <span class={styles.cabinBody} style={`background:${cabinColor}`}></span>
+      <span class={styles.cabinHook} style={`background:${cabinColor}`}></span>
+    </span>
+  </div>
+
+  <p class={styles.letters} data-monogram aria-hidden="true">
+    {['M', 'R', 'V'].map((letter, i) => (
+      <span class={styles.letterGroup} data-letter={i}>
+        <span class={styles.ghost} style={`color:${ghostColor}`}>{letter}</span>
+        <span class={styles.fill}>
+          <span class={styles.solid}>{letter}</span>
+        </span>
+      </span>
+    ))}
+  </p>
+</div>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const el = document.querySelector('[data-preloader]');
+  if (el) {
+    const body = document.body;
+    const scol = body.style.overflow;
+    body.style.overflow = 'hidden';
+
+    const min = Math.max(0, Number(el.dataset.minDuration || 400));
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const solidEls = Array.from(el.querySelectorAll('[data-letter] .solid'));
+    const letters = Array.from(el.querySelectorAll('[data-letter]'));
+    const cabin = el.querySelector('[data-cabin]');
+
+    let closed = false;
+    const close = () => {
+      if (closed) return;
+      closed = true;
+      el.setAttribute('data-hiding', 'true');
+      setTimeout(() => {
+        el.setAttribute('data-hidden', 'true');
+        body.style.overflow = scol;
+      }, 340);
+    };
+
+    // Cerrar solo cuando: página cargada + tiempo mínimo + animación lista.
+    const flags = { loaded: false, minPassed: false, animDone: false };
+    const maybeClose = () => {
+      if (flags.loaded && flags.minPassed && flags.animDone) close();
+    };
+
+    window.addEventListener('load', () => {
+      flags.loaded = true;
+      maybeClose();
+    });
+    setTimeout(() => {
+      flags.minPassed = true;
+      maybeClose();
+    }, min);
+
+    if (reduce) {
+      gsap.set(solidEls, { xPercent: 0 });
+      gsap.set(letters, { opacity: 1, y: 0 });
+      flags.animDone = true;
+      maybeClose();
+    } else {
+      const tl = gsap.timeline({
+        defaults: { ease: 'power2.inOut' },
+        onComplete: () => {
+          flags.animDone = true;
+          maybeClose();
+        },
+      });
+
+      tl.fromTo(
+        letters,
+        { y: 12, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.32, stagger: 0.12 },
+        0
+      );
+
+      tl.fromTo(
+        solidEls,
+        { xPercent: -100 },
+        { xPercent: 0, duration: 0.5, stagger: 0.12 },
+        0
+      );
+
+      if (cabin) {
+        const band = cabin.parentElement.getBoundingClientRect().width;
+        gsap.fromTo(
+          cabin,
+          { x: -48 },
+          { x: band + 48, duration: 1.1, ease: 'power1.inOut' }
+        );
+      }
+    }
+  }
+</script>

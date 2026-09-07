@@ -1,6 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,400;1,8..144,400&display=swap');
 @import "tailwindcss";
 
+:root {
+  --ink: #1a1a2e;
+  --paper: #fdf5fa;
+  --accent: #8e2583;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
 
 @theme {
   --font-roboto-serif: "Roboto Serif", serif;
