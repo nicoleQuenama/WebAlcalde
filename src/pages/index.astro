@@ -1,8 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import HeroSobre from '../components/Hero/HeroSobre.astro';
+import HeroManfred from '../components/Hero/HeroManfred.astro';
+import LineaTiempo from '../components/Historia/LineaTiempo.astro';
 ---
 
 <Layout title="Inicio">
-	<HeroSobre />
+	<HeroManfred />
+
+	<!-- Contenido que sube sobre el hero fijo. id="contenido" = destino del botón "Sobre Mí".
+	     scroll-mt-24 deja aire para el header fijo. relative z-10 + fondo opaco = tapa el hero. -->
+	<div id="contenido" class="relative z-10 scroll-mt-24 bg-white">
+		<LineaTiempo />
+	</div>
 </Layout>

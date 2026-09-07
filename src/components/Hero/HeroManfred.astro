@@ -1,0 +1,65 @@
+---
+import HeroManfredAnimado from './HeroManfredAnimado.tsx';
+---
+
+<!-- Hero FIJO: ocupa siempre el viewport. El contenido de abajo (#contenido en
+     index.astro, con fondo opaco y z mayor) sube y lo tapa SIN costura: las secciones
+     ocupan la misma posición que el hero mientras suben. -->
+<section
+  aria-labelledby="hero-title"
+  class="fixed inset-0 z-0 flex h-[100svh] min-h-[640px] w-screen flex-col overflow-hidden bg-[#F3F0F7] pt-[64px]"
+>
+    <h1 id="hero-title" class="sr-only">Manfred Reyes Villa — Alcalde de Cochabamba</h1>
+
+    <!-- Fondo: color plano de marca + textura de puntos muy sutil. Sin foto, sin
+         degradados, sin formas. Para dejarlo 100% liso: borrar el div de la textura. -->
+    <div aria-hidden="true" class="absolute inset-0 bg-[#F3F0F7]"></div>
+    <div
+      aria-hidden="true"
+      class="absolute inset-0"
+      style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23454ca5' fill-opacity='0.12'/%3E%3C/svg%3E&quot;);"
+    ></div>
+
+    <!-- Marco decorativo estático: no se anima, mantiene el hero "vestido" durante
+         todo el scroll (incluida la secuencia de frases) y llena los costados. -->
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 z-[6] overflow-hidden">
+      <!-- Línea horizonte -->
+      <div class="absolute inset-x-0 top-[63%] flex items-center gap-4 px-[7vw]">
+        <span class="h-px flex-1 bg-[#454ca5]/20"></span>
+        <span class="h-1.5 w-1.5 rotate-45 border border-[#454ca5]/40"></span>
+        <span class="h-px flex-1 bg-[#454ca5]/20"></span>
+      </div>
+
+      <!-- Etiqueta lateral izquierda -->
+      <span
+        class="absolute left-3 top-1/2 hidden -translate-y-1/2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#454ca5]/45 md:block lg:left-6"
+        style="writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg);"
+      >
+        Cochabamba · Bolivia
+      </span>
+      <!-- Etiqueta lateral derecha -->
+      <span
+        class="absolute right-3 top-1/2 hidden -translate-y-1/2 text-[10px] font-bold uppercase tracking-[0.4em] text-[#454ca5]/45 md:block lg:right-6"
+        style="writing-mode: vertical-rl;"
+      >
+        Gestión 2021 — 2026
+      </span>
+
+      <!-- Corchetes de esquina superior -->
+      <span class="absolute left-3 top-[80px] hidden h-4 w-4 border-l-2 border-t-2 border-[#454ca5]/25 md:block lg:left-6"></span>
+      <span class="absolute right-3 top-[80px] hidden h-4 w-4 border-r-2 border-t-2 border-[#454ca5]/25 md:block lg:right-6"></span>
+    </div>
+
+    <!-- Contenido animado con hook reutilizable (sin lógica en el componente) -->
+    <HeroManfredAnimado client:load />
+
+    <!-- Fundido inferior - cubre el recorte del PNG (piernas del alcalde) -->
+    <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 z-[12] h-36 bg-gradient-to-t from-[#F3F0F7] via-[#F3F0F7]/90 to-transparent lg:h-44"></div>
+</section>
+
+<!-- Espaciador TRANSPARENTE: recorrido de scroll de la coreografía (MANFRED + frases).
+     Con `100svh + N`, #contenido ENTRA al viewport recién a los N px de scroll (sin
+     importar el alto de pantalla). La ÚLTIMA frase NO se va: queda fija y #contenido
+     sube y la tapa. N ≈ un poco después de que la última frase termina de entrar
+     (FRASE_INICIO + (nFrases-1)*FRASE_DURACION + ~200). -->
+<div aria-hidden="true" class="w-full" style="height: calc(100svh + 980px);"></div>
