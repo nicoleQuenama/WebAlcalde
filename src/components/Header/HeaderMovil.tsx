@@ -53,23 +53,7 @@ export default function HeaderMovil({ enlaces }: Props) {
               <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-purple-300 transition-all duration-300 group-hover:w-full rounded-full"></span>
             </a>
           ))}
-          
-          <button 
-            className={`${abierto ? 'block w-full mt-2' : 'hidden'} lg:hidden bg-white text-purple-900 font-bold text-base px-6 py-3.5 rounded-xl shadow-lg active:scale-95 transition-all`}
-            onClick={() => alert("Navegando a la App")}
-          >
-            Iniciar Sesion
-          </button>
         </nav>
-
-        {/* Botón de Escritorio */}
-        <button 
-            className="hidden lg:block bg-white text-purple-900 font-bold text-base px-7 py-3 rounded-full shadow-[0_4px_15px_rgba(255,255,255,0.15)] hover:-translate-y-1 hover:scale-105 hover:shadow-[0_8px_25px_rgba(255,255,255,0.3)] transition-all duration-300"
-            onClick={() => alert("Navegando a la App")}
-        >
-          Iniciar Sesion
-        </button>
-
       </div>
     </div>
   );
