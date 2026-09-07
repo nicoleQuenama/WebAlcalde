@@ -137,3 +137,50 @@
   0%, 100% { transform: rotate(15deg) translateX(80px) translateY(0); }
   50% { transform: rotate(15deg) translateX(80px) translateY(-20px); }
 }
+/* 1. Animación Máquina de Escribir (Pasos precisos) */
+.typewriter-text {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 3px solid #d8b4fe; /* Cursor morado brillante */
+  width: 0;
+  /* Dura 1.5s en 20 pasos. El cursor parpadea infinito */
+  animation: typing 1.5s steps(20, end) forwards, blink 0.8s step-end infinite;
+}
+
+/* 2. Animación Escritura a Mano (Deslizamiento Fluido) */
+.handwriting-text {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  /* Comienza 1.2s después (cuando la máquina de escribir termina) */
+  animation: smoothTyping 2s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
+}
+
+/* 3. Aparición de la cita (Flota hacia arriba) */
+.fade-up-delay {
+  opacity: 0;
+  transform: translateY(20px);
+  /* Aparece 3 segundos después de que cargó todo */
+  animation: fadeUp 1s ease-out 3s forwards;
+}
+
+/* Definición de los Keyframes */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes smoothTyping {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: #d8b4fe; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

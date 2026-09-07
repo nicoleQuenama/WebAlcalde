@@ -15,19 +15,18 @@ export default function HeaderMovil({ enlaces }: Props) {
         
         {/* Lado Izquierdo: Logo y Nombre */}
         <div className="flex items-center gap-3">
-          <div className="bg-white p-2 rounded-full flex items-center justify-center shadow-md hover:scale-110 hover:rotate-6 transition-transform duration-300 cursor-pointer">
+          <div className="flex items-center justify-center shadow-md hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer">
+            <a href="/" className="flex items-center justify-center shadow-md hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer">
             <img
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/96ed444f12f2297ccd4006841bd1831940e6f23d36396492d16831d2cdf15c29"
+              src="../../../public/multimedia/Logo Alcalde.png"
               alt="Logo"
-              className="w-7 h-7"
+              className="h-10 lg:h-12 w-auto object-contain"
             />
-          </div>
-          <div className="uppercase font-black text-xl lg:text-2xl tracking-wider text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">
-            Manfred
+             </a>
           </div>
         </div>
 
-        {/* Botón Hamburguesa (Ahora se muestra en pantallas menores a 1024px con 'lg:hidden') */}
+        {/* Botón Hamburguesa */}
         <button 
           className="lg:hidden text-white active:scale-90 transition-transform"
           onClick={() => setAbierto(!abierto)}
@@ -42,7 +41,7 @@ export default function HeaderMovil({ enlaces }: Props) {
           </svg>
         </button>
 
-        {/* Centro y Derecha: Enlaces y Botón (Se ocultan y despliegan en pantallas menores a 1024px) */}
+        {/* Centro y Derecha: Enlaces y Botón */}
         <nav className={`${abierto ? 'flex flex-col w-full mt-5 gap-6 pb-4' : 'hidden'} lg:flex lg:flex-row lg:w-auto lg:mt-0 gap-6 lg:gap-8 items-center`}>
           {enlaces.map((enlace) => (
             <a 
@@ -55,21 +54,20 @@ export default function HeaderMovil({ enlaces }: Props) {
             </a>
           ))}
           
-          {/* Botón de acción para versión desplegable */}
           <button 
             className={`${abierto ? 'block w-full mt-2' : 'hidden'} lg:hidden bg-white text-purple-900 font-bold text-base px-6 py-3.5 rounded-xl shadow-lg active:scale-95 transition-all`}
             onClick={() => alert("Navegando a la App")}
           >
-            Descargar App
+            Iniciar Sesion
           </button>
         </nav>
 
-        {/* Botón de Escritorio (Oculto en pantallas menores a 1024px con 'hidden lg:block') */}
+        {/* Botón de Escritorio */}
         <button 
             className="hidden lg:block bg-white text-purple-900 font-bold text-base px-7 py-3 rounded-full shadow-[0_4px_15px_rgba(255,255,255,0.15)] hover:-translate-y-1 hover:scale-105 hover:shadow-[0_8px_25px_rgba(255,255,255,0.3)] transition-all duration-300"
             onClick={() => alert("Navegando a la App")}
         >
-          Descargar App
+          Iniciar Sesion
         </button>
 
       </div>
