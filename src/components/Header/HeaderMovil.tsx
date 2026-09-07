@@ -1,0 +1,78 @@
+import { useState } from "react";
+import type { NavItem } from "../../types/nav";
+
+interface Props {
+  enlaces: NavItem[];
+}
+
+export default function HeaderMovil({ enlaces }: Props) {
+  const [abierto, setAbierto] = useState(false);
+
+  return (
+    <div className="fixed top-0 left-0 w-full z-50">
+      
+      <div className="flex flex-wrap items-center justify-between w-full bg-purple-900/90 backdrop-blur-md border-b border-purple-400/40 py-4 px-8 lg:px-12 shadow-[0_10px_30px_rgba(76,29,149,0.4)] transition-all duration-300">
+        
+        {/* Lado Izquierdo: Logo y Nombre */}
+        <div className="flex items-center gap-3">
+          <div className="bg-white p-2 rounded-full flex items-center justify-center shadow-md hover:scale-110 hover:rotate-6 transition-transform duration-300 cursor-pointer">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/96ed444f12f2297ccd4006841bd1831940e6f23d36396492d16831d2cdf15c29"
+              alt="Logo"
+              className="w-7 h-7"
+            />
+          </div>
+          <div className="uppercase font-black text-xl lg:text-2xl tracking-wider text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">
+            Manfred
+          </div>
+        </div>
+
+        {/* Botón Hamburguesa (Ahora se muestra en pantallas menores a 1024px con 'lg:hidden') */}
+        <button 
+          className="lg:hidden text-white active:scale-90 transition-transform"
+          onClick={() => setAbierto(!abierto)}
+          aria-label="Abrir menú"
+        >
+          <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            {abierto ? (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
+
+        {/* Centro y Derecha: Enlaces y Botón (Se ocultan y despliegan en pantallas menores a 1024px) */}
+        <nav className={`${abierto ? 'flex flex-col w-full mt-5 gap-6 pb-4' : 'hidden'} lg:flex lg:flex-row lg:w-auto lg:mt-0 gap-6 lg:gap-8 items-center`}>
+          {enlaces.map((enlace) => (
+            <a 
+              key={enlace.ruta} 
+              href={enlace.ruta} 
+              className="relative text-purple-100 hover:text-white text-base lg:text-lg font-medium transition-colors duration-300 group"
+            >
+              {enlace.nombre}
+              <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-purple-300 transition-all duration-300 group-hover:w-full rounded-full"></span>
+            </a>
+          ))}
+          
+          {/* Botón de acción para versión desplegable */}
+          <button 
+            className={`${abierto ? 'block w-full mt-2' : 'hidden'} lg:hidden bg-white text-purple-900 font-bold text-base px-6 py-3.5 rounded-xl shadow-lg active:scale-95 transition-all`}
+            onClick={() => alert("Navegando a la App")}
+          >
+            Descargar App
+          </button>
+        </nav>
+
+        {/* Botón de Escritorio (Oculto en pantallas menores a 1024px con 'hidden lg:block') */}
+        <button 
+            className="hidden lg:block bg-white text-purple-900 font-bold text-base px-7 py-3 rounded-full shadow-[0_4px_15px_rgba(255,255,255,0.15)] hover:-translate-y-1 hover:scale-105 hover:shadow-[0_8px_25px_rgba(255,255,255,0.3)] transition-all duration-300"
+            onClick={() => alert("Navegando a la App")}
+        >
+          Descargar App
+        </button>
+
+      </div>
+    </div>
+  );
+}

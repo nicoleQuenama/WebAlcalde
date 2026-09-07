@@ -1,0 +1,17 @@
+---
+import type { NavItem } from '../../types/nav';
+import HeaderMovil from './HeaderMovil.tsx';
+
+const enlacesMenu: NavItem[] = [
+    { nombre: 'Inicio', ruta: '/' },
+    { nombre: 'Sobre', ruta: '/sobre' },
+    { nombre: 'Gestión', ruta: '/gestion' },
+    { nombre: 'Noticias', ruta: '/noticias' },
+    { nombre: 'Agenda', ruta: '/agenda' },
+    { nombre: 'Buzón Ciudadano', ruta: '/buzon' }
+];
+---
+
+<header>
+    <HeaderMovil enlaces={enlacesMenu} client:load />
+</header>
