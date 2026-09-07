@@ -19,6 +19,7 @@
   border-radius: 4px;
   overflow: hidden;
   height: 100%;
+  font-family: var(--font-roboto-serif);
 }
 
 .page::after {
@@ -190,7 +191,7 @@
 .backCover {
   background:
     radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.12), transparent 50%),
-    linear-gradient(145deg, #2a2a4a 0%, #1c1c38 55%, #12122a 100%);
+    linear-gradient(145deg, var(--color-primary) 0%, #3b2867 55%, #221647 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -199,6 +200,7 @@
   position: relative;
   overflow: hidden;
   height: 100%;
+  font-family: var(--font-roboto-serif);
 }
 
 .coverImg {
@@ -232,7 +234,7 @@
 .coverBadge {
   align-self: flex-start;
   background: var(--accent);
-  color: #222;
+  color: #fff;
   font-size: calc(0.7rem * var(--book-text-scale, 1));
   font-weight: 700;
   text-transform: uppercase;

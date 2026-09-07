@@ -30,11 +30,12 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   background:
     radial-gradient(120% 80% at 15% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
-    linear-gradient(150deg, #23234a 0%, #191936 60%, #14142c 100%);
+    linear-gradient(150deg, var(--color-second) 0%, var(--color-primary) 60%, #31235c 100%);
   box-shadow:
     0 24px 60px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
   color: #e8e8f0;
+  font-family: var(--font-roboto-serif);
   will-change: transform;
 }
 
@@ -56,7 +57,7 @@
   font-weight: 700;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: var(--accent, #c9a96e);
+  color: var(--accent);
 }
 
 .title {
