@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import HeroManfred from '../components/Hero/HeroManfred.astro';
 import FlipBook from '../components/FlipBook/FlipBook';
+import HeroSobre from '../components/Hero/HeroSobre.astro';
 import Book from '../components/Book/Book';
 import Ejes from '../components/Home/Ejes.astro';
 import Explora from '../components/Home/Explora.astro';
@@ -62,7 +62,7 @@ const videoList = [
 ---
 
 <Layout title="Inicio">
-	<HeroManfred />
+	<HeroSobre/>
 
 	<!-- Sube sobre el hero fijo. id="contenido" = destino del botón "Sobre Mí". -->
 	<div id="contenido" class="relative z-10 scroll-mt-24 bg-white">
@@ -113,13 +113,6 @@ const videoList = [
 				<Book coverImage="/cocha.jpg" alcalde={alcalde} gente={gente} videos={videoList} />
 			</FlipBook>
 		</section>
-
-		<!-- 2. Ejes de gestión -->
-		<Ejes />
-
-		<!-- 3. Explorá (accesos a Sobre / Gestión / Noticias) -->
-		<Explora />
 	</div>
-
 	<CableCarScroll client:visible />
 </Layout>
