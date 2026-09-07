@@ -709,3 +709,64 @@
     display: none;
   }
 }
+
+/* ============================================================
+   Estilos base de la librería page-flip (stPageFlip.css).
+   page-flip@2.0.x no incluye este CSS en su dist, se agrega aquí.
+   El DOM de la librería usa estas clases tal cual, por eso van
+   con :global() para que no se renombren con el hash del módulo.
+   ============================================================ */
+:global(.stf__parent) {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  transform: translateZ(0);
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+}
+
+:global(.stf__wrapper) {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+:global(.stf__parent) canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+:global(.stf__block) {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  perspective: 2000px;
+}
+
+:global(.stf__item) {
+  display: none;
+  position: absolute;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+}
+
+:global(.stf__item) img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+:global(.stf__outerShadow),
+:global(.stf__innerShadow),
+:global(.stf__hardShadow),
+:global(.stf__hardInnerShadow) {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
