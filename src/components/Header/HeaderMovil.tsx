@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { NavItem } from "../../types/nav";
+import  "../../styles/global.css";
 
 interface Props {
   enlaces: NavItem[];
@@ -11,7 +12,7 @@ export default function HeaderMovil({ enlaces }: Props) {
   return (
     <div className="fixed top-0 left-0 w-full z-50">
       
-      <div className="flex flex-wrap items-center justify-between w-full bg-purple-900/90 backdrop-blur-md border-b border-purple-400/40 py-4 px-8 lg:px-12 shadow-[0_10px_30px_rgba(76,29,149,0.4)] transition-all duration-300">
+      <div className="flex flex-wrap items-center justify-between w-full bg-primary backdrop-blur-md border-b border-purple-400/40 py-4 px-8 lg:px-12 shadow-[0_10px_30px_rgba(76,29,149,0.4)] transition-all duration-300">
         
         {/* Lado Izquierdo: Logo y Nombre */}
         <div className="flex items-center gap-3">
@@ -47,8 +48,14 @@ export default function HeaderMovil({ enlaces }: Props) {
             <a 
               key={enlace.ruta} 
               href={enlace.ruta} 
-              className="relative text-purple-100 hover:text-white text-base lg:text-lg font-medium transition-colors duration-300 group"
-            >
+              className="relative
+                font-roboto-serif
+                font-normal
+                not-italic
+                text-purple-100
+                hover:text-white
+                transition-colors duration-300
+                group">
               {enlace.nombre}
               <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-purple-300 transition-all duration-300 group-hover:w-full rounded-full"></span>
             </a>

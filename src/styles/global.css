@@ -1,16 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,400;1,8..144,400&display=swap');
 @import "tailwindcss";
 
+
 @theme {
+  --font-roboto-serif: "Roboto Serif", serif;
+
+  --color-primary: #472d82;
+  --color-second: #695da9;
+
   --animate-zoomIn: zoomIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   --animate-fadeIn: fadeIn 0.3s ease-out forwards;
-  
+
   @keyframes zoomIn {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+      transform: scale(0.9);
+      opacity: 0;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
-  
+
   @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
   }
+}
+
+.text-regular {
+  font-family: var(--font-roboto-serif);
+  font-weight: 400;
+  font-style: normal;
+}
+
+.text-italic {
+  font-family: var(--font-roboto-serif);
+  font-weight: 400;
+  font-style: italic;
 }
