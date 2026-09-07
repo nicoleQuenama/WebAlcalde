@@ -1,0 +1,338 @@
+/*  VARIABLES DEL LIBRO  */
+:global(:root) {
+  --page-padding: 28px;
+  --book-text-scale: 1;
+}
+
+/* Tamaño de letra del libro: 0 = Normal, 1 = Grande, 2 = Muy grande */
+[data-textsize='1'] {
+  --book-text-scale: 1.25;
+}
+
+[data-textsize='2'] {
+  --book-text-scale: 1.55;
+}
+
+/*  PÁGINAS  */
+.page {
+  background: var(--paper);
+  border-radius: 4px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.06),
+    transparent 8%,
+    transparent 92%,
+    rgba(0, 0, 0, 0.08)
+  );
+  pointer-events: none;
+}
+
+.pageInner {
+  height: 100%;
+  padding: var(--page-padding);
+  padding-top: 36px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Los títulos deben conservar sus nombres originales (sin hash):
+   <FlipBook /> los detecta textualmente para auto-generar el índice. */
+:global(.page-title) {
+  font-size: calc(1.3rem * var(--book-text-scale, 1));
+  color: var(--ink);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 8px;
+}
+
+.pageText {
+  font-size: calc(0.95rem * var(--book-text-scale, 1));
+  line-height: 1.6;
+  color: #444;
+}
+
+.caption {
+  font-size: calc(0.8rem * var(--book-text-scale, 1));
+  color: #888;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.caption code {
+  background: #eee;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: calc(0.75rem * var(--book-text-scale, 1));
+}
+
+/*  IMÁGENES: layouts flexibles dentro del libro  */
+.mediaFeature img,
+.mediaRow img,
+.mediaStrip img,
+.mediaInline img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.mediaFeature {
+  margin: 0;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+}
+
+.mediaStrip {
+  display: flex;
+  gap: 10px;
+}
+
+.mediaStrip figure {
+  flex: 1;
+  margin: 0;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.mediaRow {
+  display: flex;
+  gap: 10px;
+}
+
+.mediaRow figure {
+  flex: 1;
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.mediaRow figure.figureWider {
+  flex: 1.7;
+}
+
+.mediaInline {
+  margin: 0.5rem 0 0;
+  width: 46%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+}
+
+/* todo contenedor marcado con data-expand es clicable */
+[data-expand] {
+  cursor: zoom-in;
+  position: relative;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease, filter 0.22s ease;
+}
+
+[data-expand]:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+[data-expand][data-video] {
+  cursor: pointer;
+}
+
+/*  VIDEO  */
+.videoFrame {
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+}
+
+.videoPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.playIcon {
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+/*  PORTADA (tapa dura)  */
+.cover,
+.backCover {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.12), transparent 50%),
+    linear-gradient(145deg, #2a2a4a 0%, #1c1c38 55%, #12122a 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #fff;
+  padding: var(--page-padding);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.coverImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.coverColor {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 26, 0.2) 0%,
+    rgba(10, 10, 26, 0.35) 55%,
+    rgba(10, 10, 26, 0.72) 100%
+  );
+}
+
+.coverContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.coverBadge {
+  align-self: flex-start;
+  background: var(--accent);
+  color: #222;
+  font-size: calc(0.7rem * var(--book-text-scale, 1));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+:global(.cover-title) {
+  font-size: calc(2rem * var(--book-text-scale, 1));
+  line-height: 1.15;
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.coverSubtitle {
+  color: #c9c9e8;
+  font-size: calc(1rem * var(--book-text-scale, 1));
+  letter-spacing: 0.5px;
+}
+
+.coverShine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.08) 40%,
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+/*  CONTRAPORTADA (tapa dura)  */
+.backCoverContent {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+:global(.back-title) {
+  font-size: calc(1.6rem * var(--book-text-scale, 1));
+  color: var(--accent);
+}
+
+.backText {
+  color: #c9c9e8;
+  font-size: calc(1rem * var(--book-text-scale, 1));
+}
+
+/*  RESPONSIVE: la librería maneja 2 páginas / 1 página  */
+@media (max-width: 640px) {
+  :global(.cover-title) {
+    font-size: calc(1.5rem * var(--book-text-scale, 1));
+  }
+
+  .pageInner {
+    padding: 20px;
+    padding-top: 28px;
+  }
+}
+
+/*  REVEAL: animación de entrada del contenido por página  */
+:global(.stf__item) [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.45s ease var(--delay, 0s),
+    transform 0.45s ease var(--delay, 0s);
+}
+
+:global(.stf__item) [data-reveal='left'] {
+  transform: translateX(-18px);
+}
+
+:global(.stf__item) [data-reveal='right'] {
+  transform: translateX(18px);
+}
+
+:global(.stf__item) [data-reveal='zoom'] {
+  transform: scale(0.92);
+}
+
+:global(.stf__item)[data-page-shown] [data-reveal],
+:global(.stf__item)[data-page-shown] [data-reveal='left'],
+:global(.stf__item)[data-page-shown] [data-reveal='right'],
+:global(.stf__item)[data-page-shown] [data-reveal='zoom'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.stf__item) [data-reveal] {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}

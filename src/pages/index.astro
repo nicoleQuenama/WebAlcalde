@@ -1,8 +1,143 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import HeroSobre from '../components/Hero/HeroSobre.astro';
+import FlipBook from '../components/FlipBook/FlipBook';
+import Book from '../components/Book/Book';
+import ImageSlider from '../components/ImageSlider/ImageSlider';
+import ValueCards from '../components/ValueCards/ValueCards';
+import CableCarScroll from '../components/Teleferico/CableCarScroll';
+import Preloader from '../components/Preloader/Preloader.astro';
+
+const ALCALDE =
+  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.1%20Fotograf%C3%ADas%20del%20alcalde/';
+const GENTE =
+  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
+const VIDEOS = '/Mas%20Recursos/3.%20Otros%20recursos/';
+
+const fotos = {
+  alcalde1: ALCALDE + 'DSC_0790.jpg',
+  alcalde2: ALCALDE + 'DSC_0802.jpg',
+  alcalde3: ALCALDE + '6P9A0583.jpg',
+  alcalde4: ALCALDE + 'IMG_0643.jpg',
+  alcalde5: ALCALDE + 'DSC_0807.jpg',
+  gente1: GENTE + '6P9A5493.jpg',
+  gente2: GENTE + 'IMG_5001.jpg',
+  gente3: GENTE + 'IMG_7166.jpg',
+  gente4: GENTE + 'IMG_1215.jpg',
+  gente5: GENTE + 'IMG_2941.jpg',
+};
+
+const videos = {
+  playa: VIDEOS + '01%20PLAYA%20TURQUESA.mp4',
+  laguna: VIDEOS + '02%20LAGUNA%20ALALAY.mp4',
+  terminal: VIDEOS + '03%20ACCESOS%20NUEVA%20TERMINAL%20DE%20BUSES.mp4',
+  fexco: VIDEOS + '04%20FEXCO%20ARENA.mp4',
+  permiso: VIDEOS + '05%20PERMISO%20DE%20VIAJE%20DIGITAL.mp4',
+  market: VIDEOS + '06%20COCHA%20MARKET.mp4',
+  vet: VIDEOS + '07%20CL%C3%8DNICA%20VETERINARIA%20MUNICIPAL.mp4',
+};
+
+const alcalde = [
+  { src: fotos.alcalde1, alt: 'El alcalde de Cochabamba' },
+  { src: fotos.alcalde2, alt: 'El alcalde' },
+  { src: fotos.alcalde3, alt: 'Alcalde' },
+  { src: fotos.alcalde4, alt: 'Alcalde' },
+];
+
+const gente = [
+  { src: fotos.gente1, alt: 'Con la comunidad' },
+  { src: fotos.gente2, alt: 'Con la comunidad' },
+  { src: fotos.gente3, alt: 'Con la comunidad' },
+  { src: fotos.gente4, alt: 'Con la comunidad' },
+  { src: fotos.gente5, alt: 'Con la comunidad' },
+];
+
+const videoList = [
+  { src: videos.playa, alt: 'Playa Turquesa' },
+  { src: videos.laguna, alt: 'Laguna Alalay' },
+  { src: videos.terminal, alt: 'Accesos nueva terminal de buses' },
+  { src: videos.fexco, alt: 'FEXCO Arena' },
+  { src: videos.market, alt: 'Cocha Market' },
+  { src: videos.vet, alt: 'Clínica Veterinaria Municipal' },
+  { src: videos.permiso, alt: 'Permiso de Viaje Digital' },
+];
 ---
 
 <Layout title="Inicio">
 	<HeroSobre />
+
+	<Preloader />
+
+	<section class="w-full max-w-5xl mx-auto px-4 py-16 flex flex-col gap-10">
+
+		<FlipBook
+			client:idle
+			width={350}
+			height={560}
+			eyebrow="Conozca más con el libro digital"
+			title="Cochabamba: Ciudad Tecnológica"
+			subtitle="Explora las obras, servicios y gestiones de la ciudad página por página: fotos, videos y más."
+			ctaLabel="Abrir libro"
+			coverImage="/cocha.jpg"
+			toc={[
+				{
+					title: 'Inicio',
+					items: [
+						{ label: 'Portada', page: 0 },
+						{ label: 'Introducción', page: 1 },
+					],
+				},
+				{
+					title: 'Nuestra ciudad',
+					items: [
+						{ label: 'El Alcalde', page: 2 },
+						{ label: 'Con la Gente', page: 3 },
+					],
+				},
+				{
+					title: 'Obras y servicios',
+					items: [
+						{ label: 'Playa Turquesa', page: 4 },
+						{ label: 'Laguna Alalay', page: 5 },
+						{ label: 'Nueva Infraestructura', page: 6 },
+						{ label: 'FEXCO Arena', page: 7 },
+						{ label: 'Cocha Market', page: 8 },
+						{ label: 'Clínica Veterinaria', page: 9 },
+						{ label: 'Permiso de Viaje Digital', page: 10 },
+					],
+				},
+				{
+					title: 'Cierre',
+					items: [{ label: 'Contraportada', page: 11 }],
+				},
+			]}
+		>
+			<Book
+				coverImage="/cocha.jpg"
+				alcalde={alcalde}
+				gente={gente}
+				videos={videoList}
+			/>
+		</FlipBook>
+
+		<section class="mt-4">
+			<header class="text-left">
+				<h2 class="text-2xl font-bold tracking-wide text-white">La ciudad en transformación</h2>
+				<p class="mt-1 text-slate-400">Desliza para comparar el antes y el después.</p>
+			</header>
+			<ImageSlider
+				client:visible
+				beforeImage={fotos.alcalde1}
+				afterImage={fotos.alcalde2}
+				beforeLabel="Antes"
+				afterLabel="Después"
+			/>
+		</section>
+
+		<section class="mt-4">
+			<ValueCards client:visible />
+		</section>
+	</section>
+
+	<CableCarScroll client:visible />
 </Layout>
