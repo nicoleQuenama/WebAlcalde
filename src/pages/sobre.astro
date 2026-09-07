@@ -1,72 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import HeroSobre from '../components/Hero/HeroSobre.astro';
-import ImageSlider from '../components/ImageSlider/ImageSlider';
-import ValueCards from '../components/ValueCards/ValueCards';
-
-// Rutas base para los archivos multimedia
-const ALCALDE = '/multimedia/';
-const GENTE = '/multimedia/';
-const VIDEOS = '/multimedia/';
-
-const fotos = {
-  alcalde1: ALCALDE + 'DSC_0790.jpg',
-  alcalde2: ALCALDE + 'DSC_0802.jpg',
-  alcalde3: ALCALDE + '6P9A0583.jpg',
-  alcalde4: ALCALDE + 'IMG_0643.jpg',
-  alcalde5: ALCALDE + 'DSC_0807.jpg',
-  gente1: GENTE + '6P9A5493.jpg',
-  gente2: GENTE + 'IMG_5001.jpg',
-  gente3: GENTE + 'IMG_7166.jpg',
-  gente4: GENTE + 'IMG_1215.jpg',
-  gente5: GENTE + 'IMG_2941.jpg',
-};
-
-const videos = {
-  playa: VIDEOS + '01%20PLAYA%20TURQUESA.mp4',
-  laguna: VIDEOS + '02%20LAGUNA%20ALALAY.mp4',
-  terminal: VIDEOS + '03%20ACCESOS%20NUEVA%20TERMINAL%20DE%20BUSES.mp4',
-  fexco: VIDEOS + '04%20FEXCO%20ARENA.mp4',
-  permiso: VIDEOS + '05%20PERMISO%20DE%20VIAJE%20DIGITAL.mp4',
-  market: VIDEOS + '06%20COCHA%20MARKET.mp4',
-  vet: VIDEOS + '07%20CL%C3%8DNICA%20VETERINARIA%20MUNICIPAL.mp4',
-};
-
-const alcalde = [
-  { src: fotos.alcalde1, alt: 'El alcalde de Cochabamba' },
-  { src: fotos.alcalde2, alt: 'El alcalde' },
-  { src: fotos.alcalde3, alt: 'Alcalde' },
-  { src: fotos.alcalde4, alt: 'Alcalde' },
-];
-
-const gente = [
-  { src: fotos.gente1, alt: 'Con la comunidad' },
-  { src: fotos.gente2, alt: 'Con la comunidad' },
-  { src: fotos.gente3, alt: 'Con la comunidad' },
-  { src: fotos.gente4, alt: 'Con la comunidad' },
-  { src: fotos.gente5, alt: 'Con la comunidad' },
-];
+import LineaTiempo from '../components/Historia/LineaTiempo.astro';
 ---
-
-<Layout title="Sobre">
+<Layout title="Sobre - Manfred Reyes Villa">
     <main>
-        <HeroSobre />
+        <HeroSobre/>
+        <LineaTiempo />
     </main>
-      <section class="mt-4 max-w-7xl mx-auto px-6 lg:px-12 py-10">
-        <ValueCards client:visible />
-    </section>
-
-    <section class="mt-4 max-w-7xl mx-auto px-6 lg:px-12 py-10">
-        <header class="text-left mb-6">
-            <h2 class="text-2xl font-bold tracking-wide text-white">La ciudad en transformación</h2>
-            <p class="mt-1 text-slate-400">Desliza para comparar el antes y el después.</p>
-        </header>
-        <ImageSlider
-            client:visible
-            beforeImage={fotos.alcalde1}
-            afterImage={fotos.alcalde2}
-            beforeLabel="Antes"
-            afterLabel="Después"
-        />
-    </section>
 </Layout>
