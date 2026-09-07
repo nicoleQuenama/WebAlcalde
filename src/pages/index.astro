@@ -64,8 +64,6 @@ const videoList = [
 ---
 
 <Layout title="Inicio">
-	<HeroSobre />
-
 	<Preloader />
 
 	<section class="w-full max-w-5xl mx-auto px-4 py-16 flex flex-col gap-10">
@@ -119,24 +117,6 @@ const videoList = [
 				videos={videoList}
 			/>
 		</FlipBook>
-
-		<section class="mt-4">
-			<header class="text-left">
-				<h2 class="text-2xl font-bold tracking-wide text-white">La ciudad en transformación</h2>
-				<p class="mt-1 text-slate-400">Desliza para comparar el antes y el después.</p>
-			</header>
-			<ImageSlider
-				client:visible
-				beforeImage={fotos.alcalde1}
-				afterImage={fotos.alcalde2}
-				beforeLabel="Antes"
-				afterLabel="Después"
-			/>
-		</section>
-
-		<section class="mt-4">
-			<ValueCards client:visible />
-		</section>
 	</section>
 
 	<CableCarScroll client:visible />
