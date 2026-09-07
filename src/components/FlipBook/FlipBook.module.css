@@ -32,7 +32,7 @@
   }
 }
 
-/* ---------- RECUADRO (stage) ---------- */
+/* RECUADRO (stage) */
 .stage {
   position: relative;
   width: 100%;
@@ -55,7 +55,7 @@
   pointer-events: none;
 }
 
-/* ---------- Lado izquierdo: texto + botÃ³n ---------- */
+/* Lado izquierdo: texto + boton */
 .hero {
   flex: 0 1 40%;
   min-width: 0;
@@ -82,7 +82,7 @@
   font-size: clamp(1.7rem, 3vw, 2.5rem);
   font-weight: 800;
   line-height: 1.08;
-  color: #fff;
+  color: var(--color-primary);
   letter-spacing: -0.5px;
 }
 
@@ -136,7 +136,7 @@
   transform: translateX(4px);
 }
 
-/* ---------- Lado derecho: espacio donde vive la portada 3D ---------- */
+/* Lado derecho: espacio donde vive la portada 3D */
 .closedSlot {
   flex: 1 1 58%;
   min-width: 0;
@@ -145,12 +145,12 @@
   align-items: center;
 }
 
-/* ---------- Overlay: fondo ---------- */
+/* Overlay: fondo */
 .overlayBg {
   position: fixed;
   inset: 0;
   z-index: 900;
-  background: rgba(8, 8, 18, 0.82);
+  background: rgba(44, 21, 64, 0.82);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   animation: overlayFadeIn 0.3s ease both;
@@ -160,7 +160,6 @@
   animation: overlayFadeOut 0.3s ease both;
 }
 
-/* ---------- Wrapper animado del libro (posición manejada por JS) ---------- */
 .animWrapper {
   position: fixed;
   top: 0;
@@ -174,8 +173,6 @@
   transform-origin: top left;
 }
 
-/* OPENING + CLOSING: transition on â‡ resumida por JS en `animateBetween`.
-   La duraciÃ³n / easing se define aquÃ­ vÃ­a CSS. */
 .animWrapper,
 .animInner {
   will-change: left, top, width, height, transform;
@@ -190,7 +187,7 @@
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ---------- BotÃ³n de cierre (X) ---------- */
+/* BotÃ³n de cierre (X) */
 .closeBtn {
   position: fixed;
   top: 18px;
@@ -221,7 +218,7 @@
   transform: scale(1.08) rotate(90deg);
 }
 
-/* ---------- Visor de media (imagen / video) en el mismo overlay ---------- */
+/* Visor de media (imagen / video) en el mismo overlay */
 .mediaOverlay {
   position: fixed;
   inset: 0;
@@ -346,7 +343,7 @@
   animation: hintFadeIn 0.4s ease 0.15s both;
 }
 
-/* ---------- Placeholder del libro durante el zoom de apertura ---------- */
+/* Placeholder del libro durante el zoom de apertura */
 .bookGhost {
   width: 100%;
   height: 100%;
@@ -368,7 +365,7 @@
   }
 }
 
-/* ---------- Slider de páginas: línea fina que se expande al hover ---------- */
+/* Slider de páginas: línea fina que se expande al hover */
 .scrubWrap {
   position: fixed;
   left: 0;
@@ -473,7 +470,7 @@
   outline-offset: 4px;
 }
 
-/* ---------- Tamaño de letra: slider ocultable (arriba-izquierda) ---------- */
+/* Tamaño de letra: slider ocultable (arriba-izquierda) */
 .fontWrap {
   position: fixed;
   top: 18px;
@@ -616,7 +613,7 @@
   }
 }
 
-/* ---------- Responsive ---------- */
+/* Responsive */
 @media (max-width: 900px) {
   .stage {
     gap: 1.5rem;

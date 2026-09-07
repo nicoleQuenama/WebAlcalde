@@ -19,6 +19,7 @@
   border-radius: 4px;
   overflow: hidden;
   height: 100%;
+  font-family: var(--font-roboto-serif);
 }
 
 /* Sombreado mínimo del pliegue (necesario para que se lea como libro). */
@@ -279,6 +280,7 @@
   position: relative;
   overflow: hidden;
   height: 100%;
+  font-family: var(--font-roboto-serif);
 }
 
 .coverImg {

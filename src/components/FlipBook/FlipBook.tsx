@@ -742,9 +742,6 @@ export default function FlipBook({
           {subtitle ? <p className={styles.heroText}>{subtitle}</p> : null}
           <button type="button" className={styles.cta} onClick={open}>
             {ctaLabel}
-            <span className={styles.ctaArrow} aria-hidden="true">
-              →
-            </span>
           </button>
         </div>
 
@@ -836,7 +833,7 @@ export default function FlipBook({
                     </div>
                   ) : (
                     <div className={styles.mediaPlaceholder}>
-                      <span className={styles.mediaIcon}>🖼</span>
+                      <span className={styles.mediaIcon}>a</span>
                       <span>{mediaMode.alt || 'Imagen'}</span>
                     </div>
                   )
