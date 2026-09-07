@@ -1,51 +1,49 @@
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap');
 
-/* 1. Animación Máquina de Escribir ("Conoce más de") */
-.typewriter-text {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  border-right: 4px solid #d8b4fe;
+/*texto 1 animacion */
+.typewriter-1 {
   width: 0;
-  /* Animación más lenta (2.5s) */
-  animation: typing-conoce 2.5s steps(15, end) forwards, blink 0.8s step-end infinite;
+  border-right: 3px solid #d8b4fe;
+  animation: 
+    typing 1.5s steps(20, end) forwards, 
+    blink-stop 0.75s step-end 2 forwards;
 }
 
-/* 2. Animación Escritura a Mano ("Manfred Reyes Villa") */
-.handwriting-text {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
+/*texto 2 animacion*/
+.typewriter-2 {
   width: 0;
-  /* Comienza 2.5s después de la primera */
-  animation: typing-manfred 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) 2.5s forwards;
+  border-right: 3px solid transparent;
+  animation: 
+    typing 2s steps(25, end) 1.5s forwards, 
+    blink-infinite 0.8s step-end 1.5s infinite;
 }
 
-/* 3. Aparición de la cita (flotando hacia arriba) */
-.fade-up-delay {
+/* texto 3 animacion*/
+.fade-right-delay {
   opacity: 0;
-  transform: translateY(20px);
-  /* Aparece 5.5s después de que cargó todo */
-  animation: fadeUp 1.5s ease-out 5.5s forwards;
+  transform: translateX(-30px);
+  animation: fadeRight 1s ease-out 3.5s forwards;
 }
 
-/* === DEFINICIÓN DE MOVIMIENTOS === */
-
-/* El uso de 'ch' permite revelar el texto letra por letra de forma perfecta */
-@keyframes typing-conoce {
-  to { width: 14ch; } 
+/* === KEYFRAMES === */
+@keyframes typing {
+  0% { width: 0; }
+  100% { width: 100%; }
 }
 
-@keyframes typing-manfred {
-  to { width: 20ch; } 
+/* Cursor*/
+@keyframes blink-stop {
+  0% { border-color: transparent; }
+  50% { border-color: #d8b4fe; }
+  100% { border-color: transparent; }
 }
 
-@keyframes blink {
-  from, to { border-color: transparent; }
+/* Cursor 2*/
+@keyframes blink-infinite {
+  0%, 100% { border-color: transparent; }
   50% { border-color: #d8b4fe; }
 }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes fadeRight {
+  0% { opacity: 0; transform: translateX(-30px); }
+  100% { opacity: 1; transform: translateX(0); }
 }
