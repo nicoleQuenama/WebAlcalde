@@ -1,27 +1,31 @@
 {
-  "name": "pruebita-componentes",
+  "name": "componentesalcalde",
   "type": "module",
-  "version": "1.0.0",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "astro dev",
-    "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "^4.3.0",
-    "@react-three/fiber": "^8.18.0",
-    "@types/three": "^0.185.4",
-    "astro": "^5.12.0",
+    "@astrojs/react": "^6.0.5",
+    "@react-three/fiber": "^9.0.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "astro": "^7.3.1",
     "gsap": "^3.15.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "react-pageflip": "^2.0.3",
+    "tailwindcss": "^4.3.3",
     "three": "^0.185.1"
   },
-  "devDependencies": {
-    "@types/react": "^18.3.0",
-    "@types/react-dom": "^18.3.0",
-    "typescript": "^5.8.0"
+  "allowScripts": {
+    "esbuild": true
   }
 }

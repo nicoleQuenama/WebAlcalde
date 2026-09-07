@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap');
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.hero-sobre {
+  position: relative;
+  width: 100%;
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* --- FONDO DESENFOCADO --- */
+.hero-sobre-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=2070');
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px);
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+.hero-sobre-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 30, 60, 0.6);
+  z-index: 2;
+}
+
+/* --- CONTENIDO --- */
+.hero-sobre-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+/* Forzamos que en pantallas grandes (desktop) sean 2 columnas:
+   La 1ra columna (cartas) a la izquierda, la 2da columna (texto) a la derecha */
+@media (min-width: 768px) {
+  .hero-sobre-content {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* --- TEXTOS (Lado Derecho) --- */
+.texto-pequeno {
+  color: #e2e8f0;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+}
+
+.texto-nombre {
+  font-family: 'Dancing Script', cursive;
+  font-size: 4.5rem;
+  line-height: 1.1;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  text-shadow: 2px 4px 10px rgba(0,0,0,0.3);
+}
+
+.texto-frase {
+  color: #cbd5e1;
+  font-size: 1.25rem;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* --- CARDS ANIMADAS (Lado Izquierdo) --- */
+.cards-container {
+  position: relative;
+  height: 500px; /* Ajustado para las cartas más grandes */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  position: absolute;
+  /* --- CARTAS MÁS GRANDES --- */
+  width: 240px;
+  height: 350px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  background-size: cover;
+  background-position: center;
+}
+
+/* Ajustamos los movimientos (translateX y translateY) porque las cartas son más grandes */
+.card-izquierda {
+  transform: rotate(-15deg) translateX(-80px);
+  z-index: 1;
+  animation: flotarIzquierda 6s ease-in-out infinite;
+}
+
+.card-centro {
+  transform: rotate(0deg) translateY(-30px);
+  z-index: 3;
+  animation: flotarCentro 5s ease-in-out infinite;
+}
+
+.card-derecha {
+  transform: rotate(15deg) translateX(80px);
+  z-index: 2;
+  animation: flotarDerecha 7s ease-in-out infinite;
+}
+
+@keyframes flotarIzquierda {
+  0%, 100% { transform: rotate(-15deg) translateX(-80px) translateY(0); }
+  50% { transform: rotate(-15deg) translateX(-80px) translateY(-15px); }
+}
+@keyframes flotarCentro {
+  0%, 100% { transform: rotate(0deg) translateY(-30px); }
+  50% { transform: rotate(0deg) translateY(5px); }
+}
+@keyframes flotarDerecha {
+  0%, 100% { transform: rotate(15deg) translateX(80px) translateY(0); }
+  50% { transform: rotate(15deg) translateX(80px) translateY(-20px); }
+}
+/* 1. Animación Máquina de Escribir (Pasos precisos) */
+.typewriter-text {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 3px solid #d8b4fe; /* Cursor morado brillante */
+  width: 0;
+  /* Dura 1.5s en 20 pasos. El cursor parpadea infinito */
+  animation: typing 1.5s steps(20, end) forwards, blink 0.8s step-end infinite;
+}
+
+/* 2. Animación Escritura a Mano (Deslizamiento Fluido) */
+.handwriting-text {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  /* Comienza 1.2s después (cuando la máquina de escribir termina) */
+  animation: smoothTyping 2s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
+}
+
+/* 3. Aparición de la cita (Flota hacia arriba) */
+.fade-up-delay {
+  opacity: 0;
+  transform: translateY(20px);
+  /* Aparece 3 segundos después de que cargó todo */
+  animation: fadeUp 1s ease-out 3s forwards;
+}
+
+/* Definición de los Keyframes */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes smoothTyping {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: #d8b4fe; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
