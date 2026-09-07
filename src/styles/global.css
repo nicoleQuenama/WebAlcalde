@@ -1,0 +1,477 @@
+/* ============================================================
+   Estilos base de la librería page-flip (stPageFlip.css)
+   page-flip@2.0.7 no incluye este CSS en su dist, se agrega aquí.
+   ============================================================ */
+.stf__parent {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  transform: translateZ(0);
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+}
+
+.stf__wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stf__parent canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+.stf__block {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  perspective: 2000px;
+}
+
+.stf__item {
+  display: none;
+  position: absolute;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+}
+
+.stf__item img {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+.stf__outerShadow,
+.stf__innerShadow,
+.stf__hardShadow,
+.stf__hardInnerShadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* ============================================================
+   Estilos del proyecto
+   ============================================================ */
+:root {
+  --ink: #1a1a2e;
+  --paper: #fdfaf5;
+  --accent: #c9a96e;
+  --page-padding: 28px;
+  --book-text-scale: 1;
+}
+
+/* Tamaño de letra del libro: 0 = Normal, 1 = Grande, 2 = Muy grande */
+[data-textsize='1'] {
+  --book-text-scale: 1.25;
+}
+
+[data-textsize='2'] {
+  --book-text-scale: 1.55;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #12121c;
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+.app {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  gap: 2rem;
+}
+
+.header {
+  width: 100%;
+  max-width: 960px;
+  text-align: left;
+  color: #e8e8f0;
+}
+
+.header h1 {
+  font-size: 2rem;
+  letter-spacing: 0.5px;
+}
+
+.header p {
+  color: #9a9ab0;
+  margin-top: 0.4rem;
+}
+
+/* ---------- PÁGINAS ---------- */
+.page {
+  background: var(--paper);
+  border-radius: 4px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.06),
+    transparent 8%,
+    transparent 92%,
+    rgba(0, 0, 0, 0.08)
+  );
+  pointer-events: none;
+}
+
+.page-inner {
+  height: 100%;
+  padding: var(--page-padding);
+  padding-top: 36px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.page-title {
+  font-size: calc(1.3rem * var(--book-text-scale, 1));
+  color: var(--ink);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 8px;
+}
+
+.page-text {
+  font-size: calc(0.95rem * var(--book-text-scale, 1));
+  line-height: 1.6;
+  color: #444;
+}
+
+.caption {
+  font-size: calc(0.8rem * var(--book-text-scale, 1));
+  color: #888;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.caption code {
+  background: #eee;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: calc(0.75rem * var(--book-text-scale, 1));
+}
+
+/* ---------- IMÁGENES: layouts flexibles dentro del libro ---------- */
+.media-feature img,
+.media-row img,
+.media-strip img,
+.media-inline img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.media-feature {
+  margin: 0;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+}
+
+.media-strip {
+  display: flex;
+  gap: 10px;
+}
+
+.media-strip figure {
+  flex: 1;
+  margin: 0;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.media-row {
+  display: flex;
+  gap: 10px;
+}
+
+.media-row figure {
+  flex: 1;
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.media-row figure.wider {
+  flex: 1.7;
+}
+
+.media-inline {
+  margin: 0.5rem 0 0;
+  width: 46%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+}
+
+/* todo contenedor marcado con data-expand es clicable */
+[data-expand] {
+  cursor: zoom-in;
+  position: relative;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease, filter 0.22s ease;
+}
+
+[data-expand]:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+[data-expand][data-video] {
+  cursor: pointer;
+}
+
+/* ---------- VIDEO ---------- */
+.video-frame {
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
+}
+
+.video-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.play-icon {
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+/* ---------- PORTADA (tapa dura) ---------- */
+.cover,
+.back-cover {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.12), transparent 50%),
+    linear-gradient(145deg, #2a2a4a 0%, #1c1c38 55%, #12122a 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #fff;
+  padding: var(--page-padding);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-color {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 26, 0.2) 0%,
+    rgba(10, 10, 26, 0.35) 55%,
+    rgba(10, 10, 26, 0.72) 100%
+  );
+}
+
+.cover-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cover-badge {
+  align-self: flex-start;
+  background: var(--accent);
+  color: #222;
+  font-size: calc(0.7rem * var(--book-text-scale, 1));
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.cover-title {
+  font-size: calc(2rem * var(--book-text-scale, 1));
+  line-height: 1.15;
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.cover-subtitle {
+  color: #c9c9e8;
+  font-size: calc(1rem * var(--book-text-scale, 1));
+  letter-spacing: 0.5px;
+}
+
+.cover-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.08) 40%,
+    transparent 55%
+  );
+  pointer-events: none;
+}
+
+/* ---------- CONTRAPORTADA (tapa dura) ---------- */
+.back-cover-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.back-title {
+  font-size: calc(1.6rem * var(--book-text-scale, 1));
+  color: var(--accent);
+}
+
+.back-text {
+  color: #c9c9e8;
+  font-size: calc(1rem * var(--book-text-scale, 1));
+}
+
+/* ---------- DEMO: comparación antes/después ---------- */
+.demo-section {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.demo-header {
+  color: #e8e8f0;
+}
+
+.demo-header h2 {
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
+.demo-header p {
+  color: #9a9ab0;
+  margin-top: 0.4rem;
+  font-size: 0.95rem;
+}
+
+/* ---------- RESPONSIVE: la librería maneja 2 páginas / 1 página ---------- */
+@media (max-width: 640px) {
+  .app {
+    padding: 1rem 0.5rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .cover-title {
+    font-size: calc(1.5rem * var(--book-text-scale, 1));
+  }
+
+  .page-inner {
+    padding: 20px;
+    padding-top: 28px;
+  }
+}
+
+/* ---------- REVEAL: animación de entrada del contenido por página ---------- */
+/* El contenido lleva [data-reveal]; FlipBook marca cada página visible con
+   [data-page-shown] al inicializar y al voltear. Variantes opcionales. */
+.stf__item [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.45s ease var(--delay, 0s),
+    transform 0.45s ease var(--delay, 0s);
+}
+
+.stf__item [data-reveal='left'] {
+  transform: translateX(-18px);
+}
+
+.stf__item [data-reveal='right'] {
+  transform: translateX(18px);
+}
+
+.stf__item [data-reveal='zoom'] {
+  transform: scale(0.92);
+}
+
+.stf__item[data-page-shown] [data-reveal],
+.stf__item[data-page-shown] [data-reveal='left'],
+.stf__item[data-page-shown] [data-reveal='right'],
+.stf__item[data-page-shown] [data-reveal='zoom'] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stf__item [data-reveal] {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}

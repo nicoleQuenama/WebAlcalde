@@ -1,0 +1,398 @@
+---
+import FlipBook from '../components/FlipBook/FlipBook';
+import ImageSlider from '../components/ImageSlider/ImageSlider';
+import ValueCards from '../components/ValueCards/ValueCards';
+import CableCarScroll from '../components/CableCarScroll/CableCarScroll';
+import Preloader from '../components/Preloader/Preloader.astro';
+import '../styles/global.css';
+
+const ALCALDE =
+  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.1%20Fotograf%C3%ADas%20del%20alcalde/';
+const GENTE =
+  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
+const VIDEOS = '/Mas%20Recursos/3.%20Otros%20recursos/';
+
+const fotos = {
+  alcalde1: ALCALDE + 'DSC_0790.jpg',
+  alcalde2: ALCALDE + 'DSC_0802.jpg',
+  alcalde3: ALCALDE + '6P9A0583.jpg',
+  alcalde4: ALCALDE + 'IMG_0643.jpg',
+  alcalde5: ALCALDE + 'DSC_0807.jpg',
+  gente1: GENTE + '6P9A5493.jpg',
+  gente2: GENTE + 'IMG_5001.jpg',
+  gente3: GENTE + 'IMG_7166.jpg',
+  gente4: GENTE + 'IMG_1215.jpg',
+  gente5: GENTE + 'IMG_2941.jpg',
+};
+
+const videos = {
+  playa: VIDEOS + '01%20PLAYA%20TURQUESA.mp4',
+  laguna: VIDEOS + '02%20LAGUNA%20ALALAY.mp4',
+  terminal: VIDEOS + '03%20ACCESOS%20NUEVA%20TERMINAL%20DE%20BUSES.mp4',
+  fexco: VIDEOS + '04%20FEXCO%20ARENA.mp4',
+  permiso: VIDEOS + '05%20PERMISO%20DE%20VIAJE%20DIGITAL.mp4',
+  market: VIDEOS + '06%20COCHA%20MARKET.mp4',
+  vet: VIDEOS + '07%20CL%C3%8DNICA%20VETERINARIA%20MUNICIPAL.mp4',
+};
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cochabamba: Ciudad Tecnológica</title>
+  </head>
+  <body>
+    <Preloader />
+
+    <main class="app">
+      <header class="header">
+        <h1>Cochabamba</h1>
+        <p>Ciudad Tecnológica</p>
+      </header>
+
+      <FlipBook
+        client:idle
+        width={350}
+        height={560}
+        eyebrow="Manual"
+        title="Cochabamba: Ciudad Tecnológica"
+        subtitle="Explora las obras, servicios y gestiones de la ciudad página por página: fotos, videos y más."
+        ctaLabel="Abrir libro"
+        coverImage="/cocha.jpg"
+        toc={[
+          {
+            title: 'Inicio',
+            items: [
+              { label: 'Portada', page: 0 },
+              { label: 'Introducción', page: 1 },
+            ],
+          },
+          {
+            title: 'Nuestra ciudad',
+            items: [
+              { label: 'El Alcalde', page: 2 },
+              { label: 'Con la Gente', page: 3 },
+            ],
+          },
+          {
+            title: 'Obras y servicios',
+            items: [
+              { label: 'Playa Turquesa', page: 4 },
+              { label: 'Laguna Alalay', page: 5 },
+              { label: 'Nueva Infraestructura', page: 6 },
+              { label: 'FEXCO Arena', page: 7 },
+              { label: 'Cocha Market', page: 8 },
+              { label: 'Clínica Veterinaria', page: 9 },
+              { label: 'Permiso de Viaje Digital', page: 10 },
+            ],
+          },
+          {
+            title: 'Cierre',
+            items: [{ label: 'Contraportada', page: 11 }],
+          },
+        ]}
+      >
+        {/* 1. PORTADA - Tapa dura */}
+        <div class="cover">
+          <img class="cover-img" src="/cocha.jpg" alt="Cochabamba, ciudad tecnológica" />
+          <div class="cover-color"></div>
+          <div class="cover-content">
+            <span class="cover-badge" data-reveal>Manual</span>
+            <h2 class="cover-title" data-reveal>Cochabamba<br />Ciudad Tecnológica</h2>
+            <p class="cover-subtitle" data-reveal>Obras, servicios y gestión 2026</p>
+          </div>
+          <div class="cover-shine"></div>
+        </div>
+
+        {/* 2. Página interior - Introducción */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>Introducción</h3>
+            <p class="page-text" data-reveal>
+              Manual interactivo de la ciudad de Cochabamba. Descubre obras de
+              infraestructura, servicios digitales y el trabajo del alcalde con
+              la comunidad.
+            </p>
+
+            <figure class="media-inline">
+              <img
+                data-expand
+                data-reveal="zoom"
+                data-url={fotos.alcalde1}
+                data-alt="El alcalde de Cochabamba"
+                src={fotos.alcalde1}
+                alt="El alcalde de Cochabamba"
+                loading="lazy"
+              />
+            </figure>
+
+            <p class="page-text" data-reveal>
+              Navega con las flechas del teclado, arrastra las esquinas o usa el
+              slider inferior. Toca cualquier imagen o video para verlo en
+              pantalla completa.
+            </p>
+          </div>
+        </div>
+
+        {/* 3. Página interior - El Alcalde */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>El Alcalde</h3>
+
+            <figure class="media-feature">
+              <img
+                data-expand
+                data-reveal="zoom"
+                data-url={fotos.alcalde2}
+                data-alt="El alcalde"
+                src={fotos.alcalde2}
+                alt="El alcalde"
+                loading="lazy"
+              />
+            </figure>
+
+            <div class="media-strip" data-reveal="left">
+              <figure data-expand data-url={fotos.alcalde3} data-alt="Alcalde">
+                <img src={fotos.alcalde3} alt="Alcalde" loading="lazy" />
+              </figure>
+              <figure data-expand data-url={fotos.alcalde4} data-alt="Alcalde">
+                <img src={fotos.alcalde4} alt="Alcalde" loading="lazy" />
+              </figure>
+            </div>
+
+            <p class="caption" data-reveal>
+              Toca cualquier imagen para verla en grande.
+            </p>
+          </div>
+        </div>
+
+        {/* 4. Página interior - El Alcalde con la Gente */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>Con la Gente</h3>
+
+            <div class="media-row" data-reveal="left">
+              <figure class="wider" data-expand data-url={fotos.gente1} data-alt="Con la comunidad">
+                <img src={fotos.gente1} alt="Con la comunidad" loading="lazy" />
+              </figure>
+              <figure data-expand data-url={fotos.gente2} data-alt="Con la comunidad">
+                <img src={fotos.gente2} alt="Con la comunidad" loading="lazy" />
+              </figure>
+            </div>
+
+            <div class="media-strip" data-reveal="right">
+              <figure data-expand data-url={fotos.gente3} data-alt="Con la comunidad">
+                <img src={fotos.gente3} alt="Con la comunidad" loading="lazy" />
+              </figure>
+              <figure data-expand data-url={fotos.gente4} data-alt="Con la comunidad">
+                <img src={fotos.gente4} alt="Con la comunidad" loading="lazy" />
+              </figure>
+              <figure data-expand data-url={fotos.gente5} data-alt="Con la comunidad">
+                <img src={fotos.gente5} alt="Con la comunidad" loading="lazy" />
+              </figure>
+            </div>
+
+            <p class="caption" data-reveal>
+              La gestión de cerca, junto a los vecinos.
+            </p>
+          </div>
+        </div>
+
+        {/* 5. Página interior - Video Playa Turquesa */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>Playa Turquesa</h3>
+            <div
+              class="video-frame"
+              data-expand
+              data-video
+              data-url={videos.playa}
+              data-alt="Video - Playa Turquesa"
+              data-reveal="right"
+            >
+              <div class="video-placeholder">
+                <span class="play-icon">▶</span>
+                <span>Playa Turquesa</span>
+              </div>
+            </div>
+            <p class="caption" data-reveal>
+              Toca el video para verlo en pantalla completa.
+            </p>
+          </div>
+        </div>
+
+        {/* 6. Página interior - Video Laguna Alalay */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>Laguna Alalay</h3>
+            <div
+              class="video-frame"
+              data-expand
+              data-video
+              data-url={videos.laguna}
+              data-alt="Video - Laguna Alalay"
+              data-reveal="right"
+            >
+              <div class="video-placeholder">
+                <span class="play-icon">▶</span>
+                <span>Laguna Alalay</span>
+              </div>
+            </div>
+            <p class="caption" data-reveal>
+              Un pulmón verde para la ciudad.
+            </p>
+          </div>
+        </div>
+
+        {/* 7. Página interior - Videos Terminal y FEXCO */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>Nueva Infraestructura</h3>
+            <div
+              class="video-frame"
+              data-expand
+              data-video
+              data-url={videos.terminal}
+              data-alt="Video - Nueva terminal de buses"
+              data-reveal="right"
+            >
+              <div class="video-placeholder">
+                <span class="play-icon">▶</span>
+                <span>Accesos nueva terminal de buses</span>
+              </div>
+            </div>
+            <p class="caption" data-reveal>
+              Toca el video para verlo en pantalla completa.
+            </p>
+          </div>
+        </div>
+
+        {/* 8. Página interior - Video FEXCO Arena */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>FEXCO Arena</h3>
+            <div
+              class="video-frame"
+              data-expand
+              data-video
+              data-url={videos.fexco}
+              data-alt="Video - FEXCO Arena"
+              data-reveal="right"
+            >
+              <div class="video-placeholder">
+                <span class="play-icon">▶</span>
+                <span>FEXCO Arena</span>
+              </div>
+            </div>
+            <p class="caption" data-reveal>
+              Espacios nuevos para la ciudad.
+            </p>
+          </div>
+        </div>
+
+        {/* 9. Página interior - Video Cocha Market */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>Cocha Market</h3>
+            <div
+              class="video-frame"
+              data-expand
+              data-video
+              data-url={videos.market}
+              data-alt="Video - Cocha Market"
+              data-reveal="right"
+            >
+              <div class="video-placeholder">
+                <span class="play-icon">▶</span>
+                <span>Cocha Market</span>
+              </div>
+            </div>
+            <p class="caption" data-reveal>
+              Comercio y servicios digitales para todos.
+            </p>
+          </div>
+        </div>
+
+        {/* 10. Página interior - Video Clínica Veterinaria Marcial */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>Clínica Veterinaria Municipal</h3>
+            <div
+              class="video-frame"
+              data-expand
+              data-video
+              data-url={videos.vet}
+              data-alt="Video - Clínica veterinaria municipal"
+              data-reveal="right"
+            >
+              <div class="video-placeholder">
+                <span class="play-icon">▶</span>
+                <span>Clínica Veterinaria Municipal</span>
+              </div>
+            </div>
+            <p class="caption" data-reveal>
+              Toca el video para verlo en pantalla completa.
+            </p>
+          </div>
+        </div>
+
+        {/* 11. Página interior - Video Permiso de Viaje Digital */}
+        <div class="page">
+          <div class="page-inner">
+            <h3 class="page-title" data-reveal>Permiso de Viaje Digital</h3>
+            <div
+              class="video-frame"
+              data-expand
+              data-video
+              data-url={videos.permiso}
+              data-alt="Video - Permiso de viaje digital"
+              data-reveal="right"
+            >
+              <div class="video-placeholder">
+                <span class="play-icon">▶</span>
+                <span>Permiso de Viaje Digital</span>
+              </div>
+            </div>
+            <p class="caption" data-reveal>
+              Portal digital para trámites municipales.
+            </p>
+          </div>
+        </div>
+
+        {/* 12. CONTRAPORTADA - Tapa dura */}
+        <div class="back-cover">
+          <div class="back-cover-content">
+            <h3 class="back-title" data-reveal>Fin</h3>
+            <p class="back-text" data-reveal>Cochabamba, ciudad que avanza</p>
+          </div>
+          <div class="cover-shine"></div>
+        </div>
+      </FlipBook>
+
+      <section class="demo-section">
+        <div class="demo-header">
+          <h2>La ciudad en transformación</h2>
+          <p>Desliza para comparar el antes y el después.</p>
+        </div>
+        <ImageSlider
+          client:visible
+          beforeImage={fotos.alcalde1}
+          afterImage={fotos.alcalde2}
+          beforeLabel="Antes"
+          afterLabel="Después"
+        />
+      </section>
+
+      <section class="demo-section">
+        <div class="demo-header">
+          <h2>Biografía · Misión · Visión</h2>
+          <p>Un breve recorrido por el trabajo y los valores.</p>
+        </div>
+        <ValueCards client:visible />
+      </section>
+    </main>
+
+    <CableCarScroll client:visible />
+  </body>
+</html>

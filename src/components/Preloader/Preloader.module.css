@@ -1,0 +1,155 @@
+/* Pantalla de carga minimalista — cabina del teleférico + monograma M.R.V */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-content: center;
+  align-items: center;
+  row-gap: clamp(24px, 6vh, 50px);
+  text-align: center;
+  background: #2a1752;
+  transition: opacity 0.32s ease, visibility 0.32s ease;
+}
+
+.overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 42%, rgba(255, 255, 255, 0.05), transparent 60%);
+}
+
+.overlay[data-hiding='true'] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.overlay[data-hidden='true'] {
+  display: none;
+}
+
+/* ---------- Teleférico: cable + 1 cabina ---------- */
+.scene {
+  position: relative;
+  width: min(340px, 82vw);
+  height: clamp(30px, 6vh, 46px);
+  margin: 0 auto;
+}
+
+.cable {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.cabin {
+  position: absolute;
+  top: -6px;
+  left: 0;
+  width: 28px;
+  opacity: 0.92;
+}
+
+.cabinBody {
+  display: block;
+  width: 100%;
+  height: 21px;
+  border-radius: 9px;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18), 0 3px 8px rgba(0, 0, 0, 0.28);
+}
+
+.cabinBody::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 4px;
+  width: 5px;
+  height: 100%;
+  border-radius: 0 9px 9px 0;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.cabinHook {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 2px;
+  height: 12px;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  animation: swing 1.1s ease-in-out infinite;
+}
+
+@keyframes swing {
+  0%,
+  100% {
+    transform: translateX(-50%) rotate(-3deg);
+  }
+  50% {
+    transform: translateX(-50%) rotate(3deg);
+  }
+}
+
+/* ---------- Monograma M.R.V con relleno progresivo ---------- */
+.letters {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  font-size: clamp(2.6rem, 9vw, 4.6rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.letterGroup {
+  position: relative;
+  display: inline-flex;
+}
+
+.letterGroup + .letterGroup {
+  margin-left: 0.18em;
+}
+
+.ghost {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.solid {
+  display: inline-block;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.28);
+  transform: translateX(-100%);
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cabin {
+    left: 8px;
+  }
+
+  .cabinHook {
+    animation: none;
+    transform: translateX(-50%);
+  }
+
+  .solid {
+    transform: none;
+  }
+}

@@ -1,0 +1,22 @@
+.fixed {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    transparent 0%,
+    rgba(18, 18, 28, 0) 45%,
+    rgba(18, 18, 28, 0.72) 100%
+  );
+}
