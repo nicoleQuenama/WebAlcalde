@@ -750,7 +750,7 @@ export default function FlipBook({
 
         <div ref={closedSlotRef} className={styles.closedSlot}>
           <ThreeBook
-            coverLabel="Cochabamba"
+            coverLabel={'Cocha,\nla mejor ciudad\nde Bolivia'}
             coverImage={coverImage}
             onOpen={open}
           />

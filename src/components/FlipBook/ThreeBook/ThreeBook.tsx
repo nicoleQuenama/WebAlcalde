@@ -218,8 +218,8 @@ function makePaperTexture(size: number): HTMLCanvasElement {
 }
 
 export default function ThreeBook({
-  coverLabel = 'Cochabamba',
-  accent = '#c9a96e',
+  coverLabel = 'Cocha',
+  accent = '#472d82',
   coverImage,
   onOpen,
 }: ThreeBookProps) {
@@ -227,7 +227,7 @@ export default function ThreeBook({
   const openRef = useRef(onOpen);
   openRef.current = onOpen;
 
-  const labelText = coverLabel ?? 'Cochabamba';
+  const labelText = coverLabel ?? 'Cocha';
 
   useEffect(() => {
     const wrap = wrapRef.current;

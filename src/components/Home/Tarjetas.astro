@@ -1,0 +1,28 @@
+---
+/**
+ * Tarjetas — las cards "Biografía · Misión · Visión" en el home.
+ *
+ * Antes vivían en /gestion (componente PilaresGestion). Se movieron al home
+ * porque el equipo quería las cards en la portada. Reutiliza el mismo
+ * componente animado <ValueCards> (las 3 tarjetas apiladas que se despliegan
+ * con el scroll) y la constante PILARES.
+ *
+ * Sección OSCURA: fondo del color de marca (#472d82), sin sombras. Alterna con
+ * los bloques blancos de arriba y abajo.
+ */
+import ValueCards from '../ValueCards/ValueCards';
+import { PILARES } from '../../constants/gestion';
+---
+
+<section class="bg-[#472d82] text-white" style="--accent: #c9b8e8;">
+  <div class="mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-24">
+    <header class="max-w-2xl">
+      <h2 class="text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl">
+        Biografía, misión y visión
+      </h2>
+    </header>
+
+    <!-- 3 tarjetas que se despliegan con el scroll -->
+    <ValueCards client:visible cards={PILARES} />
+  </div>
+</section>

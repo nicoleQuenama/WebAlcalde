@@ -41,10 +41,9 @@
   align-items: center;
   gap: clamp(1rem, 3vw, 2.5rem);
   padding: clamp(1.25rem, 3vw, 2.5rem);
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 22px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition: opacity 0.25s ease, visibility 0.25s ease;
@@ -68,15 +67,15 @@
 
 .heroEyebrow {
   display: inline-block;
-  background: rgba(201, 169, 110, 0.16);
-  color: var(--accent);
+  background: rgba(255, 255, 255, 0.12);
+  color: #e7ddf5;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2.5px;
   padding: 5px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(201, 169, 110, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .heroTitle {
@@ -88,7 +87,7 @@
 }
 
 .heroText {
-  color: #b9b9cf;
+  color: #d8cfea;
   line-height: 1.65;
   font-size: 1rem;
   max-width: 44ch;
@@ -102,25 +101,19 @@
   padding: 13px 24px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(135deg, #ddbd7f, var(--accent) 55%, #ad874d);
-  color: #211b0f;
+  background: #fff;
+  color: #472d82;
   font-family: inherit;
   font-weight: 700;
   font-size: 0.95rem;
   letter-spacing: 0.4px;
   cursor: pointer;
-  box-shadow:
-    0 10px 26px rgba(201, 169, 110, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  transition: transform 0.15s ease, filter 0.15s ease;
 }
 
 .cta:hover {
   transform: translateY(-2px);
-  filter: brightness(1.06);
-  box-shadow:
-    0 14px 30px rgba(201, 169, 110, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  filter: brightness(0.96);
 }
 
 .cta:active {
@@ -175,7 +168,6 @@
   z-index: 950;
   overflow: hidden;
   border-radius: 6px;
-  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
 }
 
 .animInner {
@@ -225,7 +217,7 @@
 .closeBtn:hover {
   background: var(--accent);
   border-color: transparent;
-  color: #1a1a2e;
+  color: #fff;
   transform: scale(1.08) rotate(90deg);
 }
 
@@ -276,7 +268,7 @@
 .mediaClose:hover {
   background: var(--accent);
   border-color: transparent;
-  color: #1a1a2e;
+  color: #fff;
   transform: translateY(-1px);
 }
 
@@ -290,7 +282,6 @@
   overflow: hidden;
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
 }
 
 .mediaImg {
@@ -332,12 +323,11 @@
   gap: 12px;
   color: #fff;
   font-size: 1rem;
-  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
 }
 
 .mediaIcon {
   font-size: 3rem;
-  color: var(--accent);
+  color: #c9b8e8;
   line-height: 1;
 }
 
@@ -462,7 +452,6 @@
   border-radius: 50%;
   border: 2px solid #fff;
   background: var(--accent);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .scrubRange::-moz-range-track {
@@ -499,7 +488,6 @@
   background: rgba(12, 12, 28, 0.84);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   transition: height 0.25s ease;
 }

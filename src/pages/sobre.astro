@@ -1,11 +1,29 @@
 ---
+/**
+ * /sobre — Quién es Manfred Reyes Villa.
+ *
+ * Estructura:
+ *   1. Hero        — mismo diseño que el home, con contenido propio (biografía).
+ *   2. Biografia    — texto biográfico + video (movido desde el home).
+ *   3. Tarjetas     — biografía, misión y visión (movido desde el home).
+ *   4. LineaTiempo  — la trayectoria completa, tal como estaba.
+ */
 import Layout from '../layouts/Layout.astro';
-import HeroSobre from '../components/Hero/HeroSobre.astro';
+import Hero from '../components/Hero/Hero.astro';
+import Biografia from '../components/Home/Biografia.astro';
+import Tarjetas from '../components/Home/Tarjetas.astro';
 import LineaTiempo from '../components/Historia/LineaTiempo.astro';
 ---
-<Layout title="Sobre - Manfred Reyes Villa">
-    <main>
-        <HeroSobre/>
-        <LineaTiempo />
-    </main>
+
+<Layout title="Sobre — Manfred Reyes Villa">
+	<main>
+		<Hero
+			eyebrow="Biografía y trayectoria"
+			titulo="Manfred Reyes Villa"
+			cita="Una vida dedicada a Cochabamba"
+		/>
+		<Biografia />
+		<Tarjetas />
+		<LineaTiempo />
+	</main>
 </Layout>

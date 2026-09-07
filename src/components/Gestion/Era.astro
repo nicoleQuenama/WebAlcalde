@@ -1,0 +1,41 @@
+---
+/**
+ * Era — un capítulo de obras del temario ("Las obras son memorias" / "Cuando una
+ * ciudad vuelve a soñar en grande"). Renderiza el encabezado del capítulo y
+ * debajo todas sus subsecciones usando <SeccionObras>.
+ *
+ * El encabezado va sobre el color de marca (#472d82, el mismo del navbar) y el
+ * cuerpo con las obras siempre sobre blanco: las secciones alternan color.
+ */
+import type { EraTemario } from '../../constants/temario';
+import SeccionObras from './SeccionObras.astro';
+
+interface Props {
+  era: EraTemario;
+}
+const { era } = Astro.props;
+---
+
+<section id={era.id} class="scroll-mt-20">
+  <!-- Encabezado del capítulo -->
+  <div class="bg-[#472d82] text-white">
+    <div class="mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-24">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#c9b8e8]">
+        {era.eyebrow}
+      </p>
+      <h2 class="mt-4 max-w-4xl text-[2rem] font-black leading-[1.05] tracking-tight sm:text-4xl lg:text-[3rem]">
+        {era.titulo}
+      </h2>
+      <p class="mt-6 max-w-3xl text-base leading-relaxed text-white/70 lg:text-lg">
+        {era.bajada}
+      </p>
+    </div>
+  </div>
+
+  <!-- Subsecciones con sus obras (la imagen alterna de lado según el índice) -->
+  <div class="bg-white">
+    <div class="mx-auto max-w-6xl px-6 lg:px-8">
+      {era.secciones.map((seccion, i) => <SeccionObras seccion={seccion} indice={i} />)}
+    </div>
+  </div>
+</section>

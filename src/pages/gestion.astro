@@ -1,49 +1,54 @@
 ---
+/**
+ * /gestion — El recorrido completo de obras del libro
+ * "Cocha, la mejor ciudad de Bolivia".
+ *
+ * Toda la estructura y los textos salen de src/constants/temario.ts:
+ *   1. Hero de gestión.
+ *   2. Capítulos de apertura (presentación / cómo creció la ciudad / el inicio de una nueva Cochabamba).
+ *   3. Las dos ERAS de obras completas (años 90 y gestión 2021–2026), cada una con
+ *      sus subsecciones, imagen y la lista completa de obras — <Era> + <SeccionObras>.
+ *   4. Carrusel de proyectos con foto/video real (#proyectos).
+ */
 import Layout from '../layouts/Layout.astro';
 import HeroGestion from '../components/Gestion/HeroGestion.astro';
-import PilaresGestion from '../components/Gestion/PilaresGestion.astro';
+import Era from '../components/Gestion/Era.astro';
 import Proyectos from '../components/Gestion/Proyectos.astro';
-import ImageSlider from '../components/ImageSlider/ImageSlider';
+import { PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA, ERAS } from '../constants/temario';
 
-const BASE = '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.1%20Fotograf%C3%ADas%20del%20alcalde/';
-const antes = BASE + 'DSC_0790.jpg';
-const despues = BASE + 'DSC_0802.jpg';
+// Los capítulos de apertura comparten formato: iteramos para no repetir markup.
+const capitulosApertura = [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA];
 ---
 
-<Layout title="Gestión 2021–2026 - Manfred Reyes Villa">
+<Layout title="Gestión — Cocha, la mejor ciudad de Bolivia">
 	<main>
 		<HeroGestion />
 
-		<!-- Misión · Biografía · Visión -->
-		<PilaresGestion />
-
-		<!-- Proyectos (formato de tarjetas de la página Sobre) -->
-		<Proyectos />
-
-		<!-- La ciudad en transformación — cierre de la página -->
-		<section class="border-t border-slate-100 bg-white">
-			<div class="mx-auto max-w-5xl px-6 py-24 lg:px-8 lg:py-28">
-				<header class="max-w-2xl">
-					<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#454ca5]">
-						Antes y después
-					</p>
-					<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
-						La ciudad en transformación
-					</h2>
-					<p class="mt-4 text-base leading-relaxed text-slate-600">
-						Desliza para comparar cómo lucían algunos puntos de Cochabamba antes de la intervención.
-					</p>
-				</header>
-				<div class="mt-10">
-					<ImageSlider
-						client:visible
-						beforeImage={antes}
-						afterImage={despues}
-						beforeLabel="Antes"
-						afterLabel="Después"
-					/>
-				</div>
+		<!-- Capítulos de apertura del temario (sin lista de obras) -->
+		<section class="bg-white">
+			<div class="mx-auto max-w-5xl divide-y divide-slate-900/10 px-6 lg:px-8">
+				{
+					capitulosApertura.map((cap) => (
+						<article id={cap.id} class="scroll-mt-24 py-16 lg:py-20">
+							<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#472d82]">
+								{cap.eyebrow}
+							</p>
+							<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
+								{cap.titulo}
+							</h2>
+							<p class="mt-5 max-w-3xl text-base leading-relaxed text-slate-600 lg:text-lg">
+								{cap.bajada}
+							</p>
+						</article>
+					))
+				}
 			</div>
 		</section>
+
+		<!-- Las dos eras de obras completas -->
+		{ERAS.map((era) => <Era era={era} />)}
+
+		<!-- Carrusel de proyectos con foto/video real -->
+		<Proyectos />
 	</main>
 </Layout>

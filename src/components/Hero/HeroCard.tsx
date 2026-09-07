@@ -61,12 +61,13 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
             else if (index === (actual - 1 + IMAGENES.length) % IMAGENES.length) posicion = 'izquierda';
             else if (index === (actual + 1) % IMAGENES.length) posicion = 'derecha';
 
+            // `bg-top`: encuadra desde arriba para no cortar la cabeza en los retratos.
             const estilosBase =
-              'absolute top-0 left-0 w-full h-full rounded-3xl bg-cover bg-center border border-white/30 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]';
+              'absolute top-0 left-0 w-full h-full rounded-3xl bg-cover bg-top border border-white/30 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]';
 
             const estilosPosicion = {
               centro:
-                'z-30 scale-100 translate-x-0 rotate-0 opacity-100 cursor-pointer shadow-[0_30px_60px_rgba(0,0,0,0.6)]',
+                'z-30 scale-100 translate-x-0 rotate-0 opacity-100 cursor-pointer',
               izquierda: 'z-20 scale-90 -translate-x-36 -rotate-6 opacity-40 cursor-pointer hover:opacity-80',
               derecha: 'z-20 scale-90 translate-x-36 rotate-6 opacity-40 cursor-pointer hover:opacity-80',
               oculta: 'z-10 scale-75 opacity-0',
@@ -97,14 +98,14 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
           <button
             onClick={anterior}
             aria-label="Anterior"
-            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110 shadow-lg"
+            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110"
           >
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
           </button>
           <button
             onClick={siguiente}
             aria-label="Siguiente"
-            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110 shadow-lg"
+            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110"
           >
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
           </button>
@@ -136,7 +137,7 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
             <img
               src={actualImg.src}
               alt={actualImg.titulo ?? 'Ampliación'}
-              className="max-h-[75vh] max-w-[90vw] object-contain rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.6)] animate-[zoomIn_0.4s_ease-out]"
+              className="max-h-[75vh] max-w-[90vw] object-contain rounded-2xl animate-[zoomIn_0.4s_ease-out]"
             />
             {actualImg.titulo && (
               <figcaption className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-white/90">
