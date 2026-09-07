@@ -2,9 +2,11 @@
 @import "tailwindcss";
 
 :root {
-  --ink: #1a1a2e;
-  --paper: #fdf5fa;
-  --accent: #8e2583;
+  --ink: #1f1533;
+  --paper: #ffffff;
+  /* Color único de la marca (el mismo del navbar). Todo lo demás son blancos
+     y grises neutros; las secciones alternan entre este color y blanco. */
+  --accent: #472d82;
 }
 
 * {

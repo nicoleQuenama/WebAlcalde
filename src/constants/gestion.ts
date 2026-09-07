@@ -7,11 +7,13 @@
 
 export const GESTION_HERO = {
   kicker: 'Alcaldía de Cochabamba',
-  periodo: 'Gestión 2021 — 2026',
-  titulo: 'Una ciudad que se construye todos los días',
+  periodo: 'De los años 90 a la gestión 2021 — 2026',
+  titulo: 'Las obras son memorias',
   bajada:
-    'Movilidad, seguridad, tecnología y espacio público. El plan de gobierno municipal ' +
-    'traducido en obras concretas para los siete distritos de Cochabamba.',
+    'El recorrido completo del libro "Cocha, la mejor ciudad de Bolivia": las obras que ' +
+    'empezaron a transformar Cochabamba hace más de treinta años y las que hoy la ' +
+    'proyectan hacia el futuro. Cada avenida, parque, puente y programa social cuenta ' +
+    'una parte de esa historia.',
 };
 
 /**

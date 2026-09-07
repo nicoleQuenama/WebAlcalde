@@ -54,7 +54,7 @@ export default function GaleriaModal({ imagenes, indice, onIndice, onCerrar }: P
     >
       <button
         onClick={(e) => { e.stopPropagation(); onCerrar(); }}
-        className="fixed top-24 right-4 lg:top-28 lg:right-10 bg-white/10 hover:bg-white/30 border border-white/20 text-white p-3 lg:p-4 rounded-full backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:rotate-90 z-[1000] shadow-2xl"
+        className="fixed top-24 right-4 lg:top-28 lg:right-10 bg-white/10 hover:bg-white/30 border border-white/20 text-white p-3 lg:p-4 rounded-full backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:rotate-90 z-[1000]"
         aria-label="Cerrar galería"
       >
         <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -73,7 +73,7 @@ export default function GaleriaModal({ imagenes, indice, onIndice, onCerrar }: P
           key={actual.src}
           src={actual.src}
           alt={actual.titulo ?? 'Ampliación'}
-          className="max-h-[72vh] max-w-[90vw] object-contain rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.6)] animate-[zoomIn_0.4s_ease-out]"
+          className="max-h-[72vh] max-w-[90vw] object-contain rounded-2xl animate-[zoomIn_0.4s_ease-out]"
         />
         {actual.titulo && (
           <figcaption className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-white/90">

@@ -1,0 +1,50 @@
+---
+/**
+ * VideoBiografia — sección de video en el home, justo debajo del hero.
+ *
+ * Solo el video (el texto de biografía, misión y visión vive en /sobre).
+ *
+ * ⚠️ El <video> usa por ahora un clip de "Mas Recursos" como marcador.
+ *    TODO: reemplazar `videoBiografia` por el video de biografía real.
+ */
+const GENTE =
+  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
+const VIDEOS = '/Mas%20Recursos/3.%20Otros%20recursos/';
+
+const posterBiografia = GENTE + '6P9A5493.jpg';
+const videoBiografia = VIDEOS + '01%20PLAYA%20TURQUESA.mp4'; // TODO: video real de biografía
+---
+
+<section class="bg-white">
+  <div class="mx-auto max-w-4xl px-6 py-16 lg:px-8 lg:py-20">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#472d82]">
+      Manfred Reyes Villa
+    </p>
+    <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
+      La ciudad, contada en un video
+    </h2>
+
+    <figure class="mt-8 overflow-hidden rounded-2xl border border-slate-200">
+      <video
+        class="aspect-video w-full bg-slate-900 object-contain"
+        src={videoBiografia}
+        poster={posterBiografia}
+        controls
+        preload="metadata"
+        playsinline
+      >
+      </video>
+      <figcaption class="bg-slate-50 px-4 py-2 text-xs font-medium italic text-slate-400">
+        Video de referencia — reemplazar por el video de biografía real.
+      </figcaption>
+    </figure>
+
+    <a
+      href="/sobre"
+      class="mt-8 inline-flex items-center gap-2 rounded-full bg-[#472d82] px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-transform hover:-translate-y-0.5"
+    >
+      Conocer al alcalde
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+  </div>
+</section>

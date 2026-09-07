@@ -1,182 +1,325 @@
 import type { ReactNode } from 'react';
 import styles from './Book.module.css';
+import {
+  PRESENTACION,
+  CRECIMIENTO,
+  NUEVA_COCHABAMBA,
+  ERAS,
+  type SeccionTemario,
+  type EraTemario,
+} from '../../constants/temario';
+
+/**
+ * Book — páginas del libro digital (FlipBook).
+ *
+ * El texto y el orden salen de src/constants/temario.ts, así el libro que se
+ * hojea sigue exactamente la misma estructura que la página /gestion:
+ *
+ *   Portada
+ *   → Presentación del alcalde        (retrato grande, foto completa)
+ *   → Cómo ha crecido Cochabamba      (antes / después)
+ *   → El inicio de una nueva Cochabamba
+ *   → "Las obras son memorias" (intro) + 1 página por subsección de los años 90
+ *   → "Cuando una ciudad vuelve a soñar en grande" (intro, retrato del alcalde)
+ *     + 1 página por subsección 2021–2026
+ *   Contraportada
+ *
+ * Reglas de imagen:
+ *   - Donde el alcalde es el protagonista → clase `mediaPortrait`: la foto se ve
+ *     COMPLETA (object-fit: contain) y ocupa casi toda la página. Nunca recortada.
+ *   - Fotos de contexto / gente → `mediaFeature` / `mediaStrip`, que ahora crecen
+ *     para llenar el espacio libre (imágenes más grandes que antes).
+ *   - Cada imagen/video con `data-expand` se abre a pantalla completa.
+ */
 
 export interface IMG {
   src: string;
   alt: string;
 }
-
 export interface Video {
   src: string;
   alt: string;
 }
 
 export interface BookProps {
-  /** URL de la imagen de portada */
+  /** Imagen de portada. */
   coverImage: string;
-  /** Fotos del alcalde */
-  alcalde: IMG[];
-  /** Fotos con la gente */
-  gente: IMG[];
-  /** Videos por página */
+  /** Fotos disponibles para ilustrar páginas (alcalde + gente). */
+  fotos: IMG[];
+  /** Videos en orden del temario: playa, laguna, terminal, fexco, market, vet, permiso. */
   videos: Video[];
-  /** Contenido extra que se añade tras la contraportada, o para reemplazar páginas */
   children?: ReactNode;
 }
 
+// Traducción de nombres "bonitos" a las clases globales que el FlipBook usa para
+// auto-generar el índice (deben quedar sin hash).
 const s = (c: string) =>
-  c === 'coverTitle' ? 'cover-title'
-  : c === 'pageTitle' ? 'page-title'
-  : c === 'backTitle' ? 'back-title'
-  : (styles[c as keyof typeof styles] ?? c);
+  c === 'coverTitle'
+    ? 'cover-title'
+    : c === 'pageTitle'
+      ? 'page-title'
+      : c === 'backTitle'
+        ? 'back-title'
+        : (styles[c as keyof typeof styles] ?? c);
 
-export default function Book({ coverImage, alcalde, gente, videos }: BookProps) {
-  const [a1, a2, a3, a4] = alcalde;
-  const [g1, g2, g3, g4, g5] = gente;
-  const [playa, laguna, terminal, fexco, market, vet, permiso] = videos;
+/** Qué video va en qué subsección (por `id` del temario). */
+const VIDEO_POR_SECCION: Record<string, number> = {
+  'espejos-de-agua': 1, // Laguna Alalay
+  vialidad: 2, // Accesos nueva terminal de buses
+  alianzas: 3, // FEXCO Arena
+  vanguardia: 4, // Cocha Market
+  salud: 6, // Clínica veterinaria municipal
+};
+
+/** Retrato protagonista: foto del alcalde grande y completa. */
+function RetratoAlcalde({ foto }: { foto?: IMG }) {
+  if (!foto) return null;
+  return (
+    <figure className={s('mediaPortrait')} data-reveal="zoom">
+      <img
+        data-expand
+        data-url={foto.src}
+        data-alt={foto.alt}
+        src={foto.src}
+        alt={foto.alt}
+        loading="lazy"
+      />
+    </figure>
+  );
+}
+
+/** Imagen de contexto (paisaje / gente), grande. */
+function FotoContexto({ foto }: { foto?: IMG }) {
+  if (!foto) return null;
+  return (
+    <figure className={s('mediaFeature')} data-reveal="zoom">
+      <img
+        data-expand
+        data-url={foto.src}
+        data-alt={foto.alt}
+        src={foto.src}
+        alt={foto.alt}
+        loading="lazy"
+      />
+    </figure>
+  );
+}
+
+/** Lista compacta de obras para una página del libro (máx. 5 + "y N más"). */
+function ListaObras({ seccion }: { seccion: SeccionTemario }) {
+  const visibles = seccion.obras.slice(0, 5);
+  const resto = seccion.obras.length - visibles.length;
+  return (
+    <ul className={s('obraList')} data-reveal="left">
+      {visibles.map((obra) => (
+        <li key={obra.nombre}>
+          <span>{obra.nombre}</span>
+          {obra.anio ? <em>{obra.anio}</em> : null}
+        </li>
+      ))}
+      {resto > 0 ? (
+        <li className={s('obraMas')}>y {resto} obras más — el detalle completo está en la web</li>
+      ) : null}
+    </ul>
+  );
+}
+
+/** Página de una subsección del temario: título, bajada corta, media grande y lista. */
+function PaginaSeccion({
+  seccion,
+  foto,
+  video,
+}: {
+  seccion: SeccionTemario;
+  foto?: IMG;
+  video?: Video;
+}) {
+  return (
+    <div className={s('page')}>
+      <div className={s('pageInner')}>
+        <h3 className={s('pageTitle')} data-reveal>
+          {seccion.titulo}
+        </h3>
+        {seccion.bajada ? (
+          <p className={`${s('pageText')} ${s('bajadaClamp')}`} data-reveal>
+            {seccion.bajada}
+          </p>
+        ) : null}
+
+        {video ? (
+          <div
+            className={s('videoFrame')}
+            data-expand
+            data-video
+            data-url={video.src}
+            data-alt={video.alt}
+            data-reveal="right"
+          >
+            <div className={s('videoPlaceholder')}>
+              <span className={s('playIcon')}>▶</span>
+              <span>{video.alt}</span>
+            </div>
+          </div>
+        ) : (
+          <FotoContexto foto={foto} />
+        )}
+
+        <ListaObras seccion={seccion} />
+      </div>
+    </div>
+  );
+}
+
+/** Página de apertura de una era. `sonar-en-grande` lleva retrato del alcalde. */
+function PaginaEraIntro({ era, foto }: { era: EraTemario; foto?: IMG }) {
+  const conRetrato = era.id === 'sonar-en-grande';
+  return (
+    <div className={s('page')}>
+      <div className={s('pageInner')}>
+        <span className={s('caption')} data-reveal>
+          {era.eyebrow}
+        </span>
+        <h3 className={s('pageTitle')} data-reveal>
+          {era.titulo}
+        </h3>
+        <p className={`${s('pageText')} ${s('bajadaClamp')}`} data-reveal>
+          {era.bajada}
+        </p>
+        {conRetrato ? <RetratoAlcalde foto={foto} /> : <FotoContexto foto={foto} />}
+      </div>
+    </div>
+  );
+}
+
+export default function Book({ coverImage, fotos, videos }: BookProps) {
+  // Fotos con más presencia del alcalde (retrato). El resto son de contexto.
+  const retratoPresentacion = fotos[0];
+  const retratoEra2 = fotos[5] ?? fotos[0];
+
+  // Índice rotativo para repartir el resto de fotos sin repetir de más.
+  let f = 1;
+  const nextFoto = (): IMG | undefined => {
+    if (!fotos.length) return undefined;
+    // salta los retratos ya usados (0 y 5)
+    let idx = f++ % fotos.length;
+    if (idx === 0 || idx === 5) idx = f++ % fotos.length;
+    return fotos[idx];
+  };
 
   return (
     <>
-      {/* 1. PORTADA */}
+      {/* PORTADA — título tal cual el documento del temario */}
       <div className={s('cover')}>
-        <img className={s('coverImg')} src={coverImage} alt="Cochabamba, ciudad tecnológica" />
+        <img className={s('coverImg')} src={coverImage} alt="Cocha, la mejor ciudad de Bolivia" />
         <div className={s('coverColor')}></div>
         <div className={s('coverContent')}>
-          <span className={s('coverBadge')} data-reveal>Libro Digital</span>
-          <h2 className={s('coverTitle')} data-reveal>Cochabamba<br />Ciudad Tecnológica</h2>
-          <p className={s('coverSubtitle')} data-reveal>Obras, servicios y gestión 2026</p>
+          <span className={s('coverBadge')} data-reveal>
+            Libro digital
+          </span>
+          <h2 className={s('coverTitle')} data-reveal>
+            Cocha,
+            <br />
+            la mejor ciudad de Bolivia
+          </h2>
+          <p className={s('coverSubtitle')} data-reveal>
+            De los años 90 a la gestión 2021 — 2026
+          </p>
         </div>
         <div className={s('coverShine')}></div>
       </div>
 
-      {/* 2. INTRODUCCIÓN */}
+      {/* PRESENTACIÓN DEL ALCALDE — retrato grande, figura completa */}
       <div className={s('page')}>
         <div className={s('pageInner')}>
-          <h3 className={s('pageTitle')} data-reveal>Introducción</h3>
-          <p className={s('pageText')} data-reveal>
-            Libro digital que muestra la gestión de la Alcaldía de Cochabamba, con obras, servicios y proyectos que transforman la ciudad y mejoran la calidad de vida de sus habitantes.
+          <span className={s('caption')} data-reveal>
+            {PRESENTACION.eyebrow}
+          </span>
+          <h3 className={s('pageTitle')} data-reveal>
+            {PRESENTACION.titulo}
+          </h3>
+          <RetratoAlcalde foto={retratoPresentacion} />
+          <p className={`${s('pageLead')} ${s('bajadaClamp')}`} data-reveal>
+            {PRESENTACION.bajada}
           </p>
-
-          <figure className={s('mediaInline')}>
-            <img
-              data-expand
-              data-reveal="zoom"
-              data-url={a1?.src}
-              data-alt={a1?.alt ?? 'El alcalde de Cochabamba'}
-              src={a1?.src}
-              alt={a1?.alt ?? 'El alcalde de Cochabamba'}
-              loading="lazy"
-            />
-          </figure>
-
-          <p className={s('pageText')} data-reveal>
-            Navega con las flechas del teclado, arrastra las esquinas o usa el
-            slider inferior. Toca cualquier imagen o video para verlo en
-            pantalla completa.
+          <p className={s('caption')} data-reveal>
+            Arrastra las esquinas o usa las flechas del teclado. Toca cualquier imagen o
+            video para verlo en grande.
           </p>
         </div>
       </div>
 
-      {/* 3. EL ALCALDE */}
+      {/* CÓMO HA CRECIDO COCHABAMBA (antes / después) */}
       <div className={s('page')}>
         <div className={s('pageInner')}>
-          <h3 className={s('pageTitle')} data-reveal>El Alcalde</h3>
-
-          <figure className={s('mediaFeature')}>
-            <img
-              data-expand
-              data-reveal="zoom"
-              data-url={a2?.src}
-              data-alt={a2?.alt ?? 'El alcalde'}
-              src={a2?.src}
-              alt={a2?.alt ?? 'El alcalde'}
-              loading="lazy"
-            />
-          </figure>
-
+          <h3 className={s('pageTitle')} data-reveal>
+            {CRECIMIENTO.titulo}
+          </h3>
+          <p className={`${s('pageText')} ${s('bajadaClamp')}`} data-reveal>
+            {CRECIMIENTO.bajada}
+          </p>
           <div className={s('mediaStrip')} data-reveal="left">
-            <figure data-expand data-url={a3?.src} data-alt={a3?.alt ?? 'Alcalde'}>
-              <img src={a3?.src} alt={a3?.alt ?? 'Alcalde'} loading="lazy" />
+            <figure data-expand data-url={fotos[1]?.src} data-alt="Cochabamba de ayer">
+              <img src={fotos[1]?.src} alt="Cochabamba de ayer" loading="lazy" />
             </figure>
-            <figure data-expand data-url={a4?.src} data-alt={a4?.alt ?? 'Alcalde'}>
-              <img src={a4?.src} alt={a4?.alt ?? 'Alcalde'} loading="lazy" />
+            <figure data-expand data-url={fotos[2]?.src} data-alt="Cochabamba hoy">
+              <img src={fotos[2]?.src} alt="Cochabamba hoy" loading="lazy" />
             </figure>
           </div>
-
           <p className={s('caption')} data-reveal>
-            Toca cualquier imagen para verla en grande.
+            Fotografías comparativas a través de los años — imágenes de referencia.
           </p>
         </div>
       </div>
 
-      {/* 4. CON LA GENTE */}
+      {/* EL INICIO DE UNA NUEVA COCHABAMBA */}
       <div className={s('page')}>
         <div className={s('pageInner')}>
-          <h3 className={s('pageTitle')} data-reveal>Con la Gente</h3>
-
-          <div className={s('mediaRow')} data-reveal="left">
-            <figure className={s('figureWider')} data-expand data-url={g1?.src} data-alt={g1?.alt ?? 'Con la comunidad'}>
-              <img src={g1?.src} alt={g1?.alt ?? 'Con la comunidad'} loading="lazy" />
-            </figure>
-            <figure data-expand data-url={g2?.src} data-alt={g2?.alt ?? 'Con la comunidad'}>
-              <img src={g2?.src} alt={g2?.alt ?? 'Con la comunidad'} loading="lazy" />
-            </figure>
-          </div>
-
-          <div className={s('mediaStrip')} data-reveal="right">
-            <figure data-expand data-url={g3?.src} data-alt={g3?.alt ?? 'Con la comunidad'}>
-              <img src={g3?.src} alt={g3?.alt ?? 'Con la comunidad'} loading="lazy" />
-            </figure>
-            <figure data-expand data-url={g4?.src} data-alt={g4?.alt ?? 'Con la comunidad'}>
-              <img src={g4?.src} alt={g4?.alt ?? 'Con la comunidad'} loading="lazy" />
-            </figure>
-            <figure data-expand data-url={g5?.src} data-alt={g5?.alt ?? 'Con la comunidad'}>
-              <img src={g5?.src} alt={g5?.alt ?? 'Con la comunidad'} loading="lazy" />
-            </figure>
-          </div>
-
-          <p className={s('caption')} data-reveal>
-            La gestión de cerca, junto a los vecinos.
+          <h3 className={s('pageTitle')} data-reveal>
+            {NUEVA_COCHABAMBA.titulo}
+          </h3>
+          <p className={s('pageLead')} data-reveal>
+            {NUEVA_COCHABAMBA.eyebrow}
           </p>
+          <p className={`${s('pageText')} ${s('bajadaClamp')}`} data-reveal>
+            {NUEVA_COCHABAMBA.bajada}
+          </p>
+          <FotoContexto foto={fotos[3]} />
         </div>
       </div>
 
-      {/* PÁGINAS DE VIDEO */}
-      {[
-        { title: 'Playa Turquesa', video: playa, caption: 'Toca el video para verlo en pantalla completa.' },
-        { title: 'Laguna Alalay', video: laguna, caption: 'Un pulmón verde para la ciudad.' },
-        { title: 'Nueva Infraestructura', video: terminal, caption: 'Toca el video para verlo en pantalla completa.' },
-        { title: 'FEXCO Arena', video: fexco, caption: 'Espacios nuevos para la ciudad.' },
-        { title: 'Cocha Market', video: market, caption: 'Comercio y servicios digitales para todos.' },
-        { title: 'Clínica Veterinaria Municipal', video: vet, caption: 'Toca el video para verlo en pantalla completa.' },
-        { title: 'Permiso de Viaje Digital', video: permiso, caption: 'Portal digital para trámites municipales.' },
-      ].map(({ title, video, caption }) => (
-        <div className={s('page')} key={title}>
-          <div className={s('pageInner')}>
-            <h3 className={s('pageTitle')} data-reveal>{title}</h3>
-            <div
-              className={s('videoFrame')}
-              data-expand
-              data-video
-              data-url={video?.src}
-              data-alt={video?.alt ?? `Video - ${title}`}
-              data-reveal="right"
-            >
-              <div className={s('videoPlaceholder')}>
-                <span className={s('playIcon')}>▶</span>
-                <span>{video?.alt ?? title}</span>
-              </div>
-            </div>
-            <p className={s('caption')} data-reveal>{caption}</p>
-          </div>
-        </div>
-      ))}
+      {/* LAS DOS ERAS DE OBRAS.
+          Ojo: el FlipBook cuenta como página cada hijo directo de este fragmento,
+          así que aquí se devuelve una lista PLANA de páginas (flatMap), no divs
+          anidados. */}
+      {ERAS.flatMap((era) => [
+        <PaginaEraIntro
+          key={`${era.id}-intro`}
+          era={era}
+          foto={era.id === 'sonar-en-grande' ? retratoEra2 : fotos[4]}
+        />,
+        ...era.secciones.map((seccion) => {
+          const idxVideo = VIDEO_POR_SECCION[seccion.id];
+          const video = idxVideo != null ? videos[idxVideo] : undefined;
+          return (
+            <PaginaSeccion
+              key={seccion.id}
+              seccion={seccion}
+              video={video}
+              foto={video ? undefined : nextFoto()}
+            />
+          );
+        }),
+      ])}
 
-      {/* 12. CONTRAPORTADA */}
+      {/* CONTRAPORTADA */}
       <div className={s('backCover')}>
         <div className={s('backCoverContent')}>
-          <h3 className={s('backTitle')} data-reveal>Fin</h3>
-          <p className={s('backText')} data-reveal>Cochabamba, ciudad que avanza</p>
+          <h3 className={s('backTitle')} data-reveal>
+            Fin
+          </h3>
+          <p className={s('backText')} data-reveal>
+            Cochabamba, una ciudad que vuelve a soñar en grande.
+          </p>
         </div>
         <div className={s('coverShine')}></div>
       </div>

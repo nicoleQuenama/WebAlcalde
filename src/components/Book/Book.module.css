@@ -22,16 +22,17 @@
   font-family: var(--font-roboto-serif);
 }
 
+/* Sombreado mínimo del pliegue (necesario para que se lea como libro). */
 .page::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to right,
-    rgba(0, 0, 0, 0.06),
+    rgba(0, 0, 0, 0.03),
     transparent 8%,
     transparent 92%,
-    rgba(0, 0, 0, 0.08)
+    rgba(0, 0, 0, 0.03)
   );
   pointer-events: none;
 }
@@ -39,11 +40,11 @@
 .pageInner {
   height: 100%;
   padding: var(--page-padding);
-  padding-top: 36px;
+  padding-top: 32px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 /* Los títulos deben conservar sus nombres originales (sin hash):
@@ -85,16 +86,95 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Encuadrar desde arriba: evita cortar la cabeza del alcalde en los retratos. */
+  object-position: top center;
   border-radius: 10px;
+}
+
+/* Retrato protagonista (páginas donde el alcalde es el tema): la foto se ve
+   COMPLETA (object-fit: contain) y grande, nunca recortada. */
+.mediaPortrait {
+  margin: 0;
+  flex: 1 1 auto;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #f1ecf8;
+  border: 1px solid rgba(71, 45, 130, 0.18);
+}
+
+.mediaPortrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 14px;
+}
+
+/* Texto de entrada un poco más grande para las páginas de apertura. */
+.pageLead {
+  font-size: calc(1rem * var(--book-text-scale, 1));
+  line-height: 1.62;
+  color: #3a3a3a;
+}
+
+/* Recorta la bajada larga a pocas líneas para que la imagen luzca grande. */
+.bajadaClamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Lista compacta de obras dentro de una página del libro. */
+.obraList {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.obraList li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: calc(0.82rem * var(--book-text-scale, 1));
+  line-height: 1.35;
+  color: #333;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 5px;
+}
+
+.obraList li em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 0.85em;
+}
+
+.obraList li.obraMas {
+  border-bottom: none;
+  color: #888;
+  font-style: italic;
 }
 
 .mediaFeature {
   margin: 0;
-  aspect-ratio: 16 / 9;
+  /* Antes tenía un alto fijo (16/9) y quedaba pequeña. Ahora crece para llenar
+     el espacio libre de la página: imágenes más grandes. */
+  flex: 1 1 auto;
+  min-height: 200px;
   overflow: hidden;
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
 }
 
 .mediaStrip {
@@ -105,7 +185,8 @@
 .mediaStrip figure {
   flex: 1;
   margin: 0;
-  aspect-ratio: 1 / 1;
+  /* Más alto que ancho: se ve más de cada foto sin recortar personas. */
+  aspect-ratio: 3 / 4;
   min-width: 0;
   overflow: hidden;
   border-radius: 10px;
@@ -137,7 +218,6 @@
   overflow: hidden;
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
 }
 
 /* todo contenedor marcado con data-expand es clicable */
@@ -151,7 +231,6 @@
 [data-expand]:hover {
   transform: translateY(-2px);
   filter: brightness(1.05);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
@@ -162,11 +241,12 @@
 
 /*  VIDEO  */
 .videoFrame {
-  aspect-ratio: 16 / 9;
+  /* Crece para llenar la página igual que .mediaFeature. */
+  flex: 1 1 auto;
+  min-height: 200px;
   background: #000;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
 }
 
 .videoPlaceholder {
@@ -183,15 +263,15 @@
 
 .playIcon {
   font-size: 2rem;
-  color: var(--accent);
+  color: #c9b8e8;
 }
 
-/*  PORTADA (tapa dura)  */
+/*  PORTADA (tapa dura) — mismo color de marca  */
 .cover,
 .backCover {
   background:
     radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.12), transparent 50%),
-    linear-gradient(145deg, var(--color-primary) 0%, #3b2867 55%, #221647 100%);
+    linear-gradient(145deg, #472d82 0%, #38235f 55%, #2a1a49 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -217,9 +297,9 @@
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(10, 10, 26, 0.2) 0%,
-    rgba(10, 10, 26, 0.35) 55%,
-    rgba(10, 10, 26, 0.72) 100%
+    rgba(42, 26, 73, 0.25) 0%,
+    rgba(42, 26, 73, 0.45) 55%,
+    rgba(42, 26, 73, 0.82) 100%
   );
 }
 
@@ -233,8 +313,8 @@
 
 .coverBadge {
   align-self: flex-start;
-  background: var(--accent);
-  color: #fff;
+  background: #fff;
+  color: #472d82;
   font-size: calc(0.7rem * var(--book-text-scale, 1));
   font-weight: 700;
   text-transform: uppercase;
@@ -247,7 +327,6 @@
   font-size: calc(2rem * var(--book-text-scale, 1));
   line-height: 1.15;
   font-weight: 800;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .coverSubtitle {
@@ -283,7 +362,7 @@
 
 :global(.back-title) {
   font-size: calc(1.6rem * var(--book-text-scale, 1));
-  color: var(--accent);
+  color: #fff;
 }
 
 .backText {

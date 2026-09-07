@@ -14,7 +14,7 @@ const hitos = HISTORIA.map((hito) => ({
 <section class="relative bg-white text-slate-900">
   <div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
     <header class="max-w-2xl">
-      <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#454ca5]">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#472d82]">
         {HISTORIA_INTRO.kicker}
       </p>
       <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]">
@@ -39,7 +39,7 @@ const hitos = HISTORIA.map((hito) => ({
             role="tab"
             data-filtro-btn={f.id}
             aria-selected={i === 0 ? 'true' : 'false'}
-            class="cursor-pointer rounded-full px-5 py-2 text-[13px] font-semibold tracking-wide text-slate-500 transition-colors hover:text-slate-900 aria-selected:bg-[#454ca5] aria-selected:text-white"
+            class="cursor-pointer rounded-full px-5 py-2 text-[13px] font-semibold tracking-wide text-slate-500 transition-colors hover:text-slate-900 aria-selected:bg-[#472d82] aria-selected:text-white"
           >
             {f.label}
           </button>
@@ -52,7 +52,7 @@ const hitos = HISTORIA.map((hito) => ({
       <span
         aria-hidden="true"
         data-riel-avance
-        class="absolute left-3 top-2 bottom-8 w-px origin-top scale-y-0 bg-[#454ca5]/70 transition-transform duration-150 ease-out"
+        class="absolute left-3 top-2 bottom-8 w-px origin-top scale-y-0 bg-[#472d82]/70 transition-transform duration-150 ease-out"
       ></span>
 
       {
@@ -64,7 +64,7 @@ const hitos = HISTORIA.map((hito) => ({
           >
             <span
               aria-hidden="true"
-              class="absolute left-3 top-[6px] h-3 w-3 -translate-x-1/2 rounded-full border-2 border-[#454ca5] bg-white"
+              class="absolute left-3 top-[6px] h-3 w-3 -translate-x-1/2 rounded-full border-2 border-[#472d82] bg-white"
             />
 
             <div class="mb-4 lg:mb-0 lg:pt-[2px] lg:text-right">
@@ -79,7 +79,7 @@ const hitos = HISTORIA.map((hito) => ({
                 type="button"
                 data-galeria-idx={hito.galeriaIdx}
                 aria-label={`Ampliar foto: ${hito.titulo}`}
-                class="group mb-4 block w-full cursor-zoom-in overflow-hidden rounded-xl border border-slate-200 shadow-sm outline-none transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-[#454ca5]/60 lg:mb-0"
+                class="group mb-4 block w-full cursor-zoom-in overflow-hidden rounded-xl border border-slate-200 outline-none focus-visible:ring-2 focus-visible:ring-[#472d82]/60 lg:mb-0"
               >
                 <span class="relative block aspect-[4/3]">
                   <img
@@ -95,7 +95,7 @@ const hitos = HISTORIA.map((hito) => ({
                 </span>
               </button>
             ) : (
-              <figure class="mb-4 overflow-hidden rounded-xl border border-slate-200 shadow-sm lg:mb-0">
+              <figure class="mb-4 overflow-hidden rounded-xl border border-slate-200 lg:mb-0">
                 <div class="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1.5 bg-slate-50">
                   <span class="text-[2rem] font-bold leading-none text-slate-300">{hito.anio}</span>
                   <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -119,9 +119,9 @@ const hitos = HISTORIA.map((hito) => ({
       <li class="relative pl-10 lg:pl-12" data-hito data-tipo="historia">
         <span
           aria-hidden="true"
-          class="absolute left-3 top-1 h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-[#454ca5] ring-4 ring-white"
+          class="absolute left-3 top-1 h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-[#472d82] ring-4 ring-white"
         ></span>
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[#454ca5]">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[#472d82]">
           2026 · gestión en curso
         </p>
       </li>

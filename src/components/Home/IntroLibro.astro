@@ -1,0 +1,100 @@
+---
+/**
+ * IntroLibro — banda de "introducción al libro" en el home.
+ *
+ * Reemplaza al contenedor grande del libro que había antes: ahora es una franja
+ * compacta con un texto breve y el <FlipBook>. El libro se abre ahí mismo, a
+ * pantalla completa (overlay), sin ir a otra página.
+ *
+ * El índice (`toc`) se arma a partir del temario para que coincida página a
+ * página con el contenido de Book.tsx.
+ */
+import FlipBook from '../FlipBook/FlipBook';
+import Book from '../Book/Book';
+import {
+  PRESENTACION,
+  CRECIMIENTO,
+  NUEVA_COCHABAMBA,
+  ERAS,
+} from '../../constants/temario';
+
+// Rutas con espacios → codificadas.
+const ALCALDE =
+  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.1%20Fotograf%C3%ADas%20del%20alcalde/';
+const GENTE =
+  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
+const VIDEOS = '/Mas%20Recursos/3.%20Otros%20recursos/';
+
+// Fotos que Book.tsx reparte entre las páginas.
+const fotos = [
+  { src: ALCALDE + 'DSC_0802.jpg', alt: 'Manfred Reyes Villa' },
+  { src: GENTE + '6P9A5493.jpg', alt: 'Con la gente' },
+  { src: GENTE + 'IMG_7166.jpg', alt: 'En los barrios de Cochabamba' },
+  { src: ALCALDE + 'DSC_0790.jpg', alt: 'El alcalde en una obra' },
+  { src: GENTE + 'IMG_2941.jpg', alt: 'Cerca de los vecinos' },
+  { src: ALCALDE + 'IMG_0643.jpg', alt: 'Manfred Reyes Villa' },
+  { src: GENTE + 'IMG_5001.jpg', alt: 'Con la comunidad' },
+  { src: GENTE + 'IMG_1215.jpg', alt: 'Con la comunidad' },
+];
+
+// Videos en el orden que espera Book.tsx: playa, laguna, terminal, fexco, market, vet, permiso.
+const videos = [
+  { src: VIDEOS + '01%20PLAYA%20TURQUESA.mp4', alt: 'Playa Turquesa' },
+  { src: VIDEOS + '02%20LAGUNA%20ALALAY.mp4', alt: 'Laguna Alalay' },
+  { src: VIDEOS + '03%20ACCESOS%20NUEVA%20TERMINAL%20DE%20BUSES.mp4', alt: 'Accesos a la nueva terminal de buses' },
+  { src: VIDEOS + '04%20FEXCO%20ARENA.mp4', alt: 'FEXCO Arena' },
+  { src: VIDEOS + '06%20COCHA%20MARKET.mp4', alt: 'Cocha Market' },
+  { src: VIDEOS + '07%20CL%C3%8DNICA%20VETERINARIA%20MUNICIPAL.mp4', alt: 'Clínica Veterinaria Municipal' },
+  { src: VIDEOS + '05%20PERMISO%20DE%20VIAJE%20DIGITAL.mp4', alt: 'Permiso de Viaje Digital' },
+];
+
+// Índice del libro (mismo orden de páginas que Book.tsx).
+let p = 1;
+const aperturaItems = [
+  { label: 'Portada', page: 0 },
+  { label: PRESENTACION.eyebrow, page: p++ },
+  { label: CRECIMIENTO.titulo, page: p++ },
+  { label: NUEVA_COCHABAMBA.titulo, page: p++ },
+];
+const gruposEras = ERAS.map((era) => {
+  const items = [{ label: era.titulo, page: p++ }];
+  for (const sec of era.secciones) items.push({ label: sec.titulo, page: p++ });
+  return { title: era.eyebrow, items };
+});
+const toc = [
+  { title: 'Apertura', items: aperturaItems },
+  ...gruposEras,
+  { title: 'Cierre', items: [{ label: 'Contraportada', page: p }] },
+];
+---
+
+<!-- Bloque OSCURO: el color de marca (#472d82) ocupa todo el ancho de la sección. -->
+<section class="bg-[#472d82] text-white">
+  <div class="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-16 lg:px-8 lg:py-20">
+    <header class="max-w-2xl">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#c9b8e8]">
+        El libro digital
+      </p>
+      <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl">
+        Cocha, la mejor ciudad de Bolivia
+      </h2>
+      <p class="mt-4 text-base leading-relaxed text-white/75">
+        Un recorrido en imágenes por las obras que transformaron Cochabamba, de los años 90 a
+        la gestión 2021–2026. Ábrelo y hojéalo página por página, con fotos y videos.
+      </p>
+    </header>
+
+    <FlipBook
+      client:idle
+      width={350}
+      height={560}
+      title="Cocha, la mejor ciudad de Bolivia"
+      subtitle="Las obras, los servicios y la gestión de la ciudad, contadas como un álbum."
+      ctaLabel="Abrir libro"
+      coverImage="/cocha.jpg"
+      toc={toc}
+    >
+      <Book coverImage="/cocha.jpg" fotos={fotos} videos={videos} />
+    </FlipBook>
+  </div>
+</section>

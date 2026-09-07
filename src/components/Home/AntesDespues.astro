@@ -1,0 +1,44 @@
+---
+/**
+ * AntesDespues — sección "antes / después" del home (bloque CLARO).
+ *
+ * Ilustra "Cómo ha crecido Cochabamba: de una ciudad de ayer a una que mira al
+ * futuro". Un solo comparador grande con flechas a los costados para recorrer
+ * todos los pares (componente <ComparadorAntesDespues>).
+ *
+ * ⚠️ No hay fotos históricas todavía: pares de fotos actuales como marcador.
+ *    TODO: cargar los pares antes/después reales.
+ */
+import ComparadorAntesDespues from './ComparadorAntesDespues';
+import type { ParComparador } from './ComparadorAntesDespues';
+
+const GENTE =
+  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
+
+// Fotos de escena (no retratos): el comparador 16:9 no recorta a nadie.
+const pares: ParComparador[] = [
+  { titulo: 'Espacio público', antes: GENTE + 'IMG_7166.jpg', despues: GENTE + 'IMG_2941.jpg' },
+  { titulo: 'Infraestructura vial', antes: GENTE + 'IMG_1215.jpg', despues: GENTE + 'IMG_5001.jpg' },
+  { titulo: 'Áreas verdes', antes: GENTE + '6P9A5493.jpg', despues: GENTE + 'IMG_1088.jpg' },
+];
+---
+
+<section class="bg-white">
+  <div class="mx-auto max-w-5xl px-6 py-20 lg:px-8 lg:py-28">
+    <header class="max-w-2xl">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#472d82]">
+        Antes y después
+      </p>
+      <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
+        De una ciudad de ayer a una que mira al futuro
+      </h2>
+      <p class="mt-4 max-w-xl text-base leading-relaxed text-slate-600">
+        Desliza el tirador para comparar cada punto; usa las flechas para pasar al siguiente.
+      </p>
+    </header>
+
+    <div class="mt-12">
+      <ComparadorAntesDespues client:visible pares={pares} />
+    </div>
+  </div>
+</section>
