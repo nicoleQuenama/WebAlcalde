@@ -60,7 +60,7 @@ export const HISTORIA: Hito[] = [
     etapa: 'Origen',
     titulo: 'Nace en La Paz',
     descripcion:
-      'Manfred Reyes Villa Bacigalupi nace en 1955 en la ciudad de La Paz. Con los años ' +
+      'Manfred Armando Antonio Reyes Villa Bacigalupi nace el 19 de abril de 1955 en la ciudad de La Paz. Con los años ' +
       'se hará cochabambino por decisión. Está casado y tiene 7 hijos, dos de ellas fallecidas.',
   },
   {
