@@ -241,10 +241,6 @@ export default function Book({ coverImage, fotos, videos }: BookProps) {
           <p className={`${s('pageLead')} ${s('bajadaClamp')}`} data-reveal>
             {PRESENTACION.bajada}
           </p>
-          <p className={s('caption')} data-reveal>
-            Arrastra las esquinas o usa las flechas del teclado. Toca cualquier imagen o
-            video para verlo en grande.
-          </p>
         </div>
       </div>
 
