@@ -3,34 +3,127 @@
  * /gestion — El recorrido completo de obras del libro
  * "Cocha, la mejor ciudad de Bolivia".
  *
- * Toda la estructura y los textos salen de src/constants/temario.ts:
+ * Toda la estructura y los textos salen de la base SQLite (src/lib/db.ts);
+ * las fotos/videos resuelven Supabase (src/lib/media.ts):
  *   1. Hero de gestión.
  *   2. Capítulos de apertura (presentación / cómo creció la ciudad / el inicio de una nueva Cochabamba).
  *   3. Las dos ERAS de obras completas (años 90 y gestión 2021–2026), cada una con
- *      sus subsecciones, imagen y la lista completa de obras — <Era> + <SeccionObras>.
+ *      sus subsecciones, imagen y la lista completa de obras.
  *   4. Carrusel de proyectos con foto/video real (#proyectos).
+ *
+ * Las secciones viven AQUÍ dentro: ya no hay componentes .astro intermedios.
  */
 import Layout from '../layouts/Layout.astro';
-import HeroGestion from '../components/Gestion/HeroGestion.astro';
-import Era from '../components/Gestion/Era.astro';
-import Proyectos from '../components/Gestion/Proyectos.astro';
-import { PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA, ERAS } from '../constants/temario';
+import { Image, getImage } from 'astro:assets';
+import HeroCards from '../components/Hero/HeroCard.tsx';
+import { ajusteImagen } from '../lib/ajusteImagen';
+import { getCapitulos, getGestionHero, getEras, getProyectos, getProyectosTitulo } from '../lib/db';
 
-// Los capítulos de apertura comparten formato: iteramos para no repetir markup.
-const capitulosApertura = [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA];
+// ── HERO DE GESTIÓN ──────────────────────────────────────────────────
+const GESTION_HERO = getGestionHero();
+
+// ── CAPÍTULOS DE APERTURA ────────────────────────────────────────────
+const capitulosApertura = getCapitulos();
+
+// ── ERAS DE OBRAS ────────────────────────────────────────────────────
+const ERAS = getEras();
+
+// ── PROYECTOS ────────────────────────────────────────────────────────
+const PROYECTOS = getProyectos();
+const PROYECTOS_TITULO = getProyectosTitulo();
+
+const imagenes = await Promise.all(
+  PROYECTOS.map(async (p, i) => ({
+    id: i,
+    src: (
+      await getImage({
+        src: p.imagen,
+        width: 900,
+        ...(p.w && p.h ? { height: Math.max(1, Math.round((900 * p.h) / p.w)) } : {}),
+        fit: 'cover',
+        format: 'webp',
+      })
+    ).src,
+    titulo: p.titulo,
+    encuadre: p.encuadre ?? ('centro' as const),
+  })),
+);
+
+// Un único color (el de marca): el estado se distingue por opacidad, no por otro tono.
+const colorEstado: Record<string, string> = {
+  'En ejecución': 'bg-white/15 text-white border-white/30',
+  Concluido: 'bg-white/[0.06] text-white/75 border-white/20',
+  'En diseño': 'bg-white/[0.06] text-white/60 border-white/15',
+};
 ---
 
 <Layout title="Gestión — Cocha, la mejor ciudad de Bolivia">
 	<main>
-		<HeroGestion />
+		<!-- ═══ HERO DE GESTIÓN ═══ -->
+		<section
+			aria-labelledby="gestion-title"
+			class="relative flex min-h-[88vh] w-full items-center overflow-hidden bg-primary pt-[64px] text-white"
+		>
+			<span
+				aria-hidden="true"
+				class="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 select-none whitespace-nowrap font-black leading-none tracking-[-0.06em] text-white/[0.04]"
+				style="font-size: clamp(120px, 26vw, 400px);"
+			>
+				GESTIÓN
+			</span>
 
-		<!-- Capítulos de apertura del temario (sin lista de obras) -->
+			<div aria-hidden="true" class="pointer-events-none absolute inset-0">
+				<span class="absolute left-5 top-[84px] hidden h-4 w-4 border-l-2 border-t-2 border-white/20 md:block lg:left-10"></span>
+				<span class="absolute right-5 top-[84px] hidden h-4 w-4 border-r-2 border-t-2 border-white/20 md:block lg:right-10"></span>
+				<span class="absolute bottom-6 left-5 hidden h-4 w-4 border-b-2 border-l-2 border-white/20 md:block lg:left-10"></span>
+				<span class="absolute bottom-6 right-5 hidden h-4 w-4 border-b-2 border-r-2 border-white/20 md:block lg:right-10"></span>
+				<div class="absolute inset-x-0 bottom-[16%] flex items-center gap-4 px-[8vw]">
+					<span class="h-px flex-1 bg-white/12"></span>
+					<span class="h-1.5 w-1.5 rotate-45 border border-white/30"></span>
+					<span class="h-px flex-1 bg-white/12"></span>
+				</div>
+			</div>
+
+			<div class="relative z-10 mx-auto w-full max-w-6xl px-6 lg:px-10" data-hero-gestion>
+				<p class="anim text-[11px] font-semibold uppercase tracking-[0.4em] text-accent" style="--d:0ms">
+					{GESTION_HERO.kicker}
+				</p>
+
+				<h1
+					id="gestion-title"
+					class="anim mt-5 max-w-4xl text-[2.4rem] font-black leading-[1.02] tracking-tight sm:text-5xl lg:text-[4rem]"
+					style="--d:80ms"
+				>
+					{GESTION_HERO.titulo}
+				</h1>
+
+				<p class="anim mt-6 max-w-2xl text-base leading-relaxed text-white/70 lg:text-lg" style="--d:160ms">
+					{GESTION_HERO.bajada}
+				</p>
+
+				<div class="anim mt-9 flex flex-wrap items-center gap-3" style="--d:240ms">
+					<span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-white/90">
+						<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
+						{GESTION_HERO.periodo}
+					</span>
+					<a
+						href="#proyectos"
+						class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-primary transition-transform hover:-translate-y-0.5"
+					>
+						Ver proyectos
+						<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- ═══ CAPÍTULOS DE APERTURA (sin lista de obras) ═══ -->
 		<section class="bg-white">
 			<div class="mx-auto max-w-5xl divide-y divide-slate-900/10 px-6 lg:px-8">
 				{
 					capitulosApertura.map((cap) => (
 						<article id={cap.id} class="scroll-mt-24 py-16 lg:py-20">
-							<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#472d82]">
+							<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
 								{cap.eyebrow}
 							</p>
 							<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
@@ -45,10 +138,185 @@ const capitulosApertura = [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA];
 			</div>
 		</section>
 
-		<!-- Las dos eras de obras completas -->
-		{ERAS.map((era) => <Era era={era} />)}
+		<!-- ═══ LAS DOS ERAS DE OBRAS COMPLETAS ═══ -->
+		{
+			ERAS.map((era) => (
+				<section id={era.id} class="scroll-mt-20">
+					<!-- Encabezado del capítulo (color de marca, igual que el navbar) -->
+					<div class="bg-primary text-white">
+						<div class="mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-24">
+							<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent">
+								{era.eyebrow}
+							</p>
+							<h2 class="mt-4 max-w-4xl text-[2rem] font-black leading-[1.05] tracking-tight sm:text-4xl lg:text-[3rem]">
+								{era.titulo}
+							</h2>
+							<p class="mt-6 max-w-3xl text-base leading-relaxed text-white/70 lg:text-lg">
+								{era.bajada}
+							</p>
+						</div>
+					</div>
 
-		<!-- Carrusel de proyectos con foto/video real -->
-		<Proyectos />
+					<!-- Subsecciones con sus obras (la imagen alterna de lado según el índice) -->
+					<div class="bg-white">
+						<div class="mx-auto max-w-6xl px-6 lg:px-8">
+							{
+								era.secciones.map((seccion, i) => {
+									// Pares → imagen a la izquierda; impares → imagen a la derecha (ritmo visual).
+									const imagenDerecha = i % 2 === 1;
+									// Encuadre y tamaño real de la foto (llega dentro de la sección desde la DB).
+									const dims =
+										seccion.imagenW && seccion.imagenH
+											? { w: seccion.imagenW, h: seccion.imagenH, encuadre: seccion.encuadre, ajuste: seccion.ajuste }
+											: undefined;
+									const imagenPos: string = dims ? ajusteImagen(dims).objectPosition : '50% 30%';
+									const imagenH: number | undefined = dims ? Math.round((704 * dims.h) / dims.w) : undefined;
+									return (
+										<section id={seccion.id} class="scroll-mt-24 border-b border-slate-900/10 py-16 lg:py-20">
+											<div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16">
+												{seccion.imagen && (
+													<figure class:list={['lg:w-[22rem] lg:shrink-0 lg:sticky lg:top-28', imagenDerecha && 'lg:order-2']}>
+														<div class="overflow-hidden rounded-2xl border border-slate-200">
+															{dims ? (
+																<Image
+																	src={seccion.imagen}
+																	alt={seccion.imagenAlt ?? seccion.titulo}
+																	width={704}
+																	height={imagenH}
+																	widths={[352, 528, 704]}
+																	sizes="(min-width: 1024px) 22rem, 100vw"
+																	loading="lazy"
+																	decoding="async"
+																	class="aspect-[4/3] w-full bg-slate-100 object-cover"
+																	style={`object-position: ${imagenPos}`}
+																/>
+															) : (
+																<Image
+																	src={seccion.imagen}
+																	alt={seccion.imagenAlt ?? seccion.titulo}
+																	inferSize
+																	width={704}
+																	widths={[352, 528, 704]}
+																	sizes="(min-width: 1024px) 22rem, 100vw"
+																	loading="lazy"
+																	decoding="async"
+																	class="aspect-[4/3] w-full bg-slate-100 object-cover object-[50%_30%]"
+																/>
+															)}
+														</div>
+													</figure>
+												)}
+
+												<div class="min-w-0 flex-1">
+													<h3 class="text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.75rem]">
+														{seccion.titulo}
+													</h3>
+													{seccion.bajada && (
+														<p class="mt-4 max-w-2xl text-[15px] leading-relaxed text-slate-600 lg:text-base">
+															{seccion.bajada}
+														</p>
+													)}
+
+													<p class="mt-6 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
+														{seccion.obras.length} {seccion.obras.length === 1 ? 'obra' : 'obras'}
+													</p>
+
+													<ul class="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+														{
+															seccion.obras.map((obra) => (
+																<li class="border-t-2 border-slate-900/10 pt-3">
+																	<div class="flex flex-wrap items-center gap-2">
+																		{obra.anio && (
+																			<span class="rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold tabular-nums text-white">
+																				{obra.anio}
+																			</span>
+																		)}
+																		{obra.video && (
+																			<span class="inline-flex items-center gap-1 rounded-full border border-primary/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-primary">
+																				<svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+																				Video
+																			</span>
+																		)}
+																	</div>
+																	<h4 class="mt-1.5 text-[15px] font-semibold leading-snug tracking-tight text-slate-900">
+																		{obra.nombre}
+																	</h4>
+																	{obra.detalle && (
+																		<p class="mt-1 text-[13px] leading-relaxed text-slate-500">
+																			{obra.detalle}
+																		</p>
+																	)}
+																</li>
+															))
+														}
+													</ul>
+												</div>
+											</div>
+										</section>
+									);
+								})
+							}
+						</div>
+					</div>
+				</section>
+			))
+		}
+
+		<!-- ═══ CARRUSEL DE PROYECTOS CON FOTO/VIDEO REAL ═══ -->
+		<section id="proyectos" class="scroll-mt-20 bg-primary text-white">
+			<div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
+				<header class="max-w-2xl">
+					<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent">
+						{PROYECTOS_TITULO.kicker}
+					</p>
+					<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]">
+						{PROYECTOS_TITULO.titulo}
+					</h2>
+					<p class="mt-5 text-base leading-relaxed text-white/65 lg:text-lg">{PROYECTOS_TITULO.bajada}</p>
+				</header>
+
+				<!-- Carrusel de tarjetas (mismo formato que la página Sobre) -->
+				<div class="mt-10 flex justify-center lg:mt-14">
+					<HeroCards client:visible imagenes={imagenes} autoplayMs={4500} />
+				</div>
+
+				<!-- Detalle de cada proyecto -->
+				<ul class="mt-16 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
+					{
+						PROYECTOS.map((p) => (
+							<li class="flex flex-col gap-3 bg-primary p-7">
+								<div class="flex items-center justify-between gap-3">
+									<span class="text-[10px] font-semibold uppercase tracking-[0.24em] text-accent">
+										{p.categoria}
+									</span>
+									<span class={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${colorEstado[p.estado] ?? 'border-white/20 text-white/70'}`}>
+										{p.estado}
+									</span>
+								</div>
+								<h3 class="text-lg font-bold tracking-tight">{p.titulo}</h3>
+								<p class="text-[15px] leading-relaxed text-white/65">{p.descripcion}</p>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</section>
 	</main>
 </Layout>
+
+<style>
+	@media (prefers-reduced-motion: no-preference) {
+		[data-hero-gestion] .anim {
+			opacity: 0;
+			transform: translateY(18px);
+			animation: heroGestionIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+			animation-delay: var(--d, 0ms);
+		}
+		@keyframes heroGestionIn {
+			to {
+				opacity: 1;
+				transform: none;
+			}
+		}
+	}
+</style>

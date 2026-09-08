@@ -28,6 +28,9 @@ devserver.log
 # public: contenido multimedia pesado/no versionado
 public/multimedia
 
+# base de datos de contenido (se genera/sembra en build)
+data/
+
 # Created by https://www.toptal.com/developers/gitignore/api/astro,react
 # Edit at https://www.toptal.com/developers/gitignore?templates=astro,react
 

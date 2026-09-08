@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { NavItem } from "../../types/nav";
-import { MEDIA } from "../../constants/media";
+import { MEDIA } from "../../lib/media";
 import  "../../styles/global.css";
 
 interface Props {

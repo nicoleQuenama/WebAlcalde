@@ -76,7 +76,7 @@
 :global(.page-title) {
   font-size: calc(1.3rem * var(--book-text-scale, 1));
   color: var(--ink);
-  border-bottom: 2px solid var(--accent);
+  border-bottom: 2px solid var(--color-primary);
   padding-bottom: 8px;
 }
 
@@ -178,7 +178,7 @@
 .obraList li em {
   font-style: normal;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--color-primary);
   font-size: 0.85em;
 }
 
@@ -253,7 +253,7 @@
 [data-expand]:hover {
   transform: translateY(-2px);
   filter: brightness(1.05);
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
 
@@ -285,7 +285,7 @@
 
 .playIcon {
   font-size: 2rem;
-  color: #c9b8e8;
+  color: var(--color-accent);
 }
 
 /*  PORTADA (tapa dura) — mismo color de marca  */
@@ -293,7 +293,7 @@
 .backCover {
   background:
     radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.12), transparent 50%),
-    linear-gradient(145deg, #472d82 0%, #38235f 55%, #2a1a49 100%);
+    linear-gradient(145deg, var(--color-primary) 0%, var(--color-primary-deep) 55%, var(--color-primary-deepest) 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -336,7 +336,7 @@
 .coverBadge {
   align-self: flex-start;
   background: #fff;
-  color: #472d82;
+  color: var(--color-primary);
   font-size: calc(0.7rem * var(--book-text-scale, 1));
   font-weight: 700;
   text-transform: uppercase;

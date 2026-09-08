@@ -1,18 +1,11 @@
 import type { ReactNode } from 'react';
 import styles from './Book.module.css';
-import {
-  PRESENTACION,
-  CRECIMIENTO,
-  NUEVA_COCHABAMBA,
-  ERAS,
-  type SeccionTemario,
-  type EraTemario,
-} from '../../constants/temario';
+import type { Capitulo, SeccionTemario, EraTemario } from '../lib/db';
 
 /**
  * Book — páginas del libro digital (FlipBook).
  *
- * El texto y el orden salen de src/constants/temario.ts, así el libro que se
+ * El texto y el orden salen de la base SQLite (src/lib/db.ts), así el libro que se
  * hojea sigue exactamente la misma estructura que la página /gestion:
  *
  *   Portada
@@ -44,6 +37,10 @@ export interface Video {
 export interface BookProps {
   /** Imagen de portada. */
   coverImage: string;
+  /** Capítulos de apertura (presentación, crecimiento, nueva Cochabamba). */
+  capitulos: Capitulo[];
+  /** Las dos eras de obras completas (años 90 y 2021–2026). */
+  eras: EraTemario[];
   /** Fotos disponibles para ilustrar páginas (alcalde + gente). */
   fotos: IMG[];
   /** Videos en orden del temario: playa, laguna, terminal, fexco, market, vet, permiso. */
@@ -191,7 +188,9 @@ function PaginaEraIntro({ era, foto }: { era: EraTemario; foto?: IMG }) {
   );
 }
 
-export default function Book({ coverImage, fotos, videos }: BookProps) {
+export default function Book({ coverImage, capitulos, eras, fotos, videos }: BookProps) {
+  const [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA] = capitulos;
+  const ERAS = eras;
   // Fotos con más presencia del alcalde (retrato). El resto son de contexto.
   const retratoPresentacion = fotos[0];
   const retratoEra2 = fotos[5] ?? fotos[0];

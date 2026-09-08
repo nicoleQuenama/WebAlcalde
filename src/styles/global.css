@@ -4,9 +4,6 @@
 :root {
   --ink: #1f1533;
   --paper: #ffffff;
-  /* Color único de la marca (el mismo del navbar). Todo lo demás son blancos
-     y grises neutros; las secciones alternan entre este color y blanco. */
-  --accent: #472d82;
 }
 
 * {
@@ -25,8 +22,14 @@ body {
 @theme {
   --font-roboto-serif: "Roboto Serif", serif;
 
+  /* Tokens visuales de la marca. Únicos colores de acento del sitio:
+     - primary:  color de marca (mismo del navbar) — fondos oscuros, textos acento.
+     - accent:   tono claro de la marca — etiquetas/eyebrows sobre primary.
+     - primary-deep/deepest: degradado de la marca (libros, tapas). */
   --color-primary: #472d82;
-  --color-second: #695da9;
+  --color-accent: #c9b8e8;
+  --color-primary-deep: #38235f;
+  --color-primary-deepest: #2a1a49;
 
   --animate-zoomIn: zoomIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   --animate-fadeIn: fadeIn 0.3s ease-out forwards;
