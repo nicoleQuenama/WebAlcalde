@@ -10,6 +10,7 @@
  * "Foto de archivo" hasta cargar la foto histórica real.
  */
 import { MEDIA } from './media';
+import type { Encuadre } from '../lib/ajusteImagen';
 
 export type TipoHito = 'historia' | 'reconocimiento';
 
@@ -25,6 +26,12 @@ export interface Hito {
   /** Ruta pública de la imagen. Opcional. */
   imagen?: string;
   imagenAlt?: string;
+  /** Dimensiones reales de la foto (para optimizarla sin deformar). */
+  imagenW?: number;
+  imagenH?: number;
+  /** Encuadre por foto (misma lógica que las cards del hero, ver ajusteImagen). */
+  encuadre?: Encuadre;
+  zoomOut?: boolean;
 }
 
 export const FILTROS_HITO: { id: TipoHito; label: string }[] = [
@@ -120,6 +127,10 @@ export const HISTORIA: Hito[] = [
       'Asociaciones Municipales ante la WACLAC, con base en Ginebra, Suiza.',
     imagen: MEDIA.historia.prefecto,
     imagenAlt: 'Manfred Reyes Villa',
+    imagenW: 2832,
+    imagenH: 3826,
+    encuadre: 'rostro',
+    zoomOut: true,
   },
   {
     anio: '2005',
@@ -130,6 +141,9 @@ export const HISTORIA: Hito[] = [
       'voto directo de la ciudadanía.',
     imagen: MEDIA.historia.regreso2020,
     imagenAlt: 'Manfred Reyes Villa con la gente',
+    imagenW: 5777,
+    imagenH: 3578,
+    encuadre: 'centro',
   },
   {
     anio: '2009',
@@ -150,6 +164,10 @@ export const HISTORIA: Hito[] = [
       'los votos.',
     imagen: MEDIA.historia.alcalde2021,
     imagenAlt: 'Manfred Reyes Villa, alcalde de Cochabamba',
+    imagenW: 2549,
+    imagenH: 3568,
+    encuadre: 'rostro',
+    zoomOut: true,
   },
   {
     anio: 'Hoy',
@@ -161,6 +179,9 @@ export const HISTORIA: Hito[] = [
       'permita— siempre con honestidad, firmeza y capacidad.',
     imagen: MEDIA.historia.ciudadInteligente,
     imagenAlt: 'Cochabamba hoy',
+    imagenW: 4000,
+    imagenH: 3000,
+    encuadre: 'centro',
   },
 
   // ── Pestaña "Reconocimiento" ────────────────────────────────────────
@@ -175,6 +196,9 @@ export const HISTORIA: Hito[] = [
       'Es elegido Presidente de la Asociación de Gobiernos Municipales Autónomos de Bolivia ' +
       'durante su gestión como Alcalde de Cochabamba.',
     imagen: MEDIA.premios[1],
+    imagenW: 1980,
+    imagenH: 2641,
+    encuadre: 'centro',
   },
   {
     tipo: 'reconocimiento',
@@ -186,6 +210,9 @@ export const HISTORIA: Hito[] = [
       'Asociaciones Municipales ante la WACLAC (World Association of Cities and Local ' +
       'Authorities Coordination), con base en Ginebra, Suiza.',
     imagen: MEDIA.premios[3],
+    imagenW: 4284,
+    imagenH: 3416,
+    encuadre: 'centro',
   },
   {
     tipo: 'reconocimiento',
@@ -196,5 +223,9 @@ export const HISTORIA: Hito[] = [
       'Es distinguido como "Embajador de la Organización Mundial Ciudades Sostenibles 2026" ' +
       'en París, Francia.',
     imagen: MEDIA.premios[0],
+    imagenW: 1032,
+    imagenH: 1207,
+    encuadre: 'rostro',
+    zoomOut: true,
   },
 ];

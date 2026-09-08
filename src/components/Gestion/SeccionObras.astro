@@ -12,6 +12,8 @@
  */
 import { Image } from 'astro:assets';
 import type { SeccionTemario } from '../../constants/temario';
+import { MEDIA } from '../../constants/media';
+import { ajusteImagen } from '../../lib/ajusteImagen';
 
 interface Props {
   seccion: SeccionTemario;
@@ -21,6 +23,12 @@ interface Props {
 const { seccion, indice = 0 } = Astro.props;
 // Pares → imagen a la izquierda; impares → imagen a la derecha (ritmo visual).
 const imagenDerecha = indice % 2 === 1;
+
+// Dimensiones y encuadre reales de la foto (evita recortes tipo "sliver" de Astro
+// en webp remotos y enfoca la zona correcta, igual que las cards del hero).
+const dims = MEDIA.temarioDims[seccion.id];
+const imagenPos = dims ? ajusteImagen(dims).objectPosition : '50% 30%';
+const imagenH = dims ? Math.round((704 * dims.h) / dims.w) : undefined;
 ---
 
 <section id={seccion.id} class="scroll-mt-24 border-b border-slate-900/10 py-16 lg:py-20">
@@ -29,17 +37,32 @@ const imagenDerecha = indice % 2 === 1;
     {seccion.imagen && (
       <figure class:list={['lg:w-[22rem] lg:shrink-0 lg:sticky lg:top-28', imagenDerecha && 'lg:order-2']}>
         <div class="overflow-hidden rounded-2xl border border-slate-200">
-          <Image
-            src={seccion.imagen}
-            alt={seccion.imagenAlt ?? seccion.titulo}
-            inferSize
-            width={704}
-            widths={[352, 528, 704]}
-            sizes="(min-width: 1024px) 22rem, 100vw"
-            loading="lazy"
-            decoding="async"
-            class="aspect-[4/3] w-full bg-slate-100 object-cover object-[50%_30%]"
-          />
+          {dims ? (
+            <Image
+              src={seccion.imagen}
+              alt={seccion.imagenAlt ?? seccion.titulo}
+              width={704}
+              height={imagenH}
+              widths={[352, 528, 704]}
+              sizes="(min-width: 1024px) 22rem, 100vw"
+              loading="lazy"
+              decoding="async"
+              class="aspect-[4/3] w-full bg-slate-100 object-cover"
+              style={`object-position: ${imagenPos}`}
+            />
+          ) : (
+            <Image
+              src={seccion.imagen}
+              alt={seccion.imagenAlt ?? seccion.titulo}
+              inferSize
+              width={704}
+              widths={[352, 528, 704]}
+              sizes="(min-width: 1024px) 22rem, 100vw"
+              loading="lazy"
+              decoding="async"
+              class="aspect-[4/3] w-full bg-slate-100 object-cover object-[50%_30%]"
+            />
+          )}
         </div>
       </figure>
     )}

@@ -4,6 +4,7 @@
  * Las imágenes salen del bucket de Supabase (ver src/constants/media.ts).
  */
 import { MEDIA } from './media';
+import type { Encuadre } from '../lib/ajusteImagen';
 
 export const GESTION_HERO = {
   kicker: 'Alcaldía de Cochabamba',
@@ -56,6 +57,8 @@ export interface Proyecto {
   /** Dimensiones reales de la foto (para optimizarla sin deformarla). */
   w: number;
   h: number;
+  /** Encuadre de la card (misma lógica que el hero, ver ajusteImagen). */
+  encuadre?: Encuadre;
 }
 
 export const PROYECTOS_TITULO = {

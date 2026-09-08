@@ -16,7 +16,7 @@ const imagenes = await Promise.all(
       })
     ).src,
     titulo: p.titulo,
-    encuadre: 'centro' as const,
+    encuadre: p.encuadre ?? ('centro' as const),
   })),
 );
 

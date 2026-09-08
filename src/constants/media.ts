@@ -42,6 +42,15 @@ export interface FotoMedia {
   ajuste?: AjusteCarrusel;
 }
 
+/** Solo dimensiones + encuadre (para imágenes que ya vienen armadas como string). */
+export interface FotoEncaje {
+  w: number;
+  h: number;
+  encuadre?: Encuadre;
+  zoomOut?: boolean;
+  ajuste?: AjusteCarrusel;
+}
+
 export interface ParAntesDespues {
   titulo: string;
   antes: string;
@@ -173,6 +182,31 @@ export const MEDIA = {
     vanguardia: home('DJI_20260315233117_0043_D_CORSO2026'), // aérea de la ciudad
     alianzas: premio('01 ALCALDE FRANCIA OK.webp'), // distinción internacional (París)
   } as Record<string, string>,
+
+  /**
+   * Dimensiones reales y encuadre por subsección del temario.
+   * Clave = `id` de la subsección (misma que `MEDIA.temario`).
+   * Misma lógica que las cards del hero (ver ajusteImagen).
+   */
+  temarioDims: {
+    puentes: { w: 4000, h: 3000, encuadre: 'centro' },
+    conectividad: { w: 6240, h: 4160, encuadre: 'centro' },
+    'ciudad-jardin-90': { w: 4378, h: 3014, encuadre: 'centro' },
+    'hitos-90': { w: 4388, h: 3574, encuadre: 'centro' },
+    salud: { w: 5777, h: 3578, encuadre: 'centro' },
+    agua: { w: 2511, h: 3444, encuadre: 'rostro', zoomOut: true },
+    'ciudad-jardin-hoy': { w: 3122, h: 1939, encuadre: 'centro' },
+    ecologia: { w: 2048, h: 1280, encuadre: 'centro' },
+    'espejos-de-agua': { w: 1600, h: 1600, encuadre: 'centro' },
+    educacion: {
+      w: 12480,
+      h: 8320,
+      ajuste: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 },
+    },
+    vialidad: { w: 4000, h: 3000, encuadre: 'centro' },
+    vanguardia: { w: 8192, h: 6144, encuadre: 'centro' },
+    alianzas: { w: 1032, h: 1207, encuadre: 'rostro', zoomOut: true },
+  } as Record<string, FotoEncaje>,
 
   // ── Reconocimientos (pestaña "Reconocimiento" de la línea de tiempo) ─
   premios: [
