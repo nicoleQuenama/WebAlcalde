@@ -4,13 +4,32 @@
   --book-text-scale: 1;
 }
 
-/* Tamaño de letra del libro: 0 = Normal, 1 = Grande, 2 = Muy grande */
+/* Tamaño de letra del libro: 0 = Normal, 1 = Grande, 2 = Muy grande.
+   Al crecer la letra, las imágenes ceden espacio para que el texto nunca se corte. */
 [data-textsize='1'] {
   --book-text-scale: 1.25;
 }
 
 [data-textsize='2'] {
   --book-text-scale: 1.55;
+}
+
+[data-textsize='1'] .mediaFeature,
+[data-textsize='1'] .videoFrame {
+  min-height: 120px;
+}
+
+[data-textsize='2'] .mediaFeature,
+[data-textsize='2'] .videoFrame {
+  min-height: 80px;
+}
+
+[data-textsize='1'] .mediaPortrait {
+  min-height: 200px;
+}
+
+[data-textsize='2'] .mediaPortrait {
+  min-height: 130px;
 }
 
 /*  PÁGINAS  */
@@ -41,7 +60,12 @@
   height: 100%;
   padding: var(--page-padding);
   padding-top: 32px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(71, 45, 130, 0.35) transparent;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -122,12 +146,11 @@
   color: #3a3a3a;
 }
 
-/* Recorta la bajada larga a pocas líneas para que la imagen luzca grande. */
+/* La bajada se muestra COMPLETA: la página puede desplazarse (scroll) si no cabe. */
 .bajadaClamp {
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
 }
 
 /* Lista compacta de obras dentro de una página del libro. */
@@ -138,7 +161,6 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  overflow: hidden;
 }
 
 .obraList li {
