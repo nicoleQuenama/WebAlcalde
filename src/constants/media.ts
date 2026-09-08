@@ -199,7 +199,7 @@ export const MEDIA = {
     agua: {
       w: 2511,
       h: 3444,
-      ajuste: { objectFit: 'cover', objectPosition: '50% 28%' },
+      ajuste: { objectFit: 'cover', objectPosition: '50% 10%' },
     },
     'ciudad-jardin-hoy': { w: 3122, h: 1939, encuadre: 'centro' },
     ecologia: { w: 2048, h: 1280, encuadre: 'centro' },
