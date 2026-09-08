@@ -23,8 +23,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Encuadre desde arriba: si la foto es un retrato, no se corta la cabeza. */
-  object-position: top center;
+  object-position: center center;
   display: block;
   pointer-events: none;
 }

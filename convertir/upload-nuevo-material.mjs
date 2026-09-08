@@ -84,10 +84,11 @@ async function main() {
   const onlyImages = args.includes('--images');
   const onlyVideos = args.includes('--videos');
   const folderFilter = args.find(a => a.startsWith('--folder='))?.split('=')[1];
+  const fileArg = args.find(a => a.startsWith('--file='))?.split('=').slice(1).join('=');
 
   console.log('=== SUBIENDO NUEVO MATERIAL A SUPABASE ===\n');
 
-  const allFiles = await walkDir(SOURCE);
+  const allFiles = fileArg ? [fileArg] : await walkDir(SOURCE);
   let videos = allFiles.filter(isVideo);
   let images = allFiles.filter(isImage);
 

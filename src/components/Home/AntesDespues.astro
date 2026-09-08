@@ -14,15 +14,26 @@ import ComparadorAntesDespues from './ComparadorAntesDespues';
 import type { ParComparador } from './ComparadorAntesDespues';
 import { MEDIA } from '../../constants/media';
 
-const opt = async (src: string) =>
-  (await getImage({ src, inferSize: true, width: 1200, format: 'webp' })).src;
+const opt = async (src: string, height?: number) =>
+  (
+    await getImage({
+      src,
+      inferSize: !height,
+      width: 1200,
+      ...(height ? { height } : {}),
+      format: 'webp',
+    })
+  ).src;
 
 // Pares reales antes/ahora del bucket (imagenes/cocha-antes-y-ahora), optimizados en build.
 const pares: ParComparador[] = await Promise.all(
   MEDIA.antesDespues.map(async (p) => ({
     titulo: p.titulo,
     antes: await opt(p.antes),
-    despues: await opt(p.despues),
+    despues: await opt(p.despues, p.despuesHeight),
+    afterFit: p.afterFit,
+    afterPosition: p.afterPosition,
+    afterScale: p.afterScale,
   })),
 );
 ---

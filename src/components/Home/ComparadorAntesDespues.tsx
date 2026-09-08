@@ -16,6 +16,9 @@ export interface ParComparador {
   titulo: string;
   antes: string;
   despues: string;
+  afterFit?: 'cover' | 'contain' | 'fill' | 'none';
+  afterPosition?: string;
+  afterScale?: number;
 }
 
 interface Props {
@@ -44,6 +47,9 @@ export default function ComparadorAntesDespues({ pares }: Props) {
           afterImage={par.despues}
           beforeLabel="Antes"
           afterLabel="Después"
+          afterFit={par.afterFit}
+          afterPosition={par.afterPosition}
+          afterScale={par.afterScale}
         />
       </div>
 

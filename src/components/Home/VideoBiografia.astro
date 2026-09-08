@@ -8,7 +8,7 @@ import { getImage } from 'astro:assets';
 import { MEDIA } from '../../constants/media';
 
 const posterBiografia = (
-  await getImage({ src: MEDIA.biografia.poster, inferSize: true, width: 1200, format: 'webp' })
+  await getImage({ src: MEDIA.biografia.poster, inferSize: true, width: 2549, height: 3568, format: 'webp' })
 ).src;
 const videoBiografia = MEDIA.biografia.video;
 ---
@@ -24,7 +24,7 @@ const videoBiografia = MEDIA.biografia.video;
 
     <figure class="mt-8 overflow-hidden rounded-2xl border border-slate-200">
       <video
-        class="aspect-video w-full bg-slate-900 object-cover object-[50%_30%]"
+        class="aspect-video bg-slate-900 object-cover object-[50%_7%]"
         src={videoBiografia}
         poster={posterBiografia}
         controls
