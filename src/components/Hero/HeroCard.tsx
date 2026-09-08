@@ -23,9 +23,8 @@ interface Props {
   foco?: 'rostro' | 'centro';
 }
 
-export default function HeroCards({ imagenes, autoplayMs = 3500, foco = 'rostro' }: Props) {
+export default function HeroCards({ imagenes, autoplayMs = 3500, _foco = 'rostro' }: Props) {
   const IMAGENES = imagenes && imagenes.length > 0 ? imagenes : IMAGENES_DEFECTO;
-  const posicionFoco = foco === 'centro' ? 'bg-center' : 'bg-[position:50%_22%]';
   const [actual, setActual] = useState(0);
   const [modalAbierto, setModalAbierto] = useState(false);
 
@@ -65,10 +64,8 @@ export default function HeroCards({ imagenes, autoplayMs = 3500, foco = 'rostro'
             else if (index === (actual - 1 + IMAGENES.length) % IMAGENES.length) posicion = 'izquierda';
             else if (index === (actual + 1) % IMAGENES.length) posicion = 'derecha';
 
-            // Encuadre "retrato seguro" (50% 28%): el rostro del alcalde queda
-            // siempre dentro del recorte, sin cortar la cabeza ni mostrar puro cielo.
             const estilosBase =
-              `absolute top-0 left-0 w-full h-full rounded-3xl bg-cover ${posicionFoco} bg-no-repeat border border-white/30 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]`;
+              `absolute top-0 left-0 w-full h-full rounded-3xl overflow-hidden bg-slate-900 border border-white/30 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]`;
 
             const estilosPosicion = {
               centro:
@@ -89,8 +86,10 @@ export default function HeroCards({ imagenes, autoplayMs = 3500, foco = 'rostro'
                   if (posicion === 'derecha') siguiente();
                 }}
               >
+                {/* Cover centrado ligeramente arriba (30%) - compromiso para no cortar cabezas ni mostrar solo cielo */}
+                <div className="absolute inset-0 bg-cover bg-[position:50%_30%]" style={{ backgroundImage: `url('${img.src}')` }} />
                 {posicion === 'centro' && img.titulo && (
-                  <span className="absolute inset-x-0 bottom-0 rounded-b-3xl bg-gradient-to-t from-black/70 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white">
+                  <span className="absolute inset-x-0 bottom-0 rounded-b-3xl bg-gradient-to-t from-black/75 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white">
                     {img.titulo}
                   </span>
                 )}
@@ -142,7 +141,7 @@ export default function HeroCards({ imagenes, autoplayMs = 3500, foco = 'rostro'
             <img
               src={actualImg.src}
               alt={actualImg.titulo ?? 'Ampliación'}
-              className="max-h-[75vh] max-w-[90vw] object-contain rounded-2xl animate-[zoomIn_0.4s_ease-out]"
+              className="max-h-[75vh] max-w-[90vw] object-cover rounded-2xl animate-[zoomIn_0.4s_ease-out]"
             />
             {actualImg.titulo && (
               <figcaption className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-white/90">

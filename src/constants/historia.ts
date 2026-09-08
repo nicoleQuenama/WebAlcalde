@@ -39,8 +39,8 @@ export interface IntroHistoria {
 }
 
 export const HISTORIA_INTRO: IntroHistoria = {
-  kicker: 'Trayectoria',
-  titulo: 'Del cuartel a la Alcaldía',
+  kicker: '',
+  titulo: 'Trayectoria',
   bajada:
     'El Cap. Manfred Reyes Villa Bacigalupi es militar en retiro, político y empresario. ' +
     'Cochabambino por decisión: ama a su gente, a su tierra y, sobre todo, a Dios. ' +

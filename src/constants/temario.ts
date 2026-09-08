@@ -66,7 +66,7 @@ export const PRESENTACION: Capitulo = {
   eyebrow: 'Presentación del alcalde',
   titulo: 'Manfred Reyes Villa',
   bajada:
-    'Cochabambino, hombre de gestión y de calle. Esta es la historia de una ciudad ' +
+    'Esta es una historia a través de fotografias de una ciudad, ' +
     'contada a través de sus obras: las que hace más de treinta años empezaron a ' +
     'cambiarle la cara a Cochabamba y las que hoy la proyectan hacia el futuro.',
 };

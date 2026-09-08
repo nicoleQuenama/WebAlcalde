@@ -110,8 +110,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Encuadre "retrato seguro": el rostro del alcalde nunca queda fuera del recorte. */
-  object-position: 50% 28%;
+  /* 30% ligeramente arriba: no decapita y tampoco muestra solo cielo */
+  object-position: 50% 30%;
   border-radius: 10px;
 }
 
