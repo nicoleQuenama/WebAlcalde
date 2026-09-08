@@ -119,7 +119,9 @@ export const MEDIA = {
     {
       titulo: 'Plaza de las Banderas',
       antes: antes('trabajos_plaza_de_las_banderas_931.webp'),
-      despues: ahora('6P9A2287.webp'),
+      despues: ahora('IMG_5929.webp'),
+      // 6240×4160: alto real a 1200px (evita el sliver de inferSize en webp remotos).
+      despuesHeight: 800,
     },
     {
       titulo: 'Parque Vial',
