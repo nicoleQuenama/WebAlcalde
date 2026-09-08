@@ -7,7 +7,6 @@
  *   2. VideoBiografia — el video, justo después del hero.
  *   3. AntesDespues   — comparador grande "antes / después" (imágenes de referencia).
  *   4. IntroLibro     — introducción al libro digital; se abre ahí mismo.
- *   5. CableCarScroll — guiño al "Primer Teleférico de Bolivia, 1999".
  *
  * Biografía (texto), misión y visión viven en /sobre, no en el home.
  */
@@ -16,7 +15,6 @@ import Hero from '../components/Hero/Hero.astro';
 import VideoBiografia from '../components/Home/VideoBiografia.astro';
 import AntesDespues from '../components/Home/AntesDespues.astro';
 import IntroLibro from '../components/Home/IntroLibro.astro';
-import CableCarScroll from '../components/Teleferico/CableCarScroll';
 ---
 
 <Layout title="Manfred Reyes Villa — Cocha, la mejor ciudad de Bolivia">
@@ -24,5 +22,4 @@ import CableCarScroll from '../components/Teleferico/CableCarScroll';
 	<VideoBiografia />
 	<AntesDespues />
 	<IntroLibro />
-	<CableCarScroll client:visible />
 </Layout>
