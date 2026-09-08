@@ -27,7 +27,7 @@ export const PILARES = [
     eyebrow: '01 · Biografía',
     title: 'Biografía',
     body:
-      'Manfred Reyes Villa, cochabambino, militar de carrera y varias veces autoridad del valle. ' +
+      'Manfred Reyes Villa, militar de carrera y varias veces autoridad del valle. ' +
       'Alcalde de la ciudad para el período 2021–2026.',
   },
   {
