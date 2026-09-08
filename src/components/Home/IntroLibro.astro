@@ -21,11 +21,21 @@ import { getImage } from 'astro:assets';
 import { MEDIA } from '../../constants/media';
 
 // Fotos y videos que Book.tsx reparte entre las páginas (todo en Supabase).
-// Las fotos se optimizan en build (~1000px webp); los videos se cargan sólo al abrirlos.
+// Las fotos se optimizan en build (~1000px webp) CONSERVANDO su proporción real
+// (w/h de media.ts): `inferSize` lee mal las URLs remotas y recorta la foto a un
+// palo vertical. Los videos se cargan sólo al abrirlos.
 const fotos = await Promise.all(
   MEDIA.libro.fotos.map(async (f) => ({
     ...f,
-    src: (await getImage({ src: f.src, inferSize: true, width: 1000, format: 'webp' })).src,
+    src: (
+      await getImage({
+        src: f.src,
+        width: 1000,
+        ...(f.w && f.h ? { height: Math.max(1, Math.round((1000 * f.h) / f.w)) } : {}),
+        fit: 'cover',
+        format: 'webp',
+      })
+    ).src,
   })),
 );
 const videos = MEDIA.libro.videos;

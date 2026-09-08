@@ -29,10 +29,20 @@ const { eyebrow, titulo, cita, imagenes } = Astro.props;
 const base = imagenes ?? MEDIA.hero.carrusel;
 
 // Optimización en build: el carrusel se sirve a ~900px webp; el fondo, chico y borroso.
+// El `height` se calcula con las dimensiones reales (w/h) para NO deformar con `inferSize`
+// (Astro lee mal los remotos y recorta la foto a un palo vertical).
 const imgs: TarjetaImagen[] = await Promise.all(
   base.map(async (img) => ({
     ...img,
-    src: (await getImage({ src: img.src, inferSize: true, width: 900, format: 'webp' })).src,
+    src: (
+      await getImage({
+        src: img.src,
+        width: 900,
+        ...(img.w && img.h ? { height: Math.max(1, Math.round((900 * img.h) / img.w)) } : {}),
+        fit: 'cover',
+        format: 'webp',
+      })
+    ).src,
   })),
 );
 const fondo = await getImage({

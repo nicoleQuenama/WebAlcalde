@@ -53,6 +53,9 @@ export interface Proyecto {
   descripcion: string;
   estado: 'En ejecución' | 'Concluido' | 'En diseño';
   imagen: string;
+  /** Dimensiones reales de la foto (para optimizarla sin deformarla). */
+  w: number;
+  h: number;
 }
 
 export const PROYECTOS_TITULO = {
@@ -71,6 +74,8 @@ export const PROYECTOS: Proyecto[] = [
       'Espacio recreativo y de turismo para las familias, con playa artificial, plaza de comidas y áreas verdes.',
     estado: 'Concluido',
     imagen: MEDIA.proyectos.playaTurquesa,
+    w: 1600,
+    h: 1600,
   },
   {
     titulo: 'Recuperación de la Laguna Alalay',
@@ -79,6 +84,8 @@ export const PROYECTOS: Proyecto[] = [
       'Dragado y recuperación del mayor espejo de agua de la ciudad: sendas, forestación y control del deterioro ambiental.',
     estado: 'En ejecución',
     imagen: MEDIA.proyectos.lagunaAlalay,
+    w: 2048,
+    h: 1280,
   },
   {
     titulo: 'Plaza de las Banderas',
@@ -87,6 +94,8 @@ export const PROYECTOS: Proyecto[] = [
       'Remozado y mejoramiento de la plaza y sus fuentes, dentro del plan de recuperación de espacios de encuentro.',
     estado: 'Concluido',
     imagen: MEDIA.proyectos.plazaBanderas,
+    w: 3122,
+    h: 1939,
   },
   {
     titulo: 'Parque Vial',
@@ -95,5 +104,7 @@ export const PROYECTOS: Proyecto[] = [
       'Parque renovado dentro del Plan Maestro de Forestación y de recuperación de áreas verdes de la llajta.',
     estado: 'Concluido',
     imagen: MEDIA.proyectos.parqueVial,
+    w: 4378,
+    h: 3014,
   },
 ];

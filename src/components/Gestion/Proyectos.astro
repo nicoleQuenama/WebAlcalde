@@ -6,7 +6,15 @@ import { PROYECTOS, PROYECTOS_TITULO } from '../../constants/gestion';
 const imagenes = await Promise.all(
   PROYECTOS.map(async (p, i) => ({
     id: i,
-    src: (await getImage({ src: p.imagen, inferSize: true, width: 900, format: 'webp' })).src,
+    src: (
+      await getImage({
+        src: p.imagen,
+        width: 900,
+        ...(p.w && p.h ? { height: Math.max(1, Math.round((900 * p.h) / p.w)) } : {}),
+        fit: 'cover',
+        format: 'webp',
+      })
+    ).src,
     titulo: p.titulo,
     encuadre: 'centro' as const,
   })),

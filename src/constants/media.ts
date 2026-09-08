@@ -13,6 +13,7 @@
  *
  * Los componentes NO deben construir rutas a mano: importan `MEDIA` de acá.
  */
+import type { Encuadre, AjusteCarrusel } from '../lib/ajusteImagen';
 
 const BASE =
   'https://fsuxvbuupswucnsvrdce.supabase.co/storage/v1/object/public/media';
@@ -32,6 +33,13 @@ const video = (archivo: string) => file(`videos/${archivo}`);
 export interface FotoMedia {
   src: string;
   alt: string;
+  /** Dimensiones reales de la foto (para optimizarla sin deformar). */
+  w?: number;
+  h?: number;
+  /** Encuadre por foto (misma lógica que las cards del hero, ver ajusteImagen). */
+  encuadre?: Encuadre;
+  zoomOut?: boolean;
+  ajuste?: AjusteCarrusel;
 }
 
 export interface ParAntesDespues {
@@ -63,10 +71,10 @@ export const MEDIA = {
      * alcalde se ve claro y de cerca: el recorte vertical nunca le corta el rostro.
      */
     carrusel: [
-      { id: 'gente-1', src: raiz('DSC_0802'), titulo: 'Manfred Reyes Villa', encuadre: 'rostro', zoomOut: true },
-      { id: 'gente-2', src: raiz('IMG_2941'), titulo: 'Cerca de la gente', encuadre: 'rostro', zoomOut: true },
-      { id: 'gente-3', src: raiz('DSC_0807'), titulo: 'Alcalde de Cochabamba', encuadre: 'rostro', zoomOut: true },
-      { id: 'gente-4', src: premio('01 ALCALDE FRANCIA OK.webp'), titulo: 'Reconocimiento internacional', encuadre: 'rostro', zoomOut: true },
+      { id: 'gente-1', src: raiz('DSC_0802'), titulo: 'Manfred Reyes Villa', w: 2549, h: 3568, encuadre: 'rostro', zoomOut: true },
+      { id: 'gente-2', src: raiz('IMG_2941'), titulo: 'Cerca de la gente', w: 12480, h: 8320, ajuste: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 } },
+      { id: 'gente-3', src: raiz('DSC_0807'), titulo: 'Alcalde de Cochabamba', w: 2832, h: 3826, encuadre: 'rostro', zoomOut: true },
+      { id: 'gente-4', src: premio('01 ALCALDE FRANCIA OK.webp'), titulo: 'Reconocimiento internacional', w: 1032, h: 1207, encuadre: 'rostro', zoomOut: true },
     ],
   },
 
@@ -114,14 +122,14 @@ export const MEDIA = {
   // ── Libro digital (Book.tsx reparte estas fotos entre las páginas) ─
   libro: {
     fotos: [
-      { src: raiz('DSC_0802'), alt: 'Manfred Reyes Villa' }, // 0 · retrato de presentación
-      { src: antes('6P9A8685.webp'), alt: 'Cochabamba de ayer' }, // 1 · antes (strip "cómo creció")
-      { src: ahora('DJI_0001-Pano.webp'), alt: 'Cochabamba hoy' }, // 2 · ahora
-      { src: raiz('IMG_2941'), alt: 'El alcalde con escolares' }, // 3
-      { src: raiz('6P9A0583'), alt: 'El alcalde en un acto de la ciudad' }, // 4 · intro era 1
-      { src: raiz('DSC_0790'), alt: 'El alcalde en una obra' }, // 5 · retrato era 2
-      { src: raiz('IMG_1088'), alt: 'Cerca de los vecinos' }, // 6
-      { src: raiz('apoyo de la gente al alcalde'), alt: 'La gente con el alcalde' }, // 7
+      { src: raiz('DSC_0802'), alt: 'Manfred Reyes Villa', w: 2549, h: 3568, encuadre: 'rostro', zoomOut: true }, // 0 · retrato de presentación
+      { src: antes('6P9A8685.webp'), alt: 'Cochabamba de ayer', w: 4265, h: 2707, encuadre: 'centro' }, // 1 · antes (strip "cómo creció")
+      { src: ahora('DJI_0001-Pano.webp'), alt: 'Cochabamba hoy', w: 5570, h: 3481, encuadre: 'centro' }, // 2 · ahora
+      { src: raiz('IMG_2941'), alt: 'El alcalde con escolares', w: 12480, h: 8320, ajuste: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 } }, // 3
+      { src: raiz('6P9A0583'), alt: 'El alcalde en un acto de la ciudad', w: 4388, h: 3574, encuadre: 'centro' }, // 4 · intro era 1
+      { src: raiz('DSC_0790'), alt: 'El alcalde en una obra', w: 2511, h: 3444, encuadre: 'rostro', zoomOut: true }, // 5 · retrato era 2
+      { src: raiz('IMG_1088'), alt: 'Cerca de los vecinos', w: 2112, h: 2795, encuadre: 'rostro', zoomOut: true }, // 6
+      { src: raiz('apoyo de la gente al alcalde'), alt: 'La gente con el alcalde', w: 5777, h: 3578, encuadre: 'centro' }, // 7
     ] satisfies FotoMedia[],
     /** Orden que espera Book.tsx: playa, laguna, terminal, fexco, market, vet, permiso. */
     videos: [

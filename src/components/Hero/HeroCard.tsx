@@ -1,24 +1,31 @@
 import { useState, useEffect } from 'react';
 import { MEDIA } from '../../constants/media';
+import { ajusteImagen, type Encuadre, type AjusteCarrusel } from '../../lib/ajusteImagen';
 
+/**
+ * Imagen del carrusel del hero (y del libro): misma foto con opciones de
+ * encuadre/zoom. Ver `src/lib/ajusteImagen.ts`.
+ */
 export interface TarjetaImagen {
   id: number | string;
   src: string;
   /** Texto opcional que se muestra sobre la tarjeta y en la galería. */
   titulo?: string;
-  /**
-   * Encuadre vertical de la imagen dentro del marco cuadrado (object-cover):
-   *  - 'rostro'  → parte superior (7%), para retratos donde importa la cara.
-   *  - 'centro'  → centro exacto (50%), para paisajes u obras.
-   *  - 'norte'   → muy arriba (2%), para fotos con mucho espacio arriba.
-   *  - 'tronco'  → más abajo (~18%), para mostrar torso + cara.
-   */
-  encuadre?: 'rostro' | 'centro' | 'norte' | 'tronco';
+  /** Dimensiones reales de la foto (para optimizarla sin deformar). */
+  w?: number;
+  h?: number;
+  encuadre?: Encuadre;
   /**
    * Zoom out en la card: alarga la zona visible (menos recorte arriba/abajo).
-   * Solo aplica al carrusel, NO al modal.
+   * Solo aplica a la card, NO al modal.
    */
   zoomOut?: boolean;
+  /**
+   * Valores EXACTOS de ajuste por imagen (tal como los copias del playground).
+   * Tienen prioridad sobre `encuadre`/`zoomOut`.
+   * Ejemplo: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 }
+   */
+  ajuste?: AjusteCarrusel;
 }
 
 const IMAGENES_DEFECTO: TarjetaImagen[] = MEDIA.hero.carrusel;
@@ -37,22 +44,10 @@ interface Props {
 }
 
 /**
- * Las tarjetas siempre muestran un recorte cuadrado centrado en la imagen.
- * object-cover recorta sin deformar; object-position: center centra desde
- * el medio de la foto para que el sujeto principal quede visible.
+ * Las tarjetas siempre muestran un recorte cuadrado de la foto; el encuadre y
+ * el zoom por imagen se calculan con `ajusteImagen` (igual que el libro).
  */
-/**
- * Calcula objectPosition para la card según el encuadre y zoom de cada imagen.
- * 'zoomOut' baja ~11 puntos para mostrar más torso + cara.
- */
-function cardPosition(encuadre?: string, zoomOut?: boolean): string {
-  const base = encuadre === 'tronco' ? '18%' : encuadre === 'centro' ? '50%' : encuadre === 'norte' ? '2%' : '7%';
-  if (zoomOut && base !== '50%') {
-    const n = parseFloat(base);
-    return `50% ${Math.min(n + 11, 50)}%`;
-  }
-  return `50% ${base}`;
-}
+const cardAjuste = ajusteImagen;
 
 export default function HeroCards({ imagenes, autoplayMs = 3500, _foco = 'rostro' }: Props) {
   const IMAGENES = imagenes && imagenes.length > 0 ? imagenes : IMAGENES_DEFECTO;
@@ -121,8 +116,8 @@ export default function HeroCards({ imagenes, autoplayMs = 3500, _foco = 'rostro
                   src={img.src}
                   alt={img.titulo ?? ''}
                   loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ objectPosition: cardPosition(img.encuadre, img.zoomOut) }}
+                  className="absolute inset-0 w-full h-full"
+                  style={cardAjuste(img)}
                 />
                 {posicion === 'centro' && img.titulo && (
                   <span className="absolute inset-x-0 bottom-0 rounded-b-3xl bg-gradient-to-t from-black/75 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white">
@@ -173,12 +168,11 @@ export default function HeroCards({ imagenes, autoplayMs = 3500, _foco = 'rostro
             <svg width="40" height="40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
           </button>
 
-          <figure className="mt-16 flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+          <figure className="mt-16 flex max-h-[85vh] max-w-[90vw] flex-col items-center" onClick={(e) => e.stopPropagation()}>
             <img
               src={actualImg.src}
               alt={actualImg.titulo ?? 'Ampliación'}
-              className="w-[min(85vw,400px)] h-[min(106.25vw,500px)] rounded-2xl animate-[zoomIn_0.4s_ease-out] object-cover"
-              style={{ objectPosition: '50% 7%' }}
+              className="max-h-[85vh] max-w-[90vw] rounded-2xl animate-[zoomIn_0.4s_ease-out] object-contain"
             />
             {actualImg.titulo && (
               <figcaption className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-white/90">
