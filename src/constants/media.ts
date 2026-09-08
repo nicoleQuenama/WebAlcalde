@@ -196,7 +196,11 @@ export const MEDIA = {
     'ciudad-jardin-90': { w: 4378, h: 3014, encuadre: 'centro' },
     'hitos-90': { w: 4388, h: 3574, encuadre: 'centro' },
     salud: { w: 5777, h: 3578, encuadre: 'centro' },
-    agua: { w: 2511, h: 3444, encuadre: 'rostro', zoomOut: true },
+    agua: {
+      w: 2511,
+      h: 3444,
+      ajuste: { objectFit: 'cover', objectPosition: '50% 28%' },
+    },
     'ciudad-jardin-hoy': { w: 3122, h: 1939, encuadre: 'centro' },
     ecologia: { w: 2048, h: 1280, encuadre: 'centro' },
     'espejos-de-agua': { w: 1600, h: 1600, encuadre: 'centro' },
