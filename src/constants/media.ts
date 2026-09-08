@@ -38,6 +38,13 @@ export interface ParAntesDespues {
   titulo: string;
   antes: string;
   despues: string;
+  /**
+   * Altura explícita (px) para la imagen "después" al optimizarla.
+   * Sólo necesario cuando Astro infiere mal las dimensiones de un webp
+   * (p. ej. 6P9A2287.webp, que lee como vertical cuando en realidad es
+   * horizontal) y por eso recorta a un formato incorrecto.
+   */
+  despuesHeight?: number;
 }
 
 export const MEDIA = {
@@ -56,10 +63,10 @@ export const MEDIA = {
      * alcalde se ve claro y de cerca: el recorte vertical nunca le corta el rostro.
      */
     carrusel: [
-      { id: 'gente-1', src: raiz('DSC_0802'), titulo: 'Manfred Reyes Villa' },
-      { id: 'gente-2', src: raiz('IMG_2941'), titulo: 'Cerca de la gente' },
-      { id: 'gente-3', src: raiz('DSC_0807'), titulo: 'Alcalde de Cochabamba' },
-      { id: 'gente-4', src: premio('01 ALCALDE FRANCIA OK.webp'), titulo: 'Reconocimiento internacional' },
+      { id: 'gente-1', src: raiz('DSC_0802'), titulo: 'Manfred Reyes Villa', encuadre: 'rostro', zoomOut: true },
+      { id: 'gente-2', src: raiz('IMG_2941'), titulo: 'Cerca de la gente', encuadre: 'rostro', zoomOut: true },
+      { id: 'gente-3', src: raiz('DSC_0807'), titulo: 'Alcalde de Cochabamba', encuadre: 'rostro', zoomOut: true },
+      { id: 'gente-4', src: premio('01 ALCALDE FRANCIA OK.webp'), titulo: 'Reconocimiento internacional', encuadre: 'rostro', zoomOut: true },
     ],
   },
 
@@ -75,7 +82,13 @@ export const MEDIA = {
     {
       titulo: 'Coña Coña — Playa Turquesa',
       antes: antes('1_cona_cona_antes.jpg.webp'),
-      despues: ahora('playa_turquesa_cona_cona.jfif.webp'),
+      despues: ahora('6P9A2287.webp'),
+      afterFit: 'cover',
+      afterPosition: '49.8886431283711% 5.852502603736161%',
+      afterScale: 1.17,
+      // 6P9A2287.webp es 5472×3648 (horizontal) pero Astro la lee como vertical
+      // (1200×3648). Forzamos alto 800 al optimizarla para que conserve el formato.
+      despuesHeight: 800,
     },
     {
       titulo: 'Laguna Alalay',

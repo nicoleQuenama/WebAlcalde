@@ -6,6 +6,19 @@ export interface TarjetaImagen {
   src: string;
   /** Texto opcional que se muestra sobre la tarjeta y en la galería. */
   titulo?: string;
+  /**
+   * Encuadre vertical de la imagen dentro del marco cuadrado (object-cover):
+   *  - 'rostro'  → parte superior (7%), para retratos donde importa la cara.
+   *  - 'centro'  → centro exacto (50%), para paisajes u obras.
+   *  - 'norte'   → muy arriba (2%), para fotos con mucho espacio arriba.
+   *  - 'tronco'  → más abajo (~18%), para mostrar torso + cara.
+   */
+  encuadre?: 'rostro' | 'centro' | 'norte' | 'tronco';
+  /**
+   * Zoom out en la card: alarga la zona visible (menos recorte arriba/abajo).
+   * Solo aplica al carrusel, NO al modal.
+   */
+  zoomOut?: boolean;
 }
 
 const IMAGENES_DEFECTO: TarjetaImagen[] = MEDIA.hero.carrusel;
@@ -21,6 +34,24 @@ interface Props {
    *  - 'centro': para fotos de obra/paisaje sin personas en primer plano.
    */
   foco?: 'rostro' | 'centro';
+}
+
+/**
+ * Las tarjetas siempre muestran un recorte cuadrado centrado en la imagen.
+ * object-cover recorta sin deformar; object-position: center centra desde
+ * el medio de la foto para que el sujeto principal quede visible.
+ */
+/**
+ * Calcula objectPosition para la card según el encuadre y zoom de cada imagen.
+ * 'zoomOut' baja ~11 puntos para mostrar más torso + cara.
+ */
+function cardPosition(encuadre?: string, zoomOut?: boolean): string {
+  const base = encuadre === 'tronco' ? '18%' : encuadre === 'centro' ? '50%' : encuadre === 'norte' ? '2%' : '7%';
+  if (zoomOut && base !== '50%') {
+    const n = parseFloat(base);
+    return `50% ${Math.min(n + 11, 50)}%`;
+  }
+  return `50% ${base}`;
 }
 
 export default function HeroCards({ imagenes, autoplayMs = 3500, _foco = 'rostro' }: Props) {
@@ -57,7 +88,7 @@ export default function HeroCards({ imagenes, autoplayMs = 3500, _foco = 'rostro
   return (
     <>
       <div className="relative flex w-full items-center justify-center h-[420px] sm:h-[480px] lg:h-[540px] pb-10">
-        <div className="relative w-[260px] h-[360px] sm:w-[320px] sm:h-[420px] lg:w-[360px] lg:h-[480px]">
+        <div className="relative w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] lg:w-[400px] lg:h-[400px]">
           {IMAGENES.map((img, index) => {
             let posicion = 'oculta';
             if (index === actual) posicion = 'centro';
@@ -79,15 +110,20 @@ export default function HeroCards({ imagenes, autoplayMs = 3500, _foco = 'rostro
               <div
                 key={img.id}
                 className={`${estilosBase} ${estilosPosicion[posicion as keyof typeof estilosPosicion]}`}
-                style={{ backgroundImage: `url('${img.src}')` }}
                 onClick={() => {
                   if (posicion === 'centro') abrirModal();
                   if (posicion === 'izquierda') anterior();
                   if (posicion === 'derecha') siguiente();
                 }}
               >
-                {/* Cover centrado ligeramente arriba (30%) - compromiso para no cortar cabezas ni mostrar solo cielo */}
-                <div className="absolute inset-0 bg-cover bg-[position:50%_30%]" style={{ backgroundImage: `url('${img.src}')` }} />
+                {/* Imagen de la tarjeta: cubre el marco respetando proporción según su encuadre */}
+                <img
+                  src={img.src}
+                  alt={img.titulo ?? ''}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ objectPosition: cardPosition(img.encuadre, img.zoomOut) }}
+                />
                 {posicion === 'centro' && img.titulo && (
                   <span className="absolute inset-x-0 bottom-0 rounded-b-3xl bg-gradient-to-t from-black/75 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white">
                     {img.titulo}
@@ -141,7 +177,8 @@ export default function HeroCards({ imagenes, autoplayMs = 3500, _foco = 'rostro
             <img
               src={actualImg.src}
               alt={actualImg.titulo ?? 'Ampliación'}
-              className="max-h-[75vh] max-w-[90vw] object-cover rounded-2xl animate-[zoomIn_0.4s_ease-out]"
+              className="w-[min(85vw,400px)] h-[min(106.25vw,500px)] rounded-2xl animate-[zoomIn_0.4s_ease-out] object-cover"
+              style={{ objectPosition: '50% 7%' }}
             />
             {actualImg.titulo && (
               <figcaption className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-white/90">

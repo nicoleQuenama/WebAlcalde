@@ -61,8 +61,8 @@ export default function ValueCards({ cards = DEFAULT_CARDS, className }: ValueCa
         const dir = mobile ? 'vertical' : 'horizontal';
         const GAP = mobile ? 14 : 20;
 
-        // Centro de anclaje: las cards se posicionan desde su centro.
-        gsap.set([bio, mision, vision], { xPercent: -50, yPercent: -50 });
+        // Centro de anclaje: lo hace el wrapper `.slot` (CSS puro). GSAP solo
+        // anima la card interior con píxeles, sin parsear ningún CSS transform.
         const rect = bio.getBoundingClientRect();
         const w = rect.width;
         const h = rect.height;
@@ -72,10 +72,12 @@ export default function ValueCards({ cards = DEFAULT_CARDS, className }: ValueCa
 
         // Despliegue relativo al ancho real del escenario: las cards laterales
         // nunca se salen (se ajusta a cualquier pantalla y a resize).
+        // Vertical: 1.1× la altura de la card para separación COMPLETA (gap visible
+        // entre bio-misión y bio-visión). Horizontal: una card + 2 gaps.
         const computeSpread = () => {
-          if (dir !== 'horizontal') return Math.round(h * 0.55);
+          if (dir !== 'horizontal') return Math.round(h * 1.1);
           const W = stage.offsetWidth;
-          const raw = w + GAP;
+          const raw = w + GAP * 2;
           return Math.round(Math.max(0, Math.min(raw, (W - w) / 2 - GAP / 2)));
         };
         let spread = computeSpread();
@@ -103,8 +105,10 @@ export default function ValueCards({ cards = DEFAULT_CARDS, className }: ValueCa
           defaults: { ease: 'none' },
           scrollTrigger: {
             trigger: stage,
-            start: 'top 75%',
-            end: 'max',
+            // Arranca apenas la sección asoma por abajo y completa el despliegue
+            // en 600px de scroll: rápido y mientras la sección sigue en pantalla.
+            start: 'top bottom',
+            end: '+=600',
             scrub: 1,
           },
         });
@@ -131,11 +135,13 @@ export default function ValueCards({ cards = DEFAULT_CARDS, className }: ValueCa
   return (
     <div ref={stageRef} className={`${styles.stage} ${className ?? ''}`} data-stage>
       {cards.map((card) => (
-        <article key={card.id} className={styles.card} data-card={card.id}>
-          <p className={styles.eyebrow}>{card.eyebrow}</p>
-          <h3 className={styles.title}>{card.title}</h3>
-          <p className={styles.body}>{card.body}</p>
-        </article>
+        <div key={card.id} className={styles.slot} data-slot={card.id}>
+          <article className={styles.card} data-card={card.id}>
+            <p className={styles.eyebrow}>{card.eyebrow}</p>
+            <h3 className={styles.title}>{card.title}</h3>
+            <p className={styles.body}>{card.body}</p>
+          </article>
+        </div>
       ))}
     </div>
   );
