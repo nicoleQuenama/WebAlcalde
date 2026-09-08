@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { NavItem } from "../../types/nav";
+import { MEDIA } from "../../constants/media";
 import  "../../styles/global.css";
 
 interface Props {
@@ -19,7 +20,7 @@ export default function HeaderMovil({ enlaces }: Props) {
           <div className="flex items-center justify-center shadow-md hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer">
             <a href="/" className="flex items-center justify-center shadow-md hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer">
             <img
-              src="/multimedia/LOGO%20ALCALDE.png"
+              src={MEDIA.logo}
               alt="Manfred Reyes Villa"
               className="h-10 lg:h-12 w-auto object-contain"
             />

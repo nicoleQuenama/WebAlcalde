@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { MEDIA } from '../../constants/media';
 
 export interface TarjetaImagen {
   id: number | string;
@@ -7,21 +8,24 @@ export interface TarjetaImagen {
   titulo?: string;
 }
 
-const IMAGENES_DEFECTO: TarjetaImagen[] = [
-  { id: 1, src: '/multimedia/6P9A0583.jpg' },
-  { id: 2, src: '/multimedia/DSC_0790.jpg' },
-  { id: 3, src: '/multimedia/IMG_7166.jpg' },
-];
+const IMAGENES_DEFECTO: TarjetaImagen[] = MEDIA.hero.carrusel;
 
 interface Props {
   /** Lista de imágenes del carrusel. Si no se pasa, usa 3 de ejemplo. */
   imagenes?: TarjetaImagen[];
   /** Autoplay del carrusel (ms). 0 = sin autoplay. */
   autoplayMs?: number;
+  /**
+   * Encuadre de la foto dentro de la tarjeta:
+   *  - 'rostro' (por defecto): sube el foco para no cortar la cara del alcalde.
+   *  - 'centro': para fotos de obra/paisaje sin personas en primer plano.
+   */
+  foco?: 'rostro' | 'centro';
 }
 
-export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
+export default function HeroCards({ imagenes, autoplayMs = 3500, foco = 'rostro' }: Props) {
   const IMAGENES = imagenes && imagenes.length > 0 ? imagenes : IMAGENES_DEFECTO;
+  const posicionFoco = foco === 'centro' ? 'bg-center' : 'bg-[position:50%_22%]';
   const [actual, setActual] = useState(0);
   const [modalAbierto, setModalAbierto] = useState(false);
 
@@ -53,17 +57,18 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
 
   return (
     <>
-      <div className="relative w-full h-[550px] flex items-center justify-center">
-        <div className="relative w-[320px] h-[450px] lg:w-[360px] lg:h-[500px]">
+      <div className="relative flex w-full items-center justify-center h-[420px] sm:h-[480px] lg:h-[540px] pb-10">
+        <div className="relative w-[260px] h-[360px] sm:w-[320px] sm:h-[420px] lg:w-[360px] lg:h-[480px]">
           {IMAGENES.map((img, index) => {
             let posicion = 'oculta';
             if (index === actual) posicion = 'centro';
             else if (index === (actual - 1 + IMAGENES.length) % IMAGENES.length) posicion = 'izquierda';
             else if (index === (actual + 1) % IMAGENES.length) posicion = 'derecha';
 
-            // `bg-top`: encuadra desde arriba para no cortar la cabeza en los retratos.
+            // Encuadre "retrato seguro" (50% 28%): el rostro del alcalde queda
+            // siempre dentro del recorte, sin cortar la cabeza ni mostrar puro cielo.
             const estilosBase =
-              'absolute top-0 left-0 w-full h-full rounded-3xl bg-cover bg-top border border-white/30 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]';
+              `absolute top-0 left-0 w-full h-full rounded-3xl bg-cover ${posicionFoco} bg-no-repeat border border-white/30 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]`;
 
             const estilosPosicion = {
               centro:
@@ -94,7 +99,7 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
           })}
         </div>
 
-        <div className="absolute -bottom-4 flex gap-8 z-40">
+        <div className="absolute bottom-0 flex gap-8 z-40">
           <button
             onClick={anterior}
             aria-label="Anterior"

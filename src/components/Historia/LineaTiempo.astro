@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { HISTORIA, HISTORIA_INTRO, FILTROS_HITO } from '../../constants/historia';
 import TimelineGaleria from './TimelineGaleria';
 
@@ -81,13 +82,17 @@ const hitos = HISTORIA.map((hito) => ({
                 aria-label={`Ampliar foto: ${hito.titulo}`}
                 class="group mb-4 block w-full cursor-zoom-in overflow-hidden rounded-xl border border-slate-200 outline-none focus-visible:ring-2 focus-visible:ring-[#472d82]/60 lg:mb-0"
               >
-                <span class="relative block aspect-[4/3]">
-                  <img
+                <span class="relative block aspect-[4/3] bg-slate-100">
+                  <Image
                     src={hito.imagen}
                     alt={hito.imagenAlt ?? hito.titulo}
+                    inferSize
+                    width={640}
+                    widths={[320, 480, 640]}
+                    sizes="(min-width: 1024px) 19rem, 100vw"
                     loading="lazy"
                     decoding="async"
-                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    class="h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                   <span class="pointer-events-none absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/45 text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
                     <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" /></svg>
@@ -136,10 +141,12 @@ const hitos = HISTORIA.map((hito) => ({
     display: none;
   }
   @media (prefers-reduced-motion: no-preference) {
+    /* Reveal sutil: sólo un pequeño desplazamiento. El contenido nunca
+       llega a opacity 0, así que jamás "desaparece" aunque el observer falle. */
     [data-linea-tiempo][data-anim] [data-hito]:not(.oculto) {
       opacity: 0;
-      transform: translateY(1.25rem);
-      transition: opacity 0.7s ease, transform 0.7s ease;
+      transform: translateY(0.9rem);
+      transition: opacity 0.6s ease, transform 0.6s ease;
     }
     [data-linea-tiempo][data-anim] [data-hito].is-visible {
       opacity: 1;
@@ -170,6 +177,12 @@ const hitos = HISTORIA.map((hito) => ({
       { rootMargin: '0px 0px -12% 0px', threshold: 0.12 },
     );
     todos().forEach((h) => io.observe(h));
+
+    // Red de seguridad: si el observer no llega a disparar para algún hito
+    // (scroll muy rápido, pestaña en 2º plano…), a los 2 s se muestran todos.
+    window.setTimeout(() => {
+      todos().forEach((h) => h.classList.add('is-visible'));
+    }, 2000);
 
     const actualizarRiel = () => {
       if (!riel) return;

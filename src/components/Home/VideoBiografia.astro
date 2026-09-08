@@ -3,16 +3,14 @@
  * VideoBiografia — sección de video en el home, justo debajo del hero.
  *
  * Solo el video (el texto de biografía, misión y visión vive en /sobre).
- *
- * ⚠️ El <video> usa por ahora un clip de "Mas Recursos" como marcador.
- *    TODO: reemplazar `videoBiografia` por el video de biografía real.
  */
-const GENTE =
-  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
-const VIDEOS = '/Mas%20Recursos/3.%20Otros%20recursos/';
+import { getImage } from 'astro:assets';
+import { MEDIA } from '../../constants/media';
 
-const posterBiografia = GENTE + '6P9A5493.jpg';
-const videoBiografia = VIDEOS + '01%20PLAYA%20TURQUESA.mp4'; // TODO: video real de biografía
+const posterBiografia = (
+  await getImage({ src: MEDIA.biografia.poster, inferSize: true, width: 1200, format: 'webp' })
+).src;
+const videoBiografia = MEDIA.biografia.video;
 ---
 
 <section class="bg-white">
@@ -35,7 +33,7 @@ const videoBiografia = VIDEOS + '01%20PLAYA%20TURQUESA.mp4'; // TODO: video real
       >
       </video>
       <figcaption class="bg-slate-50 px-4 py-2 text-xs font-medium italic text-slate-400">
-        Video de referencia — reemplazar por el video de biografía real.
+        Manfred Reyes Villa — su historia y su vínculo con Cochabamba.
       </figcaption>
     </figure>
 

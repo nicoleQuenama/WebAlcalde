@@ -13,6 +13,13 @@ export default defineConfig({
     }),
   ],
 
+  // Optimización de imágenes remotas del bucket de Supabase (resize + webp en build).
+  image: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'fsuxvbuupswucnsvrdce.supabase.co' },
+    ],
+  },
+
   vite: {
     plugins: [tailwindcss()],
     server: {

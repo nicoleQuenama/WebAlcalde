@@ -7,8 +7,10 @@
  *   - home  → título del libro + nombre del alcalde.
  *   - sobre → biografía/trayectoria + nombre del alcalde + una cita.
  */
+import { getImage } from 'astro:assets';
 import HeroCards from './HeroCard.tsx';
 import type { TarjetaImagen } from './HeroCard.tsx';
+import { MEDIA } from '../../constants/media';
 import '../../styles/sobre.css';
 import '../../styles/global.css';
 
@@ -24,25 +26,30 @@ interface Props {
 }
 const { eyebrow, titulo, cita, imagenes } = Astro.props;
 
-// Rutas con espacios → codificadas. Fotos de escena (no retratos solos).
-const GENTE =
-  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
+const base = imagenes ?? MEDIA.hero.carrusel;
 
-const imagenesPorDefecto: TarjetaImagen[] = [
-  { id: 'gente-1', src: GENTE + '6P9A5493.jpg', titulo: 'Con la gente' },
-  { id: 'gente-2', src: GENTE + 'IMG_2941.jpg', titulo: 'En los barrios' },
-  { id: 'gente-3', src: GENTE + 'apoyo%20de%20la%20gente%20al%20alcalde.jpg', titulo: 'Cerca de los vecinos' },
-  { id: 'gente-4', src: GENTE + 'IMG_7166.jpg', titulo: 'En cada distrito' },
-];
-const imgs = imagenes ?? imagenesPorDefecto;
+// Optimización en build: el carrusel se sirve a ~900px webp; el fondo, chico y borroso.
+const imgs: TarjetaImagen[] = await Promise.all(
+  base.map(async (img) => ({
+    ...img,
+    src: (await getImage({ src: img.src, inferSize: true, width: 900, format: 'webp' })).src,
+  })),
+);
+const fondo = await getImage({
+  src: MEDIA.hero.panoramica,
+  inferSize: true,
+  width: 900,
+  quality: 30,
+  format: 'webp',
+});
 ---
 
-<section class="relative flex min-h-[90vh] w-full items-center justify-center overflow-hidden bg-[#472d82] pt-20">
+<section class="relative flex min-h-[100svh] w-full items-center justify-center bg-[#472d82] px-0 pb-16 pt-24 lg:pt-28">
   <!-- Fondo: panorámica desenfocada + velo del color de marca (sin sombras) -->
-  <div class="absolute inset-0 z-0">
+  <div class="absolute inset-0 z-0 overflow-hidden">
     <div
       class="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-xl"
-      style="background-image: url('/multimedia/cochaPanoramica.jpeg');"
+      style={`background-image: url('${fondo.src}');`}
     >
     </div>
     <div class="absolute inset-0 bg-[#472d82]/80 mix-blend-multiply"></div>

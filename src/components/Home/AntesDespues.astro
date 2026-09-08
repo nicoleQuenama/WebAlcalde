@@ -9,18 +9,22 @@
  * ⚠️ No hay fotos históricas todavía: pares de fotos actuales como marcador.
  *    TODO: cargar los pares antes/después reales.
  */
+import { getImage } from 'astro:assets';
 import ComparadorAntesDespues from './ComparadorAntesDespues';
 import type { ParComparador } from './ComparadorAntesDespues';
+import { MEDIA } from '../../constants/media';
 
-const GENTE =
-  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
+const opt = async (src: string) =>
+  (await getImage({ src, inferSize: true, width: 1200, format: 'webp' })).src;
 
-// Fotos de escena (no retratos): el comparador 16:9 no recorta a nadie.
-const pares: ParComparador[] = [
-  { titulo: 'Espacio público', antes: GENTE + 'IMG_7166.jpg', despues: GENTE + 'IMG_2941.jpg' },
-  { titulo: 'Infraestructura vial', antes: GENTE + 'IMG_1215.jpg', despues: GENTE + 'IMG_5001.jpg' },
-  { titulo: 'Áreas verdes', antes: GENTE + '6P9A5493.jpg', despues: GENTE + 'IMG_1088.jpg' },
-];
+// Pares reales antes/ahora del bucket (imagenes/cocha-antes-y-ahora), optimizados en build.
+const pares: ParComparador[] = await Promise.all(
+  MEDIA.antesDespues.map(async (p) => ({
+    titulo: p.titulo,
+    antes: await opt(p.antes),
+    despues: await opt(p.despues),
+  })),
+);
 ---
 
 <section class="bg-white">

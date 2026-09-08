@@ -1,8 +1,15 @@
 ---
+import { getImage } from 'astro:assets';
 import HeroCards from '../Hero/HeroCard.tsx';
 import { PROYECTOS, PROYECTOS_TITULO } from '../../constants/gestion';
 
-const imagenes = PROYECTOS.map((p, i) => ({ id: i, src: p.imagen, titulo: p.titulo }));
+const imagenes = await Promise.all(
+  PROYECTOS.map(async (p, i) => ({
+    id: i,
+    src: (await getImage({ src: p.imagen, inferSize: true, width: 900, format: 'webp' })).src,
+    titulo: p.titulo,
+  })),
+);
 
 // Un único color (el de marca): el estado se distingue por opacidad, no por otro tono.
 const colorEstado: Record<string, string> = {
@@ -26,7 +33,7 @@ const colorEstado: Record<string, string> = {
 
     <!-- Carrusel de tarjetas (mismo formato que la página Sobre) -->
     <div class="mt-10 flex justify-center lg:mt-14">
-      <HeroCards client:visible imagenes={imagenes} autoplayMs={4500} />
+      <HeroCards client:visible imagenes={imagenes} autoplayMs={4500} foco="centro" />
     </div>
 
     <!-- Detalle de cada proyecto -->

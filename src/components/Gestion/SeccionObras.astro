@@ -9,8 +9,8 @@
  *     el nombre destacado y el detalle debajo. Chip "Video" donde corresponde.
  *
  * Diseño en el color de marca (#472d82) como único acento, sin sombras.
- * ⚠️ Las imágenes son de referencia hasta cargar las del proyecto.
  */
+import { Image } from 'astro:assets';
 import type { SeccionTemario } from '../../constants/temario';
 
 interface Props {
@@ -29,17 +29,18 @@ const imagenDerecha = indice % 2 === 1;
     {seccion.imagen && (
       <figure class:list={['lg:w-[22rem] lg:shrink-0 lg:sticky lg:top-28', imagenDerecha && 'lg:order-2']}>
         <div class="overflow-hidden rounded-2xl border border-slate-200">
-          <img
+          <Image
             src={seccion.imagen}
             alt={seccion.imagenAlt ?? seccion.titulo}
+            inferSize
+            width={704}
+            widths={[352, 528, 704]}
+            sizes="(min-width: 1024px) 22rem, 100vw"
             loading="lazy"
             decoding="async"
-            class="aspect-[4/3] w-full bg-slate-100 object-cover"
+            class="aspect-[4/3] w-full bg-slate-100 object-cover object-[50%_35%]"
           />
         </div>
-        <figcaption class="mt-2 text-xs font-medium italic text-slate-400">
-          Imagen de referencia.
-        </figcaption>
       </figure>
     )}
 

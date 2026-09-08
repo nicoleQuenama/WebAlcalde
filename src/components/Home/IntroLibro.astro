@@ -17,36 +17,18 @@ import {
   NUEVA_COCHABAMBA,
   ERAS,
 } from '../../constants/temario';
+import { getImage } from 'astro:assets';
+import { MEDIA } from '../../constants/media';
 
-// Rutas con espacios → codificadas.
-const ALCALDE =
-  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.1%20Fotograf%C3%ADas%20del%20alcalde/';
-const GENTE =
-  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
-const VIDEOS = '/Mas%20Recursos/3.%20Otros%20recursos/';
-
-// Fotos que Book.tsx reparte entre las páginas.
-const fotos = [
-  { src: ALCALDE + 'DSC_0802.jpg', alt: 'Manfred Reyes Villa' },
-  { src: GENTE + '6P9A5493.jpg', alt: 'Con la gente' },
-  { src: GENTE + 'IMG_7166.jpg', alt: 'En los barrios de Cochabamba' },
-  { src: ALCALDE + 'DSC_0790.jpg', alt: 'El alcalde en una obra' },
-  { src: GENTE + 'IMG_2941.jpg', alt: 'Cerca de los vecinos' },
-  { src: ALCALDE + 'IMG_0643.jpg', alt: 'Manfred Reyes Villa' },
-  { src: GENTE + 'IMG_5001.jpg', alt: 'Con la comunidad' },
-  { src: GENTE + 'IMG_1215.jpg', alt: 'Con la comunidad' },
-];
-
-// Videos en el orden que espera Book.tsx: playa, laguna, terminal, fexco, market, vet, permiso.
-const videos = [
-  { src: VIDEOS + '01%20PLAYA%20TURQUESA.mp4', alt: 'Playa Turquesa' },
-  { src: VIDEOS + '02%20LAGUNA%20ALALAY.mp4', alt: 'Laguna Alalay' },
-  { src: VIDEOS + '03%20ACCESOS%20NUEVA%20TERMINAL%20DE%20BUSES.mp4', alt: 'Accesos a la nueva terminal de buses' },
-  { src: VIDEOS + '04%20FEXCO%20ARENA.mp4', alt: 'FEXCO Arena' },
-  { src: VIDEOS + '06%20COCHA%20MARKET.mp4', alt: 'Cocha Market' },
-  { src: VIDEOS + '07%20CL%C3%8DNICA%20VETERINARIA%20MUNICIPAL.mp4', alt: 'Clínica Veterinaria Municipal' },
-  { src: VIDEOS + '05%20PERMISO%20DE%20VIAJE%20DIGITAL.mp4', alt: 'Permiso de Viaje Digital' },
-];
+// Fotos y videos que Book.tsx reparte entre las páginas (todo en Supabase).
+// Las fotos se optimizan en build (~1000px webp); los videos se cargan sólo al abrirlos.
+const fotos = await Promise.all(
+  MEDIA.libro.fotos.map(async (f) => ({
+    ...f,
+    src: (await getImage({ src: f.src, inferSize: true, width: 1000, format: 'webp' })).src,
+  })),
+);
+const videos = MEDIA.libro.videos;
 
 // Índice del libro (mismo orden de páginas que Book.tsx).
 let p = 1;

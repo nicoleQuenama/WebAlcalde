@@ -13,6 +13,7 @@
  * ⚠️ Donde el temario dice "(QR VIDEO)" se marca la obra con `video: true`
  *    para poder mostrar un distintivo (más adelante se enlazará el video real).
  */
+import { MEDIA } from './media';
 
 /** Una obra / hito puntual dentro de una subsección. */
 export interface Obra {
@@ -40,12 +41,6 @@ export interface SeccionTemario {
   imagen?: string;
   imagenAlt?: string;
 }
-
-/* Rutas base de fotos de referencia (llevan espacios → codificadas). */
-const G =
-  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.2%20Fotograf%C3%ADas%20interactuando%20con%20la%20gente/';
-const A =
-  '/Mas%20Recursos/1.%20Recursos%20para%20el%20alcalde/1.1%20Fotograf%C3%ADas%20del%20alcalde/';
 
 /** Bloque de nivel superior del relato (un capítulo del libro). */
 export interface Capitulo {
@@ -119,7 +114,7 @@ const MEMORIAS: EraTemario = {
     {
       id: 'puentes',
       titulo: 'Pioneros en pasos a desnivel y puentes',
-      imagen: G + 'IMG_7166.jpg',
+      imagen: MEDIA.temario['puentes'],
       imagenAlt: 'Infraestructura vial de Cochabamba',
       bajada:
         'Cochabamba fue pionera en Bolivia en la implementación de pasos a desnivel y ' +
@@ -140,7 +135,7 @@ const MEMORIAS: EraTemario = {
     {
       id: 'conectividad',
       titulo: 'La conectividad: motor del crecimiento urbano',
-      imagen: G + 'IMG_2941.jpg',
+      imagen: MEDIA.temario['conectividad'],
       imagenAlt: 'Avenidas de Cochabamba',
       bajada:
         'Asfalto y pavimento rígido en las avenidas estructurantes que ordenaron la ' +
@@ -159,7 +154,7 @@ const MEMORIAS: EraTemario = {
     {
       id: 'ciudad-jardin-90',
       titulo: 'Ciudad Jardín: áreas verdes y parques',
-      imagen: G + 'IMG_1088.jpg',
+      imagen: MEDIA.temario['ciudad-jardin-90'],
       imagenAlt: 'Parques y plazas de Cochabamba',
       bajada:
         'Parques y plazas que consolidaron la identidad de Cochabamba como Ciudad Jardín ' +
@@ -180,7 +175,7 @@ const MEMORIAS: EraTemario = {
     {
       id: 'hitos-90',
       titulo: 'Hitos que marcaron época',
-      imagen: A + '6P9A0583.jpg',
+      imagen: MEDIA.temario['hitos-90'],
       imagenAlt: 'Manfred Reyes Villa',
       bajada:
         'Programas y obras con los que Cochabamba se adelantó al resto del país.',
@@ -242,7 +237,7 @@ const SONAR_EN_GRANDE: EraTemario = {
     {
       id: 'salud',
       titulo: 'Salud de calidad',
-      imagen: G + 'IMG_5001.jpg',
+      imagen: MEDIA.temario['salud'],
       imagenAlt: 'Atención a la comunidad',
       bajada:
         'La emergencia sanitaria dejó una enseñanza: la infraestructura y el equipamiento ' +
@@ -287,7 +282,7 @@ const SONAR_EN_GRANDE: EraTemario = {
     {
       id: 'agua',
       titulo: 'Cobertura de agua potable: deuda social',
-      imagen: G + 'IMG_1215.jpg',
+      imagen: MEDIA.temario['agua'],
       imagenAlt: 'Servicios básicos para los barrios',
       bajada:
         'Garantizar agua significa garantizar salud, dignidad y oportunidades. La ampliación ' +
@@ -315,7 +310,7 @@ const SONAR_EN_GRANDE: EraTemario = {
     {
       id: 'ciudad-jardin-hoy',
       titulo: 'Cochabamba, Ciudad Jardín: recreación y encuentro',
-      imagen: G + '6P9A5493.jpg',
+      imagen: MEDIA.temario['ciudad-jardin-hoy'],
       imagenAlt: 'Espacios de encuentro',
       bajada:
         'La Ciudad Jardín y de la Eterna Primavera renueva su esencia con plazas, parques y ' +
@@ -359,7 +354,7 @@ const SONAR_EN_GRANDE: EraTemario = {
     {
       id: 'ecologia',
       titulo: 'Un compromiso con el futuro ecológico',
-      imagen: A + 'DSC_0790.jpg',
+      imagen: MEDIA.temario['ecologia'],
       imagenAlt: 'Manfred Reyes Villa en una obra',
       bajada:
         'La llajta avanza hacia un futuro más verde, limpio y sostenible. La protección del ' +
@@ -390,7 +385,7 @@ const SONAR_EN_GRANDE: EraTemario = {
     {
       id: 'espejos-de-agua',
       titulo: 'Nuestros espejos de agua',
-      imagen: G + 'IMG_4043.jpg',
+      imagen: MEDIA.temario['espejos-de-agua'],
       imagenAlt: 'Laguna Alalay',
       bajada:
         'Cochabamba vuelve a mirar hacia sus espejos de agua como espacios de vida, encuentro ' +
@@ -409,7 +404,7 @@ const SONAR_EN_GRANDE: EraTemario = {
     {
       id: 'educacion',
       titulo: 'Educación integral',
-      imagen: G + 'IMG_2650.jpg',
+      imagen: MEDIA.temario['educacion'],
       imagenAlt: 'Estudiantes de Cochabamba',
       bajada:
         'El gobierno municipal ha destinado importantes esfuerzos a la construcción, ' +
@@ -437,7 +432,7 @@ const SONAR_EN_GRANDE: EraTemario = {
     {
       id: 'vialidad',
       titulo: 'Cochabamba conectada: infraestructura vial para una ciudad que avanza',
-      imagen: A + 'DSC_0807.jpg',
+      imagen: MEDIA.temario['vialidad'],
       imagenAlt: 'Manfred Reyes Villa',
       bajada:
         'La infraestructura vial volvió a ocupar un lugar central en la transformación de ' +
@@ -478,7 +473,7 @@ const SONAR_EN_GRANDE: EraTemario = {
     {
       id: 'vanguardia',
       titulo: 'Cochabamba a la vanguardia del progreso',
-      imagen: G + 'IMG_9792.jpg',
+      imagen: MEDIA.temario['vanguardia'],
       imagenAlt: 'Servicios modernos para la ciudad',
       bajada:
         'La ciudad avanza con soluciones innovadoras que mejoran la vida cotidiana, recuperan ' +
@@ -503,7 +498,7 @@ const SONAR_EN_GRANDE: EraTemario = {
     {
       id: 'alianzas',
       titulo: 'Pioneros en alianzas público-privadas',
-      imagen: A + 'DSC_0819.jpg',
+      imagen: MEDIA.temario['alianzas'],
       imagenAlt: 'Manfred Reyes Villa',
       bajada:
         'Cuando las ideas se suman, el desarrollo multiplica su fuerza. El municipio abre ' +

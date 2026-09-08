@@ -74,7 +74,7 @@ export default function ComparadorAntesDespues({ pares }: Props) {
         <div>
           <p className="text-sm font-bold tracking-tight text-slate-800">{par.titulo}</p>
           <p className="text-xs font-medium italic text-slate-400">
-            Foto de referencia — reemplazar por antes/después real.
+            Desliza para comparar el antes y el ahora.
           </p>
         </div>
 

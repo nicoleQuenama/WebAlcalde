@@ -1,14 +1,15 @@
 /**
- * Historia de Manfred Reyes Villa — datos de referencia para la línea de tiempo del home.
+ * Historia de Manfred Reyes Villa — línea de tiempo de /sobre.
  *
- * ⚠️ IMPORTANTE: esto es un BORRADOR EDITORIAL. Revisá y ajustá fechas, cargos,
- *    nombres de alianzas y cifras con fuentes oficiales antes de publicar.
+ * Contenido tomado de la reseña biográfica oficial provista por el equipo
+ * ("El Cap. Manfred Reyes Villa Bacigalupi es militar en retiro, político y
+ *  empresario…"). Ante cualquier duda de fechas o cargos, esa reseña manda.
  *
- * ⚠️ Las `imagen` de abajo son PLACEHOLDER (fotos que ya existían en el proyecto).
- *    Reemplazá cada una por la foto real del hito: poné los archivos en
- *    /public/images/historia/ y cambiá la ruta (ej: "/images/historia/2002.jpg").
- *    Si dejás `imagen` vacío, esa tarjeta muestra un marcador y NO abre la galería.
+ * Los hitos recientes llevan foto real del bucket (ver src/constants/media.ts).
+ * Los hitos antiguos van sin `imagen`: la tarjeta muestra un marcador
+ * "Foto de archivo" hasta cargar la foto histórica real.
  */
+import { MEDIA } from './media';
 
 export type TipoHito = 'historia' | 'reconocimiento';
 
@@ -21,7 +22,7 @@ export interface Hito {
   etapa: string;
   titulo: string;
   descripcion: string;
-  /** Ruta pública de la imagen, ej: "/images/historia/1993-alcaldia.jpg". Opcional. */
+  /** Ruta pública de la imagen. Opcional. */
   imagen?: string;
   imagenAlt?: string;
 }
@@ -37,161 +38,163 @@ export interface IntroHistoria {
   bajada: string;
 }
 
-// Fotos temporales para poder ver la galería funcionando. Borralas al cargar las reales.
-const PH_A = '/images/ciudad.jpg';
-const PH_B = '/images/alcalde.webp';
-
 export const HISTORIA_INTRO: IntroHistoria = {
   kicker: 'Trayectoria',
   titulo: 'Del cuartel a la Alcaldía',
   bajada:
-    'Militar de carrera, fundador de un partido con raíz cochabambina y varias veces ' +
-    'autoridad del valle. Esta es la línea de tiempo de la vida pública de Manfred Reyes Villa.',
+    'El Cap. Manfred Reyes Villa Bacigalupi es militar en retiro, político y empresario. ' +
+    'Cochabambino por decisión: ama a su gente, a su tierra y, sobre todo, a Dios. ' +
+    'Esta es la línea de tiempo de su vida pública.',
 };
 
 export const HISTORIA: Hito[] = [
   {
     anio: '1955',
     etapa: 'Origen',
-    titulo: 'Nace en Cochabamba',
+    titulo: 'Nace en La Paz',
     descripcion:
-      'Manfred Armando Antonio Reyes Villa nace el 18 de agosto de 1955 en la ciudad de ' +
-      'Cochabamba, en el centro del valle. Su vida quedará ligada a esta ciudad.',
-    imagen: PH_A,
+      'Manfred Reyes Villa Bacigalupi nace en 1955 en la ciudad de La Paz. Con los años ' +
+      'se hará cochabambino por decisión. Está casado y tiene 7 hijos, dos de ellas fallecidas.',
   },
   {
-    anio: 'Años 70–80',
+    anio: 'Años 60–70',
     etapa: 'Formación',
-    titulo: 'Carrera militar',
+    titulo: 'Colegio Israelita, La Paz',
     descripcion:
-      'Se forma en el Colegio Militar del Ejército y sigue la carrera de las armas. El grado ' +
-      'de capitán le quedará como apodo —“el Capitán”— para toda su vida política.',
-    imagen: PH_B,
+      'Cursa sus estudios escolares en el Colegio Israelita de la ciudad de La Paz.',
   },
   {
-    anio: '1993',
+    anio: '1973',
+    etapa: 'Carrera militar',
+    titulo: 'Ingresa al Colegio Militar del Ejército',
+    descripcion:
+      'Comienza la carrera de las armas en el Colegio Militar del Ejército.',
+  },
+  {
+    anio: '1977',
+    etapa: 'Carrera militar',
+    titulo: 'Grado de Subteniente',
+    descripcion:
+      'Egresa del Colegio Militar y obtiene el grado de Subteniente del Ejército.',
+  },
+  {
+    anio: 'Años 80',
+    etapa: 'Carrera militar',
+    titulo: 'Docencia y agregadurías militares',
+    descripcion:
+      'Ocupa cargos de importancia: docencia en Asuntos de Especialización Militar y ' +
+      'Agregado Militar de la Embajada de Bolivia en Brasil y en Estados Unidos.',
+  },
+  {
+    anio: '1986',
+    etapa: 'Vida civil',
+    titulo: 'Deja el Ejército con el grado de Capitán',
+    descripcion:
+      'Por razones personales deja definitivamente la carrera militar con el grado de ' +
+      'Capitán de Ejército. Se radica en Estados Unidos, se dedica a la vida civil y ' +
+      'familiar y ejerce en su área de formación, Business Management, llegando a ' +
+      'Vicepresidente de Crawford International en Silver Spring, Maryland.',
+  },
+  {
+    anio: '1990',
+    etapa: 'Regreso',
+    titulo: 'Vuelve a Bolivia e inicia su carrera política',
+    descripcion:
+      'A principios de 1990 regresa a Bolivia y da sus primeros pasos en la política.',
+  },
+  {
+    anio: '1992',
     etapa: 'Gestión municipal',
-    titulo: 'Primera vez alcalde',
+    titulo: 'Vicepresidente del Concejo Municipal de Cochabamba',
     descripcion:
-      'Llega por primera vez a la Alcaldía de Cochabamba. Empieza una etapa de obra urbana ' +
-      '—avenidas, mercados, áreas verdes— que marcará su forma de hacer política.',
-    imagen: PH_A,
-  },
-  {
-    anio: '1996',
-    etapa: 'Política',
-    titulo: 'Funda Nueva Fuerza Republicana',
-    descripcion:
-      'Crea la NFR, un partido de fuerte arraigo en el valle cochabambino que lo proyecta ' +
-      'desde el municipio hacia la escena nacional.',
-    imagen: PH_B,
+      'Asume la Vicepresidencia del Concejo Municipal de Cochabamba.',
   },
   {
     anio: '1993–2000',
     etapa: 'Gestión municipal',
-    titulo: 'Los años de la comuna',
+    titulo: 'Alcalde de Cochabamba por cuatro periodos consecutivos',
     descripcion:
-      'Reelegido al frente del municipio, acompaña la expansión acelerada de la ciudad: ' +
-      'vialidad, alumbrado y espacio público en una Cochabamba que crecía sin pausa.',
-    imagen: PH_A,
+      'Es burgomaestre de Cochabamba durante cuatro periodos seguidos. En paralelo preside ' +
+      'la Asociación de Gobiernos Municipales Autónomos de Bolivia, integra la Unión ' +
+      'Internacional de Autoridades Locales (IULA) y representa a la Red Latinoamericana de ' +
+      'Asociaciones Municipales ante la WACLAC, con base en Ginebra, Suiza.',
+    imagen: MEDIA.historia.prefecto,
+    imagenAlt: 'Manfred Reyes Villa',
   },
   {
-    anio: '2002',
-    etapa: 'Elección nacional',
-    titulo: 'Casi presidente',
-    descripcion:
-      'Se postula a la Presidencia por la NFR y termina tercero, a un puñado de votos del ' +
-      'segundo lugar, en una de las elecciones más cerradas de la democracia boliviana.',
-    imagen: PH_B,
-  },
-  {
-    anio: '2006',
+    anio: '2005',
     etapa: 'Gestión regional',
-    titulo: 'Prefecto de Cochabamba',
+    titulo: 'Primer Prefecto electo de Cochabamba',
     descripcion:
-      'Tras ganar la primera elección directa de prefectos (2005), asume el gobierno del ' +
-      'departamento de Cochabamba.',
-    imagen: PH_A,
-  },
-  {
-    anio: '2008',
-    etapa: 'Elección nacional',
-    titulo: 'El referéndum revocatorio',
-    descripcion:
-      'El revocatorio nacional alcanza a prefectos y presidente. Reyes Villa no supera la ' +
-      'consulta y deja la Prefectura.',
-    imagen: PH_B,
+      'Es el primer Prefecto del departamento de Cochabamba elegido democráticamente por ' +
+      'voto directo de la ciudadanía.',
+    imagen: MEDIA.historia.regreso2020,
+    imagenAlt: 'Manfred Reyes Villa con la gente',
   },
   {
     anio: '2009',
     etapa: 'Elección nacional',
-    titulo: 'Segunda candidatura presidencial',
+    titulo: 'Segundo lugar en las elecciones presidenciales',
     descripcion:
-      'Vuelve a competir por la Presidencia, esta vez dentro de la alianza Plan Progreso ' +
-      'para Bolivia – Convergencia Nacional.',
-    imagen: PH_A,
-  },
-  {
-    anio: '2010–2019',
-    etapa: 'Fuera del país',
-    titulo: 'Una década en el exterior',
-    descripcion:
-      'Pasa varios años fuera de Bolivia. Su figura se mantiene, aun a la distancia, como ' +
-      'referente de la oposición en Cochabamba.',
-    imagen: PH_B,
-  },
-  {
-    anio: '2020',
-    etapa: 'Regreso',
-    titulo: 'Vuelta a la ciudad',
-    descripcion:
-      'Regresa a Cochabamba y reorganiza su proyecto político local de cara a las ' +
-      'elecciones subnacionales.',
-    imagen: PH_A,
+      'En abril de 2009, en el marco de la nueva Constitución Política del Estado, se ' +
+      'presenta a las elecciones presidenciales y obtiene el segundo lugar en la ' +
+      'preferencia electoral.',
   },
   {
     anio: '2021',
     etapa: 'Gestión municipal',
-    titulo: 'De nuevo alcalde',
+    titulo: 'Alcalde de Cochabamba por quinta vez',
     descripcion:
-      'Gana las elecciones subnacionales y asume la Alcaldía de Cochabamba para la gestión ' +
-      '2021–2026, más de veinte años después de su primer paso por la comuna.',
-    imagen: PH_B,
+      'Se re-postula a la Alcaldía en las elecciones subnacionales de 2021 representando a ' +
+      'la agrupación política SÚMATE y es elegido Alcalde por quinta vez con el 55,63 % de ' +
+      'los votos.',
+    imagen: MEDIA.historia.alcalde2021,
+    imagenAlt: 'Manfred Reyes Villa, alcalde de Cochabamba',
   },
   {
-    anio: '2021–2026',
-    etapa: 'Gestión actual',
-    titulo: 'La ciudad inteligente',
+    anio: 'Hoy',
+    etapa: 'Compromiso',
+    titulo: 'Trabajar por Cochabamba',
     descripcion:
-      'La gestión gira en torno a la movilidad, la infraestructura y la modernización de ' +
-      'servicios, bajo la idea de una Cochabamba más conectada y eficiente.',
-    imagen: PH_A,
+      'Llega a la silla edil como político con experiencia, trayectoria y grandes ideas, ' +
+      'con el firme compromiso de trabajar por Cochabamba —desde donde el pueblo se lo ' +
+      'permita— siempre con honestidad, firmeza y capacidad.',
+    imagen: MEDIA.historia.ciudadInteligente,
+    imagenAlt: 'Cochabamba hoy',
   },
 
   // ── Pestaña "Reconocimiento" ────────────────────────────────────────
-  // ⚠️ PLACEHOLDERS. Reemplazá por reconocimientos reales (institución, motivo, año)
-  //    y sacá los que no correspondan. Cada uno lleva `tipo: 'reconocimiento'`.
+  // Distinciones y representaciones internacionales tomadas de la reseña oficial.
+  // ⚠️ Revisá instituciones y años exactos antes de publicar.
   {
     tipo: 'reconocimiento',
-    anio: '—',
+    anio: '1993–2000',
     etapa: 'Reconocimiento',
-    titulo: 'Reconocimiento 1 — completar',
+    titulo: 'Presidente de la Asociación de Gobiernos Municipales de Bolivia',
     descripcion:
-      'Cargá acá el reconocimiento: institución que lo otorga, motivo y año. ' +
-      'Ejemplo: distinción por gestión municipal, hermanamiento de ciudades, condecoración.',
+      'Es elegido Presidente de la Asociación de Gobiernos Municipales Autónomos de Bolivia ' +
+      'durante su gestión como Alcalde de Cochabamba.',
+    imagen: MEDIA.premios[1],
   },
   {
     tipo: 'reconocimiento',
-    anio: '—',
+    anio: '1993–2000',
     etapa: 'Reconocimiento',
-    titulo: 'Reconocimiento 2 — completar',
-    descripcion: 'Institución, motivo y año del reconocimiento.',
+    titulo: 'Miembro de la Unión Internacional de Autoridades Locales (IULA)',
+    descripcion:
+      'Integra la IULA y es nombrado representante oficial de la Red Latinoamericana de ' +
+      'Asociaciones Municipales ante la WACLAC (World Association of Cities and Local ' +
+      'Authorities Coordination), con base en Ginebra, Suiza.',
+    imagen: MEDIA.premios[3],
   },
   {
     tipo: 'reconocimiento',
-    anio: '—',
+    anio: '2026',
     etapa: 'Reconocimiento',
-    titulo: 'Reconocimiento 3 — completar',
-    descripcion: 'Institución, motivo y año del reconocimiento.',
+    titulo: 'Embajador de Ciudades Sostenibles',
+    descripcion:
+      'Es distinguido como "Embajador de la Organización Mundial Ciudades Sostenibles 2026" ' +
+      'en París, Francia.',
+    imagen: MEDIA.premios[0],
   },
 ];

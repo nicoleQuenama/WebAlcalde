@@ -110,8 +110,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Encuadrar desde arriba: evita cortar la cabeza del alcalde en los retratos. */
-  object-position: top center;
+  /* Encuadre "retrato seguro": el rostro del alcalde nunca queda fuera del recorte. */
+  object-position: 50% 28%;
   border-radius: 10px;
 }
 

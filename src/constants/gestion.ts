@@ -1,9 +1,9 @@
 /**
  * Contenido de la página /gestion.
  * ⚠️ Borrador editorial: revisá cifras, nombres de proyectos y estados antes de publicar.
- * Imágenes de proyectos: dejá los archivos en /public/images/gestion/ (o /public/multimedia/)
- * y actualizá `imagen`.
+ * Las imágenes salen del bucket de Supabase (ver src/constants/media.ts).
  */
+import { MEDIA } from './media';
 
 export const GESTION_HERO = {
   kicker: 'Alcaldía de Cochabamba',
@@ -61,38 +61,39 @@ export const PROYECTOS_TITULO = {
   bajada: 'Tocá una tarjeta para abrir la galería con todas las imágenes del proyecto.',
 };
 
-// ⚠️ PLACEHOLDER: títulos y estados de ejemplo, imágenes temporales de /public/multimedia/.
+// ⚠️ Revisá estados y descripciones antes de publicar. Las 4 obras tienen foto
+//    real del bucket (imagenes/cocha-antes-y-ahora): son proyectos del temario.
 export const PROYECTOS: Proyecto[] = [
   {
-    titulo: 'Playa Turquesa',
+    titulo: 'Complejo Recreacional Coña Coña — Playa Turquesa',
     categoria: 'Espacio público',
     descripcion:
-      'Nuevo espacio recreativo y de encuentro para las familias, con áreas verdes y equipamiento urbano.',
+      'Espacio recreativo y de turismo para las familias, con playa artificial, plaza de comidas y áreas verdes.',
     estado: 'Concluido',
-    imagen: '/multimedia/6P9A0583.jpg',
+    imagen: MEDIA.proyectos.playaTurquesa,
   },
   {
-    titulo: 'Laguna Alalay',
+    titulo: 'Recuperación de la Laguna Alalay',
     categoria: 'Medio ambiente',
     descripcion:
-      'Recuperación del entorno de la laguna: sendas, forestación y control del deterioro ambiental.',
+      'Dragado y recuperación del mayor espejo de agua de la ciudad: sendas, forestación y control del deterioro ambiental.',
     estado: 'En ejecución',
-    imagen: '/multimedia/DSC_0790.jpg',
+    imagen: MEDIA.proyectos.lagunaAlalay,
   },
   {
-    titulo: 'Accesos a la nueva terminal',
-    categoria: 'Movilidad',
+    titulo: 'Plaza de las Banderas',
+    categoria: 'Espacio público',
     descripcion:
-      'Obras viales de acceso a la nueva terminal de buses para ordenar el ingreso y salida de la ciudad.',
-    estado: 'En ejecución',
-    imagen: '/multimedia/IMG_7166.jpg',
-  },
-  {
-    titulo: 'Permiso de viaje digital',
-    categoria: 'Ciudad inteligente',
-    descripcion:
-      'Trámite en línea que reemplaza las filas presenciales para autorizar el viaje de menores.',
+      'Remozado y mejoramiento de la plaza y sus fuentes, dentro del plan de recuperación de espacios de encuentro.',
     estado: 'Concluido',
-    imagen: '/multimedia/IMG_0455.jpg.jpeg',
+    imagen: MEDIA.proyectos.plazaBanderas,
+  },
+  {
+    titulo: 'Parque Vial',
+    categoria: 'Ciudad Jardín',
+    descripcion:
+      'Parque renovado dentro del Plan Maestro de Forestación y de recuperación de áreas verdes de la llajta.',
+    estado: 'Concluido',
+    imagen: MEDIA.proyectos.parqueVial,
   },
 ];
