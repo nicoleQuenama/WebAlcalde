@@ -8,7 +8,6 @@ import {
   type SeccionTemario,
   type EraTemario,
 } from '../../constants/temario';
-import { ajusteImagen, type Encuadre, type AjusteCarrusel } from '../../lib/ajusteImagen';
 
 /**
  * Book — páginas del libro digital (FlipBook).
@@ -36,13 +35,6 @@ import { ajusteImagen, type Encuadre, type AjusteCarrusel } from '../../lib/ajus
 export interface IMG {
   src: string;
   alt: string;
-  /** Dimensiones reales de la foto (para optimizarla sin deformar). */
-  w?: number;
-  h?: number;
-  /** Encuadre por foto (misma lógica que las cards del hero). */
-  encuadre?: Encuadre;
-  zoomOut?: boolean;
-  ajuste?: AjusteCarrusel;
 }
 export interface Video {
   src: string;
@@ -79,7 +71,7 @@ const VIDEO_POR_SECCION: Record<string, number> = {
   salud: 6, // Clínica veterinaria municipal
 };
 
-/** Retrato protagonista: foto del alcalde recortada con el encuadre de las cards del hero. */
+/** Retrato protagonista: foto del alcalde grande y completa. */
 function RetratoAlcalde({ foto }: { foto?: IMG }) {
   if (!foto) return null;
   return (
@@ -91,13 +83,12 @@ function RetratoAlcalde({ foto }: { foto?: IMG }) {
         src={foto.src}
         alt={foto.alt}
         loading="lazy"
-        style={ajusteImagen(foto)}
       />
     </figure>
   );
 }
 
-/** Imagen de contexto (paisaje / gente), recortada con el encuadre de las cards del hero. */
+/** Imagen de contexto (paisaje / gente), grande. */
 function FotoContexto({ foto }: { foto?: IMG }) {
   if (!foto) return null;
   return (
@@ -109,7 +100,6 @@ function FotoContexto({ foto }: { foto?: IMG }) {
         src={foto.src}
         alt={foto.alt}
         loading="lazy"
-        style={ajusteImagen(foto)}
       />
     </figure>
   );
@@ -265,10 +255,10 @@ export default function Book({ coverImage, fotos, videos }: BookProps) {
           </p>
           <div className={s('mediaStrip')} data-reveal="left">
             <figure data-expand data-url={fotos[1]?.src} data-alt="Cochabamba de ayer">
-              <img src={fotos[1]?.src} alt="Cochabamba de ayer" loading="lazy" style={ajusteImagen(fotos[1])} />
+              <img src={fotos[1]?.src} alt="Cochabamba de ayer" loading="lazy" />
             </figure>
             <figure data-expand data-url={fotos[2]?.src} data-alt="Cochabamba hoy">
-              <img src={fotos[2]?.src} alt="Cochabamba hoy" loading="lazy" style={ajusteImagen(fotos[2])} />
+              <img src={fotos[2]?.src} alt="Cochabamba hoy" loading="lazy" />
             </figure>
           </div>
           <p className={s('caption')} data-reveal>

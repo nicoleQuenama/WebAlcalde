@@ -115,9 +115,8 @@
   border-radius: 10px;
 }
 
-/* Retrato protagonista (páginas donde el alcalde es el tema): recortado con el
-   encuadre por foto (igual que las cards del hero). El `object-position` lo pone
-   `ajusteImagen` inline; este center es solo el fallback. */
+/* Retrato protagonista (páginas donde el alcalde es el tema): la foto se ve
+   COMPLETA (object-fit: contain) y grande, nunca recortada. */
 .mediaPortrait {
   margin: 0;
   flex: 1 1 auto;
@@ -135,7 +134,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   border-radius: 14px;
 }
