@@ -1,0 +1,384 @@
+---
+/**
+ * /sobre — Quién es Manfred Reyes Villa.
+ *
+ * Estructura:
+ *   1. Hero        — mismo diseño que el home, con el contenido propio (biografía).
+ *   2. Biografia    — texto biográfico (sale de la apertura del temario, en la DB).
+ *   3. Tarjetas     — biografía, misión y visión.
+ *   4. LineaTiempo  — la trayectoria completa.
+ *
+ * Todo el contenido sale de la base SQLite (src/lib/db.ts); las fotos/videos
+ * resuelven Supabase (src/lib/media.ts). Las secciones viven AQUÍ dentro.
+ */
+import Layout from '../layouts/Layout.astro';
+import { Image, getImage } from 'astro:assets';
+import { getCapitulos, getHitos, getHistoriaIntro, getFiltrosHito, getPilares } from '../lib/db';
+import { MEDIA } from '../lib/media';
+import { ajusteImagen } from '../lib/ajusteImagen';
+import type { ImagenFaceta } from '../components/Hero/GaleriaModal';
+import HeroCards from '../components/Hero/HeroCard.tsx';
+import type { TarjetaImagen } from '../components/Hero/HeroCard.tsx';
+import ValueCards from '../components/ValueCards/ValueCards';
+import TimelineGaleria from '../components/Historia/TimelineGaleria';
+import '../styles/sobre.css';
+
+// ── HERO ──────────────────────────────────────────────────────────────
+const imgs: TarjetaImagen[] = await Promise.all(
+  MEDIA.hero.carrusel.map(async (img) => ({
+    ...img,
+    src: (
+      await getImage({
+        src: img.src,
+        width: 900,
+        ...(img.w && img.h ? { height: Math.max(1, Math.round((900 * img.h) / img.w)) } : {}),
+        fit: 'cover',
+        format: 'webp',
+      })
+    ).src,
+  })),
+);
+const fondo = await getImage({
+  src: MEDIA.hero.panoramica,
+  width: 900,
+  height: 562,
+  quality: 30,
+  format: 'webp',
+});
+
+// ── BIOGRAFÍA ────────────────────────────────────────────────────────
+const PRESENTACION = getCapitulos().find((c) => c.id === 'presentacion')!;
+
+// ── TARJETAS (biografía / misión / visión) ───────────────────────────
+const PILARES = getPilares();
+
+// ── LÍNEA DE TIEMPO ──────────────────────────────────────────────────
+const HISTORIA = getHitos();
+const HISTORIA_INTRO = getHistoriaIntro();
+const FILTROS_HITO = getFiltrosHito();
+
+// tipo por defecto + índice en la galería (mismo orden que TimelineGaleria.tsx).
+// Además resuelve la altura real de cada foto y el punto de enfoque (encuadre).
+let cuentaImg = 0;
+const hitos = HISTORIA.map((hito) => ({
+  ...hito,
+  tipo: hito.tipo ?? 'historia',
+  galeriaIdx: hito.imagen ? cuentaImg++ : null,
+  imagenH:
+    hito.imagen && hito.imagenW && hito.imagenH
+      ? Math.round((640 * hito.imagenH) / hito.imagenW)
+      : undefined,
+  imagenPos: hito.imagen ? ajusteImagen(hito).objectPosition : '50% 30%',
+}));
+
+// La galería (client) recibe las imágenes por props: no puede leer la DB.
+const galeriaImagenes: ImagenFaceta[] = HISTORIA.filter((h) => h.imagen).map((h) => ({
+  src: h.imagen as string,
+  titulo: `${h.anio} · ${h.titulo}`,
+}));
+---
+
+<Layout title="Sobre — Manfred Reyes Villa">
+    <main>
+        <!-- ═══ HERO (mismo diseño que el home, con el contenido de /sobre) ═══ -->
+        <section class="relative flex min-h-[100svh] w-full items-center justify-center bg-primary px-0 pb-16 pt-24 lg:pt-28">
+            <div class="absolute inset-0 z-0 overflow-hidden">
+                <div
+                    class="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-xl"
+                    style={`background-image: url('${fondo.src}');`}
+                ></div>
+                <div class="absolute inset-0 bg-primary/80 mix-blend-multiply"></div>
+                <div class="absolute inset-0 bg-gradient-to-b from-primary/40 to-primary"></div>
+            </div>
+
+            <div class="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 px-6 lg:grid-cols-2 lg:px-12">
+                <div class="flex w-full justify-center">
+                    <HeroCards client:load imagenes={imgs} autoplayMs={4500} />
+                </div>
+
+                <div class="flex flex-col items-center space-y-6 text-center lg:items-start lg:text-left">
+                    <div class="relative w-max max-w-full">
+                        <p class="invisible whitespace-nowrap pr-2 font-roboto-serif text-[11px] uppercase tracking-[0.14em] opacity-0 sm:text-sm sm:tracking-[0.2em]">
+                            Biografía y trayectoria
+                        </p>
+                        <p class="typewriter-1 absolute left-0 top-0 h-full overflow-hidden whitespace-nowrap pr-2 font-roboto-serif text-[11px] uppercase tracking-[0.14em] text-accent sm:text-sm sm:tracking-[0.2em]">
+                            Biografía y trayectoria
+                        </p>
+                    </div>
+
+                    <div class="relative w-max max-w-full">
+                        <h1 class="invisible whitespace-nowrap py-1 pr-4 font-roboto-serif text-4xl leading-[1.1] text-white opacity-0 sm:text-5xl lg:text-7xl">
+                            Manfred Reyes Villa
+                        </h1>
+                        <h1 class="typewriter-2 absolute left-0 top-0 h-full overflow-hidden whitespace-nowrap py-1 font-serif text-3xl leading-[1.1] text-white sm:text-4xl lg:text-6xl">
+                            Manfred Reyes Villa
+                        </h1>
+                    </div>
+
+                    <p class="fade-right-delay border-l-4 border-accent pl-6 font-roboto-serif text-lg italic text-white/85 sm:text-xl lg:text-2xl">
+                        "Una vida dedicada a Cochabamba"
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ BIOGRAFÍA ═══ -->
+        <section class="bg-white">
+            <div class="mx-auto max-w-3xl px-6 py-20 lg:px-8 lg:py-24">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
+                    Biografía
+                </p>
+                <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
+                    Una vida dedicada a Cochabamba
+                </h2>
+                <p class="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
+                    {PRESENTACION.bajada}
+                </p>
+                <a
+                    href="/gestion#presentacion"
+                    class="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-transform hover:-translate-y-0.5"
+                >
+                    Ver la gestión completa
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- ═══ TARJETAS: biografía, misión y visión ═══ -->
+        <section class="bg-primary text-white">
+            <div class="mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-24">
+                <header class="max-w-2xl">
+                    <h2 class="text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl">
+                        Biografía, misión y visión
+                    </h2>
+                </header>
+
+                <ValueCards client:visible cards={PILARES} />
+            </div>
+        </section>
+
+        <!-- ═══ LÍNEA DE TIEMPO ═══ -->
+        <section class="relative bg-white text-slate-900">
+            <div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
+                <header class="max-w-2xl">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
+                        {HISTORIA_INTRO.kicker}
+                    </p>
+                    <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]">
+                        {HISTORIA_INTRO.titulo}
+                    </h2>
+                    <p class="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
+                        {HISTORIA_INTRO.bajada}
+                    </p>
+                </header>
+
+                <!-- Filtro: Historia / Reconocimiento (mismo timeline, cambia el contenido) -->
+                <div
+                    class="mt-8 inline-flex rounded-full border border-slate-200 bg-slate-50 p-1"
+                    role="tablist"
+                    aria-label="Filtrar línea de tiempo"
+                    data-filtros
+                >
+                    {
+                        FILTROS_HITO.map((f, i) => (
+                            <button
+                                type="button"
+                                role="tab"
+                                data-filtro-btn={f.id}
+                                aria-selected={i === 0 ? 'true' : 'false'}
+                                class="cursor-pointer rounded-full px-5 py-2 text-[13px] font-semibold tracking-wide text-slate-500 transition-colors hover:text-slate-900 aria-selected:bg-primary aria-selected:text-white"
+                            >
+                                {f.label}
+                            </button>
+                        ))
+                    }
+                </div>
+
+                <ol class="relative mt-14 lg:mt-16" data-linea-tiempo>
+                    <span aria-hidden="true" class="absolute left-3 top-2 bottom-8 w-px bg-slate-200"></span>
+                    <span
+                        aria-hidden="true"
+                        data-riel-avance
+                        class="absolute left-3 top-2 bottom-8 w-px origin-top scale-y-0 bg-primary/70 transition-transform duration-150 ease-out"
+                    ></span>
+
+                    {
+                        hitos.map((hito, i) => (
+                            <li
+                                data-hito
+                                data-tipo={hito.tipo}
+                                class="relative pb-14 pl-10 last:pb-0 lg:grid lg:grid-cols-[5rem_19rem_1fr] lg:items-start lg:gap-x-10 lg:pl-12"
+                            >
+                                <span
+                                    aria-hidden="true"
+                                    class="absolute left-3 top-[6px] h-3 w-3 -translate-x-1/2 rounded-full border-2 border-primary bg-white"
+                                />
+
+                                <div class="mb-4 lg:mb-0 lg:pt-[2px] lg:text-right">
+                                    <div class="text-2xl font-bold tracking-tight lg:text-[1.7rem]">{hito.anio}</div>
+                                    <div class="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+                                        {hito.etapa}
+                                    </div>
+                                </div>
+
+                                {hito.imagen ? (
+                                    <button
+                                        type="button"
+                                        data-galeria-idx={hito.galeriaIdx}
+                                        aria-label={`Ampliar foto: ${hito.titulo}`}
+                                        class="group mb-4 block w-full cursor-zoom-in overflow-hidden rounded-xl border border-slate-200 outline-none focus-visible:ring-2 focus-visible:ring-primary/60 lg:mb-0"
+                                    >
+                                        <span class="relative block aspect-[4/3] bg-slate-100">
+                                            {hito.imagenH ? (
+                                                <Image
+                                                    src={hito.imagen}
+                                                    alt={hito.imagenAlt ?? hito.titulo}
+                                                    width={640}
+                                                    height={hito.imagenH}
+                                                    widths={[320, 480, 640]}
+                                                    sizes="(min-width: 1024px) 19rem, 100vw"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    class="h-full w-full bg-slate-100 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                                                    style={`object-position: ${hito.imagenPos}`}
+                                                />
+                                            ) : (
+                                                <Image
+                                                    src={hito.imagen}
+                                                    alt={hito.imagenAlt ?? hito.titulo}
+                                                    inferSize
+                                                    width={640}
+                                                    widths={[320, 480, 640]}
+                                                    sizes="(min-width: 1024px) 19rem, 100vw"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    class="h-full w-full bg-slate-100 object-cover object-[50%_30%] transition-transform duration-500 group-hover:scale-[1.03]"
+                                                />
+                                            )}
+                                            <span class="pointer-events-none absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/45 text-white opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
+                                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" /></svg>
+                                            </span>
+                                        </span>
+                                    </button>
+                                ) : (
+                                    <figure class="mb-4 overflow-hidden rounded-xl border border-slate-200 lg:mb-0">
+                                        <div class="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1.5 bg-slate-50">
+                                            <span class="text-[2rem] font-bold leading-none text-slate-300">{hito.anio}</span>
+                                            <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                                Foto de archivo
+                                            </span>
+                                        </div>
+                                    </figure>
+                                )}
+
+                                <div class="lg:pt-[2px]">
+                                    <span class="font-mono text-xs text-slate-400">{String(i + 1).padStart(2, '0')}</span>
+                                    <h3 class="mt-1 text-lg font-bold tracking-tight lg:text-xl">{hito.titulo}</h3>
+                                    <p class="mt-2 max-w-prose text-[15px] leading-relaxed text-slate-600">
+                                        {hito.descripcion}
+                                    </p>
+                                </div>
+                            </li>
+                        ))
+                    }
+
+                    <li class="relative pl-10 lg:pl-12" data-hito data-tipo="historia">
+                        <span
+                            aria-hidden="true"
+                            class="absolute left-3 top-1 h-3.5 w-3.5 -translate-x-1/2 rounded-full bg-primary ring-4 ring-white"
+                        ></span>
+                        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
+                            2026 · gestión en curso
+                        </p>
+                    </li>
+                </ol>
+            </div>
+
+            <TimelineGaleria client:idle imagenes={galeriaImagenes} />
+        </section>
+    </main>
+</Layout>
+
+<style>
+    [data-hito].oculto {
+        display: none;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+        [data-linea-tiempo][data-anim] [data-hito]:not(.oculto) {
+            opacity: 0;
+            transform: translateY(0.9rem);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        [data-linea-tiempo][data-anim] [data-hito].is-visible {
+            opacity: 1;
+            transform: none;
+        }
+    }
+</style>
+
+<script>
+    const ol = document.querySelector<HTMLElement>('[data-linea-tiempo]');
+    const filtros = document.querySelector<HTMLElement>('[data-filtros]');
+
+    if (ol) {
+        const riel = ol.querySelector<HTMLElement>('[data-riel-avance]');
+        const todos = () => Array.from(ol.querySelectorAll<HTMLElement>('[data-hito]'));
+
+        ol.setAttribute('data-anim', '');
+
+        const io = new IntersectionObserver(
+            (entradas) => {
+                entradas.forEach((e) => {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('is-visible');
+                        io.unobserve(e.target);
+                    }
+                });
+            },
+            { rootMargin: '0px 0px -12% 0px', threshold: 0.12 },
+        );
+        todos().forEach((h) => io.observe(h));
+
+        window.setTimeout(() => {
+            todos().forEach((h) => h.classList.add('is-visible'));
+        }, 2000);
+
+        const actualizarRiel = () => {
+            if (!riel) return;
+            const r = ol.getBoundingClientRect();
+            const avance = Math.min(Math.max((window.innerHeight * 0.55 - r.top) / r.height, 0), 1);
+            riel.style.transform = `scaleY(${avance})`;
+        };
+        let pendiente = false;
+        const alScroll = () => {
+            if (pendiente) return;
+            pendiente = true;
+            requestAnimationFrame(() => {
+                pendiente = false;
+                actualizarRiel();
+            });
+        };
+        window.addEventListener('scroll', alScroll, { passive: true });
+        window.addEventListener('resize', alScroll, { passive: true });
+        actualizarRiel();
+
+        if (filtros) {
+            const botones = Array.from(filtros.querySelectorAll<HTMLElement>('[data-filtro-btn]'));
+            const aplicar = (tipo: string) => {
+                botones.forEach((b) =>
+                    b.setAttribute('aria-selected', String(b.dataset.filtroBtn === tipo)),
+                );
+                todos().forEach((li) => {
+                    const visible = li.getAttribute('data-tipo') === tipo;
+                    li.classList.toggle('oculto', !visible);
+                    if (visible) li.classList.add('is-visible');
+                });
+                actualizarRiel();
+            };
+            botones.forEach((b) =>
+                b.addEventListener('click', () => aplicar(b.dataset.filtroBtn || 'historia')),
+            );
+            aplicar('historia');
+        }
+    }
+</script>

@@ -12,16 +12,16 @@
  * (src/lib/db.ts); las fotos/videos resuelven Supabase (src/lib/media.ts).
  * Las secciones viven AQUÍ dentro: ya no hay componentes .astro intermedios.
  */
-import Layout from '../layouts/Layout.astro';
-import { getCapitulos, getEras } from '../lib/db';
-import { MEDIA } from '../lib/media';
 import { getImage } from 'astro:assets';
-import HeroCards from '../components/Hero/HeroCard.tsx';
-import type { TarjetaImagen } from '../components/Hero/HeroCard.tsx';
-import ComparadorAntesDespues from '../components/Home/ComparadorAntesDespues';
-import type { ParComparador } from '../components/Home/ComparadorAntesDespues';
-import FlipBook from '../components/FlipBook/FlipBook';
-import Book from '../components/Book/Book';
+import Layout from '@layouts/Layout.astro';
+import { getCapitulos, getEras } from '@lib/db';
+import { MEDIA } from '@lib/media';
+import HeroCards from '@components/Hero/HeroCard.tsx';
+import type { TarjetaImagen } from '@components/Hero/HeroCard.tsx';
+import ComparadorAntesDespues from '@components/Home/ComparatingProjects.component.tsx';
+import type { ParComparador } from '@components/Home/ComparatingProjects.component.tsx';
+import FlipBook from '@components/FlipBook/FlipBook';
+import Book from '@components/Book/Book';
 import '../styles/sobre.css';
 
 // ── HERO ──────────────────────────────────────────────────────────────
