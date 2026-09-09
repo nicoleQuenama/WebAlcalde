@@ -11,6 +11,9 @@ export default function ImageSlider({
   afterLabel = 'DESPUÉS',
   initialPosition = 50,
   className,
+  afterFit,
+  afterPosition,
+  afterScale,
 }: ImageSliderProps) {
   const [position, setPosition] = useState(clamp(initialPosition));
   const containerRef = useRef<HTMLDivElement>(null);
@@ -61,6 +64,15 @@ export default function ImageSlider({
         alt={afterLabel}
         draggable={false}
         loading="lazy"
+        style={
+          afterFit || afterPosition || afterScale
+            ? {
+                objectFit: afterFit,
+                objectPosition: afterPosition,
+                transform: afterScale ? `scale(${afterScale})` : undefined,
+              }
+            : undefined
+        }
       />
 
       <div

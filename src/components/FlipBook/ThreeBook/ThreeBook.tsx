@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './ThreeBook.module.css';
 
 export interface ThreeBookProps {
@@ -218,8 +218,8 @@ function makePaperTexture(size: number): HTMLCanvasElement {
 }
 
 export default function ThreeBook({
-  coverLabel = 'Cochabamba',
-  accent = '#c9a96e',
+  coverLabel = 'Cocha',
+  accent: accentProp = '#472d82',
   coverImage,
   onOpen,
 }: ThreeBookProps) {
@@ -227,7 +227,18 @@ export default function ThreeBook({
   const openRef = useRef(onOpen);
   openRef.current = onOpen;
 
-  const labelText = coverLabel ?? 'Cochabamba';
+  const labelText = coverLabel ?? 'Cocha';
+
+  // El acento (tapa, lomo y espina del libro) es el color de marca. FlipBook no
+  // pasa `accent`, así que lo tomamos del CSS global (--color-primary) en el
+  // navegador. En SSR (sin `document`) cae al mismo #472d82 de global.css.
+  const [accent] = useState<string>(() => {
+    if (typeof document === 'undefined') return accentProp;
+    return (
+      getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() ||
+      accentProp
+    );
+  });
 
   useEffect(() => {
     const wrap = wrapRef.current;

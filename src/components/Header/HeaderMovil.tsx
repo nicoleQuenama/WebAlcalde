@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { NavItem } from "../../types/nav";
+import { MEDIA } from "../../lib/media";
 import  "../../styles/global.css";
 
 interface Props {
@@ -12,15 +13,15 @@ export default function HeaderMovil({ enlaces }: Props) {
   return (
     <div className="fixed top-0 left-0 w-full z-50">
       
-      <div className="flex flex-wrap items-center justify-between w-full bg-primary backdrop-blur-md border-b border-purple-400/40 py-4 px-8 lg:px-12 shadow-[0_10px_30px_rgba(76,29,149,0.4)] transition-all duration-300">
+      <div className="flex flex-wrap items-center justify-between w-full bg-primary border-b border-white/10 py-4 px-8 lg:px-12 transition-all duration-300">
         
         {/* Lado Izquierdo: Logo y Nombre */}
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center shadow-md hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer">
             <a href="/" className="flex items-center justify-center shadow-md hover:scale-105 hover:rotate-6 transition-transform duration-300 cursor-pointer">
             <img
-              src="../../../public/multimedia/Logo Alcalde.png"
-              alt="Logo"
+              src={MEDIA.logo}
+              alt="Manfred Reyes Villa"
               className="h-10 lg:h-12 w-auto object-contain"
             />
              </a>

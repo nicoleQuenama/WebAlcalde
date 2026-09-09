@@ -5,10 +5,7 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
@@ -26,6 +23,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center center;
   display: block;
   pointer-events: none;
 }
@@ -56,20 +54,19 @@
   -webkit-user-select: none;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 .labelBefore {
   left: 16px;
-  background: rgba(26, 26, 46, 0.65);
+  background: rgba(31, 21, 51, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
 .labelAfter {
   right: 16px;
-  background: rgba(201, 169, 110, 0.75);
+  background: rgba(71, 45, 130, 0.82);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #211b0f;
+  color: #fff;
 }
 
 /* ---------- Handle ---------- */
@@ -89,7 +86,7 @@
 }
 
 .handle:focus-visible .handleLine {
-  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.6);
+  box-shadow: 0 0 0 3px rgba(71, 45, 130, 0.6);
 }
 
 .handleLine {
@@ -101,11 +98,10 @@
   margin-left: -1px;
   background: linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.55),
     rgba(255, 255, 255, 0.95) 48%,
-    rgba(255, 255, 255, 0.35)
+    rgba(255, 255, 255, 0.55)
   );
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
 }
 
 .handleKnob {
@@ -117,15 +113,12 @@
   height: 46px;
   border-radius: 50%;
   background: #fff;
-  color: #1a1a2e;
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid #1a1a2e;
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: 3px solid var(--color-primary);
+  transition: transform 0.15s ease;
 }
 
 .handle:hover .handleKnob {
@@ -134,7 +127,6 @@
 
 .container:active .handleKnob {
   transform: translate(-50%, -50%) scale(1.12);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55);
 }
 
 /* ---------- Responsive ---------- */

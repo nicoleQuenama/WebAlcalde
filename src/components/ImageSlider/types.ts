@@ -5,4 +5,7 @@ export interface ImageSliderProps {
   afterLabel?: string;
   initialPosition?: number;
   className?: string;
+  afterFit?: 'cover' | 'contain' | 'fill' | 'none';
+  afterPosition?: string;
+  afterScale?: number;
 }

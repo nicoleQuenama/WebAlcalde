@@ -1,24 +1,46 @@
 import { useState, useEffect } from 'react';
+import { ajusteImagen, type Encuadre, type AjusteCarrusel } from '../../lib/ajusteImagen';
 
+/**
+ * Imagen del carrusel del hero (y del libro): misma foto con opciones de
+ * encuadre/zoom. Ver `src/lib/ajusteImagen.ts`.
+ */
 export interface TarjetaImagen {
   id: number | string;
   src: string;
   /** Texto opcional que se muestra sobre la tarjeta y en la galería. */
   titulo?: string;
+  /** Dimensiones reales de la foto (para optimizarla sin deformar). */
+  w?: number;
+  h?: number;
+  encuadre?: Encuadre;
+  /**
+   * Zoom out en la card: alarga la zona visible (menos recorte arriba/abajo).
+   * Solo aplica a la card, NO al modal.
+   */
+  zoomOut?: boolean;
+  /**
+   * Valores EXACTOS de ajuste por imagen (tal como los copias del playground).
+   * Tienen prioridad sobre `encuadre`/`zoomOut`.
+   * Ejemplo: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 }
+   */
+  ajuste?: AjusteCarrusel;
 }
 
-const IMAGENES_DEFECTO: TarjetaImagen[] = [
-  { id: 1, src: '/multimedia/6P9A0583.jpg' },
-  { id: 2, src: '/multimedia/DSC_0790.jpg' },
-  { id: 3, src: '/multimedia/IMG_7166.jpg' },
-];
+const IMAGENES_DEFECTO: TarjetaImagen[] = [];
 
 interface Props {
-  /** Lista de imágenes del carrusel. Si no se pasa, usa 3 de ejemplo. */
-  imagenes?: TarjetaImagen[];
+  /** Imágenes del carrusel (se pasan siempre desde el Hero o Proyectos). */
+  imagenes: TarjetaImagen[];
   /** Autoplay del carrusel (ms). 0 = sin autoplay. */
   autoplayMs?: number;
 }
+
+/**
+ * Las tarjetas siempre muestran un recorte cuadrado de la foto; el encuadre y
+ * el zoom por imagen se calculan con `ajusteImagen` (igual que el libro).
+ */
+const cardAjuste = ajusteImagen;
 
 export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
   const IMAGENES = imagenes && imagenes.length > 0 ? imagenes : IMAGENES_DEFECTO;
@@ -53,8 +75,8 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
 
   return (
     <>
-      <div className="relative w-full h-[550px] flex items-center justify-center">
-        <div className="relative w-[320px] h-[450px] lg:w-[360px] lg:h-[500px]">
+      <div className="relative flex w-full items-center justify-center h-[420px] sm:h-[480px] lg:h-[540px] pb-10">
+        <div className="relative w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] lg:w-[400px] lg:h-[400px]">
           {IMAGENES.map((img, index) => {
             let posicion = 'oculta';
             if (index === actual) posicion = 'centro';
@@ -62,11 +84,11 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
             else if (index === (actual + 1) % IMAGENES.length) posicion = 'derecha';
 
             const estilosBase =
-              'absolute top-0 left-0 w-full h-full rounded-3xl bg-cover bg-center border border-white/30 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]';
+              `absolute top-0 left-0 w-full h-full rounded-3xl overflow-hidden bg-slate-900 border border-white/30 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]`;
 
             const estilosPosicion = {
               centro:
-                'z-30 scale-100 translate-x-0 rotate-0 opacity-100 cursor-pointer shadow-[0_30px_60px_rgba(0,0,0,0.6)]',
+                'z-30 scale-100 translate-x-0 rotate-0 opacity-100 cursor-pointer',
               izquierda: 'z-20 scale-90 -translate-x-36 -rotate-6 opacity-40 cursor-pointer hover:opacity-80',
               derecha: 'z-20 scale-90 translate-x-36 rotate-6 opacity-40 cursor-pointer hover:opacity-80',
               oculta: 'z-10 scale-75 opacity-0',
@@ -76,15 +98,22 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
               <div
                 key={img.id}
                 className={`${estilosBase} ${estilosPosicion[posicion as keyof typeof estilosPosicion]}`}
-                style={{ backgroundImage: `url('${img.src}')` }}
                 onClick={() => {
                   if (posicion === 'centro') abrirModal();
                   if (posicion === 'izquierda') anterior();
                   if (posicion === 'derecha') siguiente();
                 }}
               >
+                {/* Imagen de la tarjeta: cubre el marco respetando proporción según su encuadre */}
+                <img
+                  src={img.src}
+                  alt={img.titulo ?? ''}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full"
+                  style={cardAjuste(img)}
+                />
                 {posicion === 'centro' && img.titulo && (
-                  <span className="absolute inset-x-0 bottom-0 rounded-b-3xl bg-gradient-to-t from-black/70 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white">
+                  <span className="absolute inset-x-0 bottom-0 rounded-b-3xl bg-gradient-to-t from-black/75 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white">
                     {img.titulo}
                   </span>
                 )}
@@ -93,18 +122,18 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
           })}
         </div>
 
-        <div className="absolute -bottom-4 flex gap-8 z-40">
+        <div className="absolute bottom-0 flex gap-8 z-40">
           <button
             onClick={anterior}
             aria-label="Anterior"
-            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110 shadow-lg"
+            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110"
           >
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
           </button>
           <button
             onClick={siguiente}
             aria-label="Siguiente"
-            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110 shadow-lg"
+            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110"
           >
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
           </button>
@@ -132,11 +161,11 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
             <svg width="40" height="40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
           </button>
 
-          <figure className="mt-16 flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+          <figure className="mt-16 flex max-h-[85vh] max-w-[90vw] flex-col items-center" onClick={(e) => e.stopPropagation()}>
             <img
               src={actualImg.src}
               alt={actualImg.titulo ?? 'Ampliación'}
-              className="max-h-[75vh] max-w-[90vw] object-contain rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.6)] animate-[zoomIn_0.4s_ease-out]"
+              className="max-h-[85vh] max-w-[90vw] rounded-2xl animate-[zoomIn_0.4s_ease-out] object-contain"
             />
             {actualImg.titulo && (
               <figcaption className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-white/90">

@@ -1,20 +1,17 @@
 import { useEffect, useState } from 'react';
 import GaleriaModal, { type ImagenFaceta } from '../Hero/GaleriaModal';
-import { HISTORIA } from '../../constants/historia';
 
-// Solo los hitos que tienen foto entran a la galería. El orden acá debe coincidir
-// con el `data-galeria-idx` que pinta LineaTiempo.astro.
-const IMAGENES: ImagenFaceta[] = HISTORIA.filter((h) => h.imagen).map((h) => ({
-  src: h.imagen as string,
-  titulo: `${h.anio} · ${h.titulo}`,
-}));
+interface Props {
+  /** Imágenes de los hitos con foto, en el mismo orden que `data-galeria-idx`. */
+  imagenes: ImagenFaceta[];
+}
 
-export default function TimelineGaleria() {
+export default function TimelineGaleria({ imagenes }: Props) {
   const [abierto, setAbierto] = useState(false);
   const [indice, setIndice] = useState(0);
 
   useEffect(() => {
-    if (IMAGENES.length === 0) return;
+    if (imagenes.length === 0) return;
     const onClick = (e: MouseEvent) => {
       const disparador = (e.target as HTMLElement).closest<HTMLElement>('[data-galeria-idx]');
       if (!disparador) return;
@@ -25,12 +22,12 @@ export default function TimelineGaleria() {
     };
     document.addEventListener('click', onClick);
     return () => document.removeEventListener('click', onClick);
-  }, []);
+  }, [imagenes.length]);
 
   if (!abierto) return null;
   return (
     <GaleriaModal
-      imagenes={IMAGENES}
+      imagenes={imagenes}
       indice={indice}
       onIndice={setIndice}
       onCerrar={() => setAbierto(false)}
