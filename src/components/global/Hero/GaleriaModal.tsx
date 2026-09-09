@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import ArrowButton from '../CardDecks/ArrowButton';
 
 export interface ImagenFaceta {
   src: string;
@@ -60,13 +61,13 @@ export default function GaleriaModal({ imagenes, indice, onIndice, onCerrar }: P
         <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
 
-      <button
-        onClick={(e) => { e.stopPropagation(); anterior(); }}
-        className="absolute left-4 lg:left-12 text-white/70 hover:text-white bg-black/20 hover:bg-black/50 rounded-full p-4 hover:scale-110 transition-all z-[110]"
+      <ArrowButton
+        direction="left"
+        variant="modal"
+        onClick={(e) => { e?.stopPropagation(); anterior(); }}
         aria-label="Imagen anterior"
-      >
-        <svg width="40" height="40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-      </button>
+        className="absolute left-4 lg:left-12 z-[110]"
+      />
 
       <figure className="mt-16 flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
         <img
@@ -82,13 +83,13 @@ export default function GaleriaModal({ imagenes, indice, onIndice, onCerrar }: P
         )}
       </figure>
 
-      <button
-        onClick={(e) => { e.stopPropagation(); siguiente(); }}
-        className="absolute right-4 lg:right-12 text-white/70 hover:text-white bg-black/20 hover:bg-black/50 rounded-full p-4 hover:scale-110 transition-all z-[110]"
+      <ArrowButton
+        direction="right"
+        variant="modal"
+        onClick={(e) => { e?.stopPropagation(); siguiente(); }}
         aria-label="Imagen siguiente"
-      >
-        <svg width="40" height="40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-      </button>
+        className="absolute right-4 lg:right-12 z-[110]"
+      />
 
       {total > 1 && (
         <div className="fixed bottom-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold tracking-[0.35em] text-white/70">

@@ -1,36 +1,14 @@
 import { useState, useEffect } from 'react';
-import { ajusteImagen, type Encuadre, type AjusteCarrusel } from '../../lib/ajusteImagen';
+import { ajusteImagen } from '../../../lib/ajusteImagen';
+import type { TarjetaImagen } from './types';
+import ArrowButton from '../CardDecks/ArrowButton';
 
-/**
- * Imagen del carrusel del hero (y del libro): misma foto con opciones de
- * encuadre/zoom. Ver `src/lib/ajusteImagen.ts`.
- */
-export interface TarjetaImagen {
-  id: number | string;
-  src: string;
-  /** Texto opcional que se muestra sobre la tarjeta y en la galería. */
-  titulo?: string;
-  /** Dimensiones reales de la foto (para optimizarla sin deformar). */
-  w?: number;
-  h?: number;
-  encuadre?: Encuadre;
-  /**
-   * Zoom out en la card: alarga la zona visible (menos recorte arriba/abajo).
-   * Solo aplica a la card, NO al modal.
-   */
-  zoomOut?: boolean;
-  /**
-   * Valores EXACTOS de ajuste por imagen (tal como los copias del playground).
-   * Tienen prioridad sobre `encuadre`/`zoomOut`.
-   * Ejemplo: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 }
-   */
-  ajuste?: AjusteCarrusel;
-}
+export type { TarjetaImagen } from './types';
 
 const IMAGENES_DEFECTO: TarjetaImagen[] = [];
 
 interface Props {
-  /** Imágenes del carrusel (se pasan siempre desde el Hero o Proyectos). */
+  /** Imágenes del carrusel */
   imagenes: TarjetaImagen[];
   /** Autoplay del carrusel (ms). 0 = sin autoplay. */
   autoplayMs?: number;
@@ -123,20 +101,8 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
         </div>
 
         <div className="absolute bottom-0 flex gap-8 z-40">
-          <button
-            onClick={anterior}
-            aria-label="Anterior"
-            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110"
-          >
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-          </button>
-          <button
-            onClick={siguiente}
-            aria-label="Siguiente"
-            className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110"
-          >
-            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-          </button>
+          <ArrowButton direction="left" variant="hero" onClick={anterior} aria-label="Anterior" />
+          <ArrowButton direction="right" variant="hero" onClick={siguiente} aria-label="Siguiente" />
         </div>
       </div>
 
@@ -153,13 +119,13 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
             <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
 
-          <button
-            onClick={(e) => { e.stopPropagation(); anterior(); }}
-            className="absolute left-4 lg:left-12 text-white/70 hover:text-white bg-black/20 hover:bg-black/50 rounded-full p-4 hover:scale-110 transition-all z-[110]"
+          <ArrowButton
+            direction="left"
+            variant="modal"
+            onClick={(e) => { e?.stopPropagation(); anterior(); }}
             aria-label="Anterior"
-          >
-            <svg width="40" height="40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-          </button>
+            className="absolute left-4 lg:left-12 z-[110]"
+          />
 
           <figure className="mt-16 flex max-h-[85vh] max-w-[90vw] flex-col items-center" onClick={(e) => e.stopPropagation()}>
             <img
@@ -174,13 +140,13 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
             )}
           </figure>
 
-          <button
-            onClick={(e) => { e.stopPropagation(); siguiente(); }}
-            className="absolute right-4 lg:right-12 text-white/70 hover:text-white bg-black/20 hover:bg-black/50 rounded-full p-4 hover:scale-110 transition-all z-[110]"
+          <ArrowButton
+            direction="right"
+            variant="modal"
+            onClick={(e) => { e?.stopPropagation(); siguiente(); }}
             aria-label="Siguiente"
-          >
-            <svg width="40" height="40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
-          </button>
+            className="absolute right-4 lg:right-12 z-[110]"
+          />
         </div>
       )}
     </>

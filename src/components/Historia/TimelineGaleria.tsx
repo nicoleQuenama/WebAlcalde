@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import GaleriaModal, { type ImagenFaceta } from '../Hero/GaleriaModal';
+import GaleriaModal, { type ImagenFaceta } from '../global/Hero/GaleriaModal';
 
 interface Props {
   /** Imágenes de los hitos con foto, en el mismo orden que `data-galeria-idx`. */

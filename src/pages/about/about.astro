@@ -11,17 +11,17 @@
  * Todo el contenido sale de la base SQLite (src/lib/db.ts); las fotos/videos
  * resuelven Supabase (src/lib/media.ts). Las secciones viven AQUÍ dentro.
  */
-import Layout from '../layouts/Layout.astro';
+import Layout from '../../layouts/Layout.astro';
 import { Image, getImage } from 'astro:assets';
-import { getCapitulos, getHitos, getHistoriaIntro, getFiltrosHito, getPilares } from '../lib/db';
-import { MEDIA } from '../lib/media';
-import { ajusteImagen } from '../lib/ajusteImagen';
-import type { ImagenFaceta } from '../components/Hero/GaleriaModal';
-import HeroCards from '../components/Hero/HeroCard.tsx';
-import type { TarjetaImagen } from '../components/Hero/HeroCard.tsx';
-import ValueCards from '../components/ValueCards/ValueCards';
-import TimelineGaleria from '../components/Historia/TimelineGaleria';
-import '../styles/sobre.css';
+import { getCapitulos, getHitos, getHistoriaIntro, getFiltrosHito, getPilares } from '../../lib/db';
+import { MEDIA } from '../../lib/media';
+import { ajusteImagen } from '../../lib/ajusteImagen';
+import type { ImagenFaceta } from '../../components/global/Hero/GaleriaModal';
+import HeroCards from '../../components/global/Hero/HeroCard.tsx';
+import type { TarjetaImagen } from '../../components/global/Hero/HeroCard.tsx';
+import ValueCards from '../../components/ValueCards/ValueCards';
+import TimelineGaleria from '../../components/Historia/TimelineGaleria';
+import '../../styles/sobre.css';
 
 // ── HERO ──────────────────────────────────────────────────────────────
 const imgs: TarjetaImagen[] = await Promise.all(
