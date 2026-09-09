@@ -60,7 +60,7 @@ export default function ComparadorAntesDespues({ pares }: Props) {
             type="button"
             onClick={() => ir(-1)}
             aria-label="Comparación anterior"
-            className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#472d82] text-white transition-transform hover:scale-110 sm:left-4 sm:h-14 sm:w-14"
+            className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-white transition-transform hover:scale-110 sm:left-4 sm:h-14 sm:w-14"
           >
             <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
           </button>
@@ -68,7 +68,7 @@ export default function ComparadorAntesDespues({ pares }: Props) {
             type="button"
             onClick={() => ir(1)}
             aria-label="Comparación siguiente"
-            className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-[#472d82] text-white transition-transform hover:scale-110 sm:right-4 sm:h-14 sm:w-14"
+            className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-white transition-transform hover:scale-110 sm:right-4 sm:h-14 sm:w-14"
           >
             <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
           </button>
@@ -94,7 +94,7 @@ export default function ComparadorAntesDespues({ pares }: Props) {
                 aria-label={`Ver comparación ${idx + 1}: ${p.titulo}`}
                 aria-current={idx === i}
                 className={`h-2.5 rounded-full transition-all ${
-                  idx === i ? 'w-7 bg-[#472d82]' : 'w-2.5 bg-slate-300 hover:bg-slate-400'
+                  idx === i ? 'w-7 bg-primary' : 'w-2.5 bg-slate-300 hover:bg-slate-400'
                 }`}
               />
             ))}

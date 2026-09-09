@@ -60,7 +60,7 @@
   font-weight: 700;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: var(--accent, #c9b8e8);
+  color: var(--color-accent, #c9b8e8);
 }
 
 .title {

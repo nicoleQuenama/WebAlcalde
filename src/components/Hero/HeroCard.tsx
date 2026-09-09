@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { MEDIA } from '../../constants/media';
 import { ajusteImagen, type Encuadre, type AjusteCarrusel } from '../../lib/ajusteImagen';
 
 /**
@@ -28,19 +27,13 @@ export interface TarjetaImagen {
   ajuste?: AjusteCarrusel;
 }
 
-const IMAGENES_DEFECTO: TarjetaImagen[] = MEDIA.hero.carrusel;
+const IMAGENES_DEFECTO: TarjetaImagen[] = [];
 
 interface Props {
-  /** Lista de imágenes del carrusel. Si no se pasa, usa 3 de ejemplo. */
-  imagenes?: TarjetaImagen[];
+  /** Imágenes del carrusel (se pasan siempre desde el Hero o Proyectos). */
+  imagenes: TarjetaImagen[];
   /** Autoplay del carrusel (ms). 0 = sin autoplay. */
   autoplayMs?: number;
-  /**
-   * Encuadre de la foto dentro de la tarjeta:
-   *  - 'rostro' (por defecto): sube el foco para no cortar la cara del alcalde.
-   *  - 'centro': para fotos de obra/paisaje sin personas en primer plano.
-   */
-  foco?: 'rostro' | 'centro';
 }
 
 /**
@@ -49,7 +42,7 @@ interface Props {
  */
 const cardAjuste = ajusteImagen;
 
-export default function HeroCards({ imagenes, autoplayMs = 3500, _foco = 'rostro' }: Props) {
+export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
   const IMAGENES = imagenes && imagenes.length > 0 ? imagenes : IMAGENES_DEFECTO;
   const [actual, setActual] = useState(0);
   const [modalAbierto, setModalAbierto] = useState(false);

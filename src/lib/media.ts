@@ -12,8 +12,9 @@
  *   videos/                            → 01..07 de obras + Biografia.mp4
  *
  * Los componentes NO deben construir rutas a mano: importan `MEDIA` de acá.
+ * (Antes vivía en src/constants/media.ts; ahora vive junto a la capa de datos.)
  */
-import type { Encuadre, AjusteCarrusel } from '../lib/ajusteImagen';
+import type { Encuadre, AjusteCarrusel } from './ajusteImagen';
 
 const BASE =
   'https://fsuxvbuupswucnsvrdce.supabase.co/storage/v1/object/public/media';
@@ -57,11 +58,14 @@ export interface ParAntesDespues {
   despues: string;
   /**
    * Altura explícita (px) para la imagen "después" al optimizarla.
-   * Sólo necesario cuando Astro infiere mal las dimensiones de un webp
-   * (p. ej. 6P9A2287.webp, que lee como vertical cuando en realidad es
-   * horizontal) y por eso recorta a un formato incorrecto.
+   * Evita depender de `inferSize` en webps remotos (Astro algunos los lee
+   * mal, p. ej. 6P9A2287.webp lee como vertical cuando es horizontal) y el
+   * fallo transitorio "failed to fetch remote image dimensions".
    */
   despuesHeight?: number;
+  afterFit?: string;
+  afterPosition?: string;
+  afterScale?: number;
 }
 
 export const MEDIA = {
@@ -115,6 +119,8 @@ export const MEDIA = {
       despues: ahora(
         'Laguna_Alalay_el_proyecto_de_recuperacion_ambiental_mas_grande_del_pais.jpg.webp',
       ),
+      // 2048×1280 (horizontal): alto real a 1200px de ancho.
+      despuesHeight: 750,
     },
     {
       titulo: 'Plaza de las Banderas',
@@ -127,6 +133,8 @@ export const MEDIA = {
       titulo: 'Parque Vial',
       antes: antes('parque_vial.webp'),
       despues: ahora('DJI_0169.webp'),
+      // 4000×3000: alto real a 1200px de ancho.
+      despuesHeight: 900,
     },
   ] satisfies ParAntesDespues[],
 
@@ -166,7 +174,7 @@ export const MEDIA = {
   },
 
   // ── Imagen por subsección del temario (/gestion y libro) ──────────
-  // Clave = `id` de la subsección en temario.ts.
+  // Clave = `id` de la subsección en db.ts (seed del temario).
   temario: {
     puentes: home('DJI_0187'), // aérea de la ciudad / infraestructura
     conectividad: ahora('IMG_5929.webp'), // avenidas de la ciudad hoy

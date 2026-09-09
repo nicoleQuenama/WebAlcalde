@@ -113,11 +113,11 @@
   height: 46px;
   border-radius: 50%;
   background: #fff;
-  color: #472d82;
+  color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid #472d82;
+  border: 3px solid var(--color-primary);
   transition: transform 0.15s ease;
 }
 

@@ -103,7 +103,7 @@
   border: none;
   border-radius: 999px;
   background: #fff;
-  color: #472d82;
+  color: var(--color-primary);
   font-family: inherit;
   font-weight: 700;
   font-size: 0.95rem;
@@ -124,7 +124,7 @@
 .cta:focus-visible,
 .closeBtn:focus-visible,
 .videoClose:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
 
@@ -213,7 +213,7 @@
 }
 
 .closeBtn:hover {
-  background: var(--accent);
+  background: var(--color-primary);
   border-color: transparent;
   color: #fff;
   transform: scale(1.08) rotate(90deg);
@@ -264,7 +264,7 @@
 }
 
 .mediaClose:hover {
-  background: var(--accent);
+  background: var(--color-primary);
   border-color: transparent;
   color: #fff;
   transform: translateY(-1px);
@@ -325,7 +325,7 @@
 
 .mediaIcon {
   font-size: 3rem;
-  color: #c9b8e8;
+  color: var(--color-accent);
   line-height: 1;
 }
 
@@ -449,7 +449,7 @@
   margin-top: -6px;
   border-radius: 50%;
   border: 2px solid #fff;
-  background: var(--accent);
+  background: var(--color-primary);
 }
 
 .scrubRange::-moz-range-track {
@@ -463,11 +463,11 @@
   height: 15px;
   border-radius: 50%;
   border: 2px solid #fff;
-  background: var(--accent);
+  background: var(--color-primary);
 }
 
 .scrubRange:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 4px;
 }
 
@@ -546,7 +546,7 @@
   margin-top: -5px;
   border-radius: 50%;
   border: 2px solid #fff;
-  background: var(--accent);
+  background: var(--color-primary);
 }
 
 .fontRange::-moz-range-track {
@@ -560,11 +560,11 @@
   height: 11px;
   border-radius: 50%;
   border: 2px solid #fff;
-  background: var(--accent);
+  background: var(--color-primary);
 }
 
 .fontRange:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
