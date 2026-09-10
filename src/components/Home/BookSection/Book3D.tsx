@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import styles from './Book.module.css';
+import styles from '../../Book/Book.module.css';
 import type { Capitulo, SeccionTemario, EraTemario } from '@lib/db';
 
 /**

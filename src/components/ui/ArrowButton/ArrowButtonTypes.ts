@@ -1,5 +1,4 @@
 export type ArrowDirection = 'left' | 'right';
-
 /**
  * Variantes de estilo para las flechas de navegación:
  * - hero:      bg-white/20, p-4, svg 24px (carrusel de tarjetas)

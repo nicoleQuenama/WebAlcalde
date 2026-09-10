@@ -1,23 +1,19 @@
 import { useState, useEffect } from 'react';
-import { ajusteImagen } from '../../../lib/ajusteImagen';
+import { ajusteImagen } from '@lib/ajusteImagen';
 import type { TarjetaImagen } from './types';
-import ArrowButton from '../CardDecks/ArrowButton';
+import ArrowButton from '@components/ui/ArrowButton/ArrowButton';
+import GaleriaModal from './GaleriaModal'; 
+import './hero.css';
 
 export type { TarjetaImagen } from './types';
 
 const IMAGENES_DEFECTO: TarjetaImagen[] = [];
 
 interface Props {
-  /** Imágenes del carrusel */
   imagenes: TarjetaImagen[];
-  /** Autoplay del carrusel (ms). 0 = sin autoplay. */
   autoplayMs?: number;
 }
 
-/**
- * Las tarjetas siempre muestran un recorte cuadrado de la foto; el encuadre y
- * el zoom por imagen se calculan con `ajusteImagen` (igual que el libro).
- */
 const cardAjuste = ajusteImagen;
 
 export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
@@ -44,45 +40,29 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
   };
 
   const abrirModal = () => setModalAbierto(true);
-  const cerrarModal = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setModalAbierto(false);
-  };
-
-  const actualImg = IMAGENES[actual];
+  const cerrarModal = () => setModalAbierto(false);
 
   return (
     <>
       <div className="relative flex w-full items-center justify-center h-[420px] sm:h-[480px] lg:h-[540px] pb-10">
         <div className="relative w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] lg:w-[400px] lg:h-[400px]">
           {IMAGENES.map((img, index) => {
-            let posicion = 'oculta';
-            if (index === actual) posicion = 'centro';
-            else if (index === (actual - 1 + IMAGENES.length) % IMAGENES.length) posicion = 'izquierda';
-            else if (index === (actual + 1) % IMAGENES.length) posicion = 'derecha';
-
-            const estilosBase =
-              `absolute top-0 left-0 w-full h-full rounded-3xl overflow-hidden bg-slate-900 border border-white/30 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]`;
-
-            const estilosPosicion = {
-              centro:
-                'z-30 scale-100 translate-x-0 rotate-0 opacity-100 cursor-pointer',
-              izquierda: 'z-20 scale-90 -translate-x-36 -rotate-6 opacity-40 cursor-pointer hover:opacity-80',
-              derecha: 'z-20 scale-90 translate-x-36 rotate-6 opacity-40 cursor-pointer hover:opacity-80',
-              oculta: 'z-10 scale-75 opacity-0',
-            };
+            // Lógica limpia usando las clases del CSS
+            let posicion = 'hero-card-oculta';
+            if (index === actual) posicion = 'hero-card-centro';
+            else if (index === (actual - 1 + IMAGENES.length) % IMAGENES.length) posicion = 'hero-card-izquierda';
+            else if (index === (actual + 1) % IMAGENES.length) posicion = 'hero-card-derecha';
 
             return (
               <div
                 key={img.id}
-                className={`${estilosBase} ${estilosPosicion[posicion as keyof typeof estilosPosicion]}`}
+                className={`hero-card-base ${posicion}`}
                 onClick={() => {
-                  if (posicion === 'centro') abrirModal();
-                  if (posicion === 'izquierda') anterior();
-                  if (posicion === 'derecha') siguiente();
+                  if (posicion === 'hero-card-centro') abrirModal();
+                  if (posicion === 'hero-card-izquierda') anterior();
+                  if (posicion === 'hero-card-derecha') siguiente();
                 }}
               >
-                {/* Imagen de la tarjeta: cubre el marco respetando proporción según su encuadre */}
                 <img
                   src={img.src}
                   alt={img.titulo ?? ''}
@@ -90,7 +70,7 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
                   className="absolute inset-0 w-full h-full"
                   style={cardAjuste(img)}
                 />
-                {posicion === 'centro' && img.titulo && (
+                {posicion === 'hero-card-centro' && img.titulo && (
                   <span className="absolute inset-x-0 bottom-0 rounded-b-3xl bg-gradient-to-t from-black/75 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white">
                     {img.titulo}
                   </span>
@@ -106,48 +86,14 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
         </div>
       </div>
 
+      {/* Renderizamos el Modal reutilizable sin duplicar código */}
       {modalAbierto && (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/30 backdrop-blur-3xl animate-[fadeIn_0.3s_ease-out]"
-          onClick={cerrarModal}
-        >
-          <button
-            onClick={cerrarModal}
-            className="fixed top-24 right-4 lg:top-28 lg:right-10 bg-white/10 hover:bg-white/30 border border-white/20 text-white p-3 lg:p-4 rounded-full backdrop-blur-lg transition-all duration-300 hover:scale-110 hover:rotate-90 z-[1000] shadow-2xl"
-            aria-label="Cerrar galería"
-          >
-            <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-
-          <ArrowButton
-            direction="left"
-            variant="modal"
-            onClick={(e) => { e?.stopPropagation(); anterior(); }}
-            aria-label="Anterior"
-            className="absolute left-4 lg:left-12 z-[110]"
-          />
-
-          <figure className="mt-16 flex max-h-[85vh] max-w-[90vw] flex-col items-center" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={actualImg.src}
-              alt={actualImg.titulo ?? 'Ampliación'}
-              className="max-h-[85vh] max-w-[90vw] rounded-2xl animate-[zoomIn_0.4s_ease-out] object-contain"
-            />
-            {actualImg.titulo && (
-              <figcaption className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-white/90">
-                {actualImg.titulo}
-              </figcaption>
-            )}
-          </figure>
-
-          <ArrowButton
-            direction="right"
-            variant="modal"
-            onClick={(e) => { e?.stopPropagation(); siguiente(); }}
-            aria-label="Siguiente"
-            className="absolute right-4 lg:right-12 z-[110]"
-          />
-        </div>
+        <GaleriaModal
+          imagenes={IMAGENES.map(img => ({ src: img.src, titulo: img.titulo }))}
+          indice={actual}
+          onIndice={setActual}
+          onCerrar={cerrarModal}
+        />
       )}
     </>
   );

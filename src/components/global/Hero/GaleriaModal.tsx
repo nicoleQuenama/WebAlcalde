@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import ArrowButton from '../CardDecks/ArrowButton';
+import ArrowButton from '@components/ui/ArrowButton/ArrowButton';
+import './hero.css';
 
 export interface ImagenFaceta {
   src: string;
@@ -14,10 +15,6 @@ interface Props {
   onCerrar: () => void;
 }
 
-/**
- * Galería a pantalla completa (reutilizable).
- * Cerrar: X, fondo o Esc. Navegar: flechas laterales, teclas ← →, o swipe en móvil.
- */
 export default function GaleriaModal({ imagenes, indice, onIndice, onCerrar }: Props) {
   const total = imagenes.length;
   const anterior = () => onIndice((indice - 1 + total) % total);
@@ -39,7 +36,7 @@ export default function GaleriaModal({ imagenes, indice, onIndice, onCerrar }: P
 
   return createPortal(
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-black/30 backdrop-blur-3xl animate-[fadeIn_0.3s_ease-out]"
+      className="hero-modal-overlay fixed inset-0 z-40 flex items-center justify-center bg-black/30 backdrop-blur-3xl"
       onClick={onCerrar}
       onTouchStart={(e) => { touchX.current = e.touches[0].clientX; }}
       onTouchEnd={(e) => {
@@ -61,20 +58,14 @@ export default function GaleriaModal({ imagenes, indice, onIndice, onCerrar }: P
         <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
 
-      <ArrowButton
-        direction="left"
-        variant="modal"
-        onClick={(e) => { e?.stopPropagation(); anterior(); }}
-        aria-label="Imagen anterior"
-        className="absolute left-4 lg:left-12 z-[110]"
-      />
+      <ArrowButton direction="left" variant="modal" onClick={(e) => { e?.stopPropagation(); anterior(); }} aria-label="Imagen anterior" className="absolute left-4 lg:left-12 z-[110]" />
 
       <figure className="mt-16 flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
         <img
           key={actual.src}
           src={actual.src}
           alt={actual.titulo ?? 'Ampliación'}
-          className="max-h-[72vh] max-w-[90vw] object-contain rounded-2xl animate-[zoomIn_0.4s_ease-out]"
+          className="hero-modal-image max-h-[72vh] max-w-[90vw] object-contain rounded-2xl"
         />
         {actual.titulo && (
           <figcaption className="mt-4 text-xs font-bold uppercase tracking-[0.3em] text-white/90">
@@ -83,13 +74,7 @@ export default function GaleriaModal({ imagenes, indice, onIndice, onCerrar }: P
         )}
       </figure>
 
-      <ArrowButton
-        direction="right"
-        variant="modal"
-        onClick={(e) => { e?.stopPropagation(); siguiente(); }}
-        aria-label="Imagen siguiente"
-        className="absolute right-4 lg:right-12 z-[110]"
-      />
+      <ArrowButton direction="right" variant="modal" onClick={(e) => { e?.stopPropagation(); siguiente(); }} aria-label="Imagen siguiente" className="absolute right-4 lg:right-12 z-[110]" />
 
       {total > 1 && (
         <div className="fixed bottom-7 left-1/2 -translate-x-1/2 text-[11px] font-semibold tracking-[0.35em] text-white/70">

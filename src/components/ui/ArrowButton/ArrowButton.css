@@ -1,0 +1,20 @@
+.deck-arrows-wrapper{
+    position:absolute;
+    top:50%;
+    left:0;
+    transform:translateY(-50%);
+    z-index:50;
+    display:flex;
+    justify-content:space-between;
+    padding: 0 1rem;
+}
+
+.arrow-container{
+    transition: transform 0.3s ease-in-out;
+}
+.left-arrow:hover{
+    transform:translateX(-4px);
+}
+.right-arrow:hover{
+    transform:translateX(4px);
+}

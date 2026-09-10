@@ -1,4 +1,4 @@
-import type { Encuadre, AjusteCarrusel } from '../../../lib/ajusteImagen';
+import type { Encuadre, AjusteCarrusel } from '@lib/ajusteImagen';
 /**
  * Imagen del carrusel del hero, misma foto con opciones de
  * encuadre/zoom. Ver `src/lib/ajusteImagen.ts`.
@@ -40,3 +40,5 @@ export interface HeroProps {
   /** Quote/frase opcional con estilo italic y borde accent. */
   quote?: string;
 }
+
+/* manejar uno solo*/
