@@ -1,7 +1,6 @@
 /**
  * Contenedor principal de las tarjetas.
  * Renderiza un grupo de tarjetas con navegación flechas.
- * las rutas en solo archivo, la estructura
  */
 import { useState, useCallback, useEffect } from 'react';
 import CardDeck from './CardDeck';
