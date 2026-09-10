@@ -1,0 +1,19 @@
+services:
+  web:
+    build:
+      context: .
+    image: webalcalde:latest
+    container_name: webalcalde
+    ports:
+      # PUERTO_DE_TU_PC : PUERTO_DEL_CONTENEDOR (el server Node escucha en 4321)
+      - "4321:4321"
+    environment:
+      # El servidor Node lee estas al arrancar.
+      HOST: 0.0.0.0
+      PORT: 4321
+    # Credenciales de Supabase / Postgres para el fetch en runtime.
+    # Definilas en un archivo .env junto a este compose (ver .env.example).
+    env_file:
+      - path: .env
+        required: false
+    restart: unless-stopped

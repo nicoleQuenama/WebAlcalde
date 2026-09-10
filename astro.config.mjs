@@ -2,10 +2,17 @@
 import { defineConfig } from 'astro/config';
 import path from 'node:path';
 import react from '@astrojs/react';
+import node from '@astrojs/node';
 import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  // SSR: cada request se renderiza en el servidor Node (dist/server/entry.mjs).
+  // Las páginas que no necesiten datos frescos pueden marcar
+  // `export const prerender = true` para volver a ser estáticas.
+  output: 'server',
+  adapter: node({ mode: 'standalone' }),
+
   integrations: [
     react({
       experimentalReactChildren: true,

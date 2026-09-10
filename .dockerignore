@@ -1,0 +1,40 @@
+# Dependencias y artefactos (se regeneran dentro de la imagen)
+node_modules
+dist
+.astro
+.output
+.vercel
+.netlify
+
+# Base de datos de contenido: se siembra en el build (src/lib/db.ts)
+data
+
+# Control de versiones / editores
+.git
+.github
+.gitignore
+.vscode
+.idea
+
+# Media pesada no versionada (vive en Supabase)
+public/multimedia
+
+# Scripts / docs que no hacen falta en la imagen
+convertir
+README.md
+REFACTOR.md
+AGENTS.md
+CLAUDE.md
+netlify.toml
+
+# Entorno y logs
+.env
+.env.*
+*.log
+devserver.log
+npm-debug.log*
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
