@@ -696,12 +696,6 @@
   }
 }
 
-/* ============================================================
-   Estilos base de la librería page-flip (stPageFlip.css).
-   page-flip@2.0.x no incluye este CSS en su dist, se agrega aquí.
-   El DOM de la librería usa estas clases tal cual, por eso van
-   con :global() para que no se renombren con el hash del módulo.
-   ============================================================ */
 :global(.stf__parent) {
   position: relative;
   display: block;

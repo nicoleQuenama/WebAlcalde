@@ -1,0 +1,79 @@
+---
+import { getImage } from 'astro:assets';
+import { getFiltrosHito, getHistoriaIntro, getHitos } from '@lib/db';
+import type { Hito } from '@lib/db';
+import { ajusteImagen } from '@lib/ajusteImagen';
+import TimelineDolly from './TimelineDolly';
+import type { PlacaDolly, TabDolly } from './types';
+
+const HISTORIA = getHitos();
+const INTRO = getHistoriaIntro();
+const FILTROS = getFiltrosHito();
+
+const ANCHO = 640;
+
+async function placaDe(hito: Hito & { imagen: string }, id: string): Promise<PlacaDolly> {
+  const optim =
+    hito.imagenW && hito.imagenH
+      ? await getImage({
+          src: hito.imagen,
+          width: ANCHO,
+          height: Math.max(1, Math.round((ANCHO * hito.imagenH) / hito.imagenW)),
+          fit: 'cover',
+          format: 'webp',
+        })
+      : null;
+  return {
+    id,
+    anio: hito.anio,
+    etapa: hito.etapa,
+    titulo: hito.titulo,
+    descripcion: hito.descripcion,
+    imagen: optim?.src ?? hito.imagen,
+    alt: hito.imagenAlt ?? hito.titulo,
+    objectPosition: ajusteImagen(hito).objectPosition,
+  };
+}
+
+// Un tab por filtro (Historia / Reconocimiento), solo hitos con foto.
+const tabs: TabDolly[] = await Promise.all(
+  FILTROS.map(async (filtro) => {
+    const conFoto: (Hito & { imagen: string })[] = HISTORIA.filter(
+      (h): h is Hito & { imagen: string } =>
+        Boolean(h.imagen) && (h.tipo ?? 'historia') === filtro.id,
+    ).map((h) => ({ ...h, tipo: h.tipo ?? 'historia' }));
+
+    const placas: PlacaDolly[] = [];
+    for (let i = 0; i < conFoto.length; i += 1) {
+      placas.push(await placaDe(conFoto[i], `${filtro.id}-${i}`));
+    }
+
+    return {
+      id: filtro.id,
+      label: filtro.label,
+      placas,
+      galeria: conFoto.map((h) => ({ src: h.imagen, titulo: `${h.anio} · ${h.titulo}` })),
+    };
+  }),
+);
+---
+
+<section class="relative bg-white text-slate-900" id="trayectoria">
+    <div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
+        <header class="max-w-2xl">
+            {INTRO.kicker && (
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
+                    {INTRO.kicker}
+                </p>
+            )}
+            <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]">
+                {INTRO.titulo}
+            </h2>
+            <p class="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
+                {INTRO.bajada}
+            </p>
+        </header>
+
+        <TimelineDolly client:load tabs={tabs} />
+    </div>
+</section>

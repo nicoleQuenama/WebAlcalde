@@ -1,0 +1,121 @@
+---
+import Card from './Card.component.astro';
+import { INSTITUTIONAL_CARDS } from '@constants/institutionalProfile/content';
+
+const { class: extraClass } = Astro.props;
+
+const Z_INDEX: Record<string, number> = { bio: 3, mision: 2, vision: 1 };
+---
+
+<div
+  class:list={[
+    'relative mx-auto mt-6 w-[min(1080px,100%)] overflow-visible h-[min(960px,290vw)] md:h-[clamp(380px,48vh,460px)] lg:h-[clamp(380px,52vh,520px)]',
+    extraClass,
+  ]}
+  data-stage
+>
+  {INSTITUTIONAL_CARDS.map((card) => (
+    <div
+      class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      style={`z-index: ${Z_INDEX[card.id] ?? 1};`}
+      data-slot={card.id}
+    >
+      <Card
+        title={card.title}
+        eyebrow={card.eyebrow}
+        description={card.body}
+        data-card={card.id}
+      />
+    </div>
+  ))}
+</div>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.matchMedia().add(
+    {
+      desktop: '(min-width: 861px)',
+      tablet: '(min-width: 561px) and (max-width: 860px)',
+      mobile: '(max-width: 560px)',
+    },
+    (ctx) => {
+      const stage = document.querySelector('[data-stage]');
+      if (!stage) return;
+
+      const cardEls = Array.from(stage.querySelectorAll<HTMLElement>('[data-card]'));
+      if (cardEls.length === 0) return;
+
+      const byId = new Map(cardEls.map((el) => [el.dataset.card, el]));
+      const bio = byId.get('bio');
+      const mision = byId.get('mision');
+      const vision = byId.get('vision');
+      if (!bio || !mision || !vision) return;
+
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const mobile = !!ctx.conditions?.mobile;
+      const dir = mobile ? 'vertical' : 'horizontal';
+      const GAP = mobile ? 14 : 20;
+
+      const rect = bio.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const side = dir === 'vertical' ? h : w;
+      const overlap = Math.round(side * 0.62);
+
+      const computeSpread = () => {
+        if (dir !== 'horizontal') return Math.round(h * 1.1);
+        const W = stage.offsetWidth;
+        const raw = w + GAP * 2;
+        return Math.round(Math.max(0, Math.min(raw, (W - w) / 2 - GAP / 2)));
+      };
+      let spread = computeSpread();
+      ScrollTrigger.addEventListener('refreshInit', () => {
+        spread = computeSpread();
+      });
+
+      const setFinal = () => {
+        if (dir === 'vertical') {
+          gsap.set(mision, { x: 0, y: -spread, rotation: 0, scale: 1, opacity: 1 });
+          gsap.set(vision, { x: 0, y: spread, rotation: 0, scale: 1, opacity: 1 });
+        } else {
+          gsap.set(mision, { x: -spread, y: 0, rotation: 0, scale: 1, opacity: 1 });
+          gsap.set(vision, { x: spread, y: 0, rotation: 0, scale: 1, opacity: 1 });
+        }
+        gsap.set(bio, { x: 0, y: 0, scale: 1, opacity: 1 });
+      };
+
+      if (reduce) {
+        setFinal();
+        return;
+      }
+
+      const tl = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: stage,
+          start: 'top bottom',
+          end: '+=600',
+          scrub: 1,
+        },
+      });
+
+      tl.fromTo(
+        mision,
+        { x: dir === 'vertical' ? 0 : -overlap, y: dir === 'vertical' ? 0 : 0, rotation: -2.5, scale: 0.88, opacity: 0.9 },
+        { x: dir === 'vertical' ? 0 : () => -spread, y: dir === 'vertical' ? () => -spread : 0, rotation: 0, scale: 1, opacity: 1 },
+        0
+      )
+        .fromTo(
+          vision,
+          { x: dir === 'vertical' ? 0 : overlap, y: 0, rotation: 2.5, scale: 0.88, opacity: 0.9 },
+          { x: dir === 'vertical' ? 0 : () => spread, y: dir === 'vertical' ? () => spread : 0, rotation: 0, scale: 1, opacity: 1 },
+          0
+        )
+        .fromTo(bio, { scale: 0.98 }, { scale: 1 }, 0);
+    }
+  );
+</script>

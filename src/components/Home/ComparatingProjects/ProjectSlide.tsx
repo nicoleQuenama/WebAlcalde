@@ -2,16 +2,6 @@ import { useState, useCallback } from 'react';
 import ImageSlider from '@components/ImageSlider/ImageSlider';
 import ArrowButton from '@components/ui/ArrowButton/ArrowButton';
 
-/**
- * ComparadorAntesDespues — un comparador "antes / después" GRANDE con flechas a
- * los costados para pasar entre varios pares.
- *
- * Reutiliza <ImageSlider> (se arrastra el tirador central). Cada par es un punto
- * de la ciudad; las flechas y los puntos de abajo permiten recorrer todos.
- *
- * ⚠️ Sin sombras y con el color de marca (#472d82) en los controles. Las fotos
- *    son de referencia hasta tener los pares antes/después reales.
- */
 
 export interface ParComparador {
   titulo: string;
