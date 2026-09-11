@@ -22,11 +22,6 @@ body {
 @theme {
   --font-roboto-serif: "Roboto Serif", serif;
 
-  /* Tokens visuales de la marca. Únicos colores de acento del sitio:
-     - primary:  color de marca (mismo del navbar) — fondos oscuros, textos acento.
-     - accent:   tono claro de la marca — etiquetas/eyebrows sobre primary.
-     - primary-deep/deepest: degradado de la marca (libros, tapas).
-     - hero-*:   degradado del hero (morado oscuro a azul marino). */
   --color-primary: #472d82;
   --color-primary-rgb: 71, 45, 130;
   --color-accent: #c9b8e8;

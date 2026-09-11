@@ -1,16 +1,3 @@
-/**
- * ajusteImagen — encuadre/zoom por foto, compartido entre el carrusel del hero
- * y el libro digital.
- *
- * Misma semántica que la card del carrusel:
- *  - Sin `ajuste` explícito, `encuadre` define dónde apunta el foco vertical:
- *      'rostro' → 7%  (cara del alcalde)
- *      'tronco' → 18% (cara + torso)
- *      'norte'  → 2%  (casi arriba del todo)
- *      'centro' → 50% (fotos de obra/paisaje)
- *    y `zoomOut` baja ~11 puntos para mostrar más torso.
- *  - Con `ajuste` (valores copiados del playground) tiene prioridad total.
- */
 export type Encuadre = 'rostro' | 'centro' | 'norte' | 'tronco';
 
 export interface AjusteCarrusel {

@@ -1,18 +1,4 @@
 ---
-/**
- * /gestion — El recorrido completo de obras del libro
- * "Cocha, la mejor ciudad de Bolivia".
- *
- * Toda la estructura y los textos salen de la base SQLite (src/lib/db.ts);
- * las fotos/videos resuelven Supabase (src/lib/media.ts):
- *   1. Hero de gestión.
- *   2. Capítulos de apertura (presentación / cómo creció la ciudad / el inicio de una nueva Cochabamba).
- *   3. Las dos ERAS de obras completas (años 90 y gestión 2021–2026), cada una con
- *      sus subsecciones, imagen y la lista completa de obras.
- *   4. Carrusel de proyectos con foto/video real (#proyectos).
- *
- * Las secciones viven AQUÍ dentro: ya no hay componentes .astro intermedios.
- */
 import Layout from '@layouts/Layout.astro';
 import { Image, getImage } from 'astro:assets';
 import HeroCards from '@components/global/Hero/HeroCard.tsx';

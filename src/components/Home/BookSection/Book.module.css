@@ -4,8 +4,6 @@
   --book-text-scale: 1;
 }
 
-/* Tamaño de letra del libro: 0 = Normal, 1 = Grande, 2 = Muy grande.
-   Al crecer la letra, las imágenes ceden espacio para que el texto nunca se corte. */
 [data-textsize='1'] {
   --book-text-scale: 1.25;
 }
@@ -71,8 +69,6 @@
   gap: 16px;
 }
 
-/* Los títulos deben conservar sus nombres originales (sin hash):
-   <FlipBook /> los detecta textualmente para auto-generar el índice. */
 :global(.page-title) {
   font-size: calc(1.3rem * var(--book-text-scale, 1));
   color: var(--ink);
@@ -115,8 +111,6 @@
   border-radius: 10px;
 }
 
-/* Retrato protagonista (páginas donde el alcalde es el tema): la foto se ve
-   COMPLETA (object-fit: contain) y grande, nunca recortada. */
 .mediaPortrait {
   margin: 0;
   flex: 1 1 auto;
@@ -190,8 +184,6 @@
 
 .mediaFeature {
   margin: 0;
-  /* Antes tenía un alto fijo (16/9) y quedaba pequeña. Ahora crece para llenar
-     el espacio libre de la página: imágenes más grandes. */
   flex: 1 1 auto;
   min-height: 200px;
   overflow: hidden;
