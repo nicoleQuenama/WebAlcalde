@@ -1,0 +1,47 @@
+---
+import Section from '@/components/global/Section/Section.astro';
+import VideoPlayer from './VideoPlayer';
+interface Props{
+    videoBiografia:string;
+    posterBiografia:string;
+}
+const{videoBiografia, posterBiografia} = Astro.props;
+---
+
+<Section 
+    theme="white"
+    subtitle="Manfred Reyes Villa"
+    title="Biografia">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <!-- Columna izquierda: Texto biográfico -->
+        <div class="space-y-6">
+            <p class="text-lg leading-relaxed text-slate-700">
+                Manfred Reyes Villa es un líder político boliviano con una trayectoria dedicada al desarrollo 
+                de Cochabamba. Con experiencia en gestión pública y un compromiso inquebrantable con el 
+                progreso de su ciudad, ha impulsado proyectos fundamentales que transforman la vida de los 
+                cochabambinos.
+            </p>
+            <!-- Botones de acción -->
+            <div class="flex flex-wrap gap-4 pt-4">
+                <a href="/sobre" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
+                    Conoce más sobre él
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </a>
+                <a href="/gestion" class="inline-flex items-center gap-2 rounded-full border-2 border-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
+                    Ver gestión completa
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Columna derecha: Video -->
+        <div class="order-first lg:order-last">
+            <VideoPlayer 
+                src={videoBiografia}
+                poster={posterBiografia}
+                client:load
+            />
+        </div>
+    </div>
+</Section>

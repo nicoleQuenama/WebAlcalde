@@ -1,0 +1,74 @@
+---
+interface Props{
+    title?:string;
+    subtitle?:string;
+    description?:string;
+    //tema de color del tipo banner
+    theme?: 'white' | 'purple' | 'transparent';
+    class?:string;
+}
+
+const{
+    title,
+    subtitle,
+    description,
+    theme = 'white',
+    class: className = ''
+} = Astro.props;
+
+
+//temas
+const themeStyles = {
+    white:{
+        bg:'bg-white',
+        title: 'text-slate-900',
+        subtitle:'text-primary',
+        desc: 'text-slate-600',
+    },
+    purple:{
+        bg: 'bg-primary',
+        title: 'text-slate-900',
+        subtitle:'text-accent',
+        desc:'text-slate-600',
+    },
+    transparent:{
+        bg: 'bg-transparent',
+        title: 'text-slate-900',
+        subtitle:'text-primary',
+        desc: 'text-slate-600',
+    }
+};
+const currentTheme = themeStyles[theme];
+---
+
+<!-- aplicacion al contendor-->
+<section class={`w-full py-16 lg:py-24 ${currentTheme.bg} ${className}`}>
+  <div class="mx-auto max-w-5xl px-6 lg:px-8">
+    
+    <!-- Cabecera de la sección -->
+    {(title || subtitle || description) && (
+      <header class="max-w-2xl mb-12">
+        {subtitle && (
+          <p class={`text-[11px] font-semibold uppercase tracking-[0.34em] ${currentTheme.subtitle}`}>
+            {subtitle}
+          </p>
+        )}
+        {title && (
+          <h2 class={`mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl ${currentTheme.title}`}>
+            {title}
+          </h2>
+        )}
+        {description && (
+          <p class={`mt-4 max-w-xl text-base leading-relaxed ${currentTheme.desc}`}>
+            {description}
+          </p>
+        )}
+      </header>
+    )}
+    
+    <div class="w-full">
+      <slot />
+    </div>
+
+  </div>
+</section>

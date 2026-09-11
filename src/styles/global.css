@@ -28,6 +28,10 @@ body {
   --color-primary-deep: #38235f;
   --color-primary-deepest: #2a1a49;
 
+  --color-hero-from: #3b1f6b;
+  --color-hero-via: #1e1040;
+  --color-hero-to: #0c1a3d;
+
   --animate-zoomIn: zoomIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   --animate-fadeIn: fadeIn 0.3s ease-out forwards;
 
