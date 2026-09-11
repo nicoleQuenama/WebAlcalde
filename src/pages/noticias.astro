@@ -1,0 +1,76 @@
+---
+/**
+ * /noticias — Sección de noticias adaptada del modelo de referencia.
+ * Estructura semántica:
+ *  - Hero (NoticiasHero) inspirado en "Música, mensajes y fe..."
+ *  - Últimas noticias (grid de 5 como en la imagen)
+ *  - Archivo filtrable (NoticiasFiltros isla React: categorías + búsqueda)
+ * Reutiliza: Layout, tokens primary/accent, MEDIA para imágenes reales.
+ */
+import Layout from '@layouts/Layout.astro';
+import { getImage } from 'astro:assets';
+import { MEDIA } from '@lib/media';
+import { getNoticias, getNoticiasDestacadas, NOTICIAS_CATEGORIAS } from '@lib/noticias';
+import NoticiasHero from '@components/Noticias/NoticiasHero.astro';
+import NoticiasGrid from '@components/Noticias/NoticiasGrid.astro';
+import NoticiasFiltros from '@components/Noticias/NoticiasFiltros.tsx';
+
+const todas = getNoticias();
+const destacadas = getNoticiasDestacadas(5);
+
+// Hero image: usar una imagen con figura humana en escenario (alianzas = premiado en escenario) o fallback
+const heroRaw = MEDIA.historia.prefecto ?? MEDIA.temario['alianzas'];
+const heroOpt = await getImage({ src: heroRaw, width: 1200, height: 750, format: 'webp', fit: 'cover' });
+---
+
+<Layout title="Noticias — Alcaldía de Cochabamba">
+  <main>
+    <!-- Hero adaptado del modelo -->
+    <NoticiasHero
+      imagenSrc={heroOpt.src}
+      imagenAlt="Artista en escenario — música y cultura"
+      titulo="Música, mensajes y fe en cada emisión"
+      subtitulo="Historias, obras y cultura que inspiran a Cochabamba. Actualidad de la gestión contada cerca de la gente."
+      eyebrow="Actualidad"
+      ctaLabel="Ver noticias"
+      ctaHref="#ultimas-noticias"
+    />
+
+    <!-- Últimas noticias — replica exacta del modelo (5 cards) -->
+    <NoticiasGrid noticias={destacadas} />
+
+    <!-- Archivo completo filtrable -->
+    <section aria-labelledby="archivo-title" class="bg-white py-12 lg:py-16">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        <header class="max-w-2xl">
+          <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">Archivo</p>
+          <h2 id="archivo-title" class="mt-3 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
+            Todas las noticias
+          </h2>
+          <p class="mt-4 text-base leading-relaxed text-slate-600">
+            Filtra por categoría o busca por palabra clave. Cada tarjeta abre el detalle completo.
+          </p>
+        </header>
+      </div>
+    </section>
+
+    <!-- Isla React filtrable (funcional) -->
+    <NoticiasFiltros client:load noticias={todas} categorias={NOTICIAS_CATEGORIAS} />
+
+    <!-- CTA sugerido -->
+    <section class="bg-primary px-6 py-10 lg:px-8">
+      <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <p class="max-w-xl text-sm leading-relaxed text-white/80">
+          ¿Quieres recibir las noticias de la Alcaldía en tu correo?
+        </p>
+        <a
+          href="/buzon"
+          class="inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-primary transition hover:-translate-y-0.5"
+        >
+          Ir al Buzón Ciudadano
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </section>
+  </main>
+</Layout>

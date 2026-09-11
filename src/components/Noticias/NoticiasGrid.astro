@@ -1,0 +1,71 @@
+---
+/**
+ * NoticiasGrid — Grilla "Últimas noticias" fiel al modelo.
+ * 1 col en móvil, 2 en tablet, 5 en desktop (como la imagen referencia).
+ * Semántico: <section> + <header> + <ul role="list"> + <li><article>.
+ */
+import NoticiasCard from './NoticiasCard.astro';
+import type { Noticia } from '@types/noticias';
+
+interface Props {
+  noticias: Noticia[];
+  titulo?: string;
+  subtitulo?: string;
+  id?: string;
+}
+
+const {
+  noticias,
+  titulo = 'Últimas noticias',
+  subtitulo,
+  id = 'ultimas-noticias',
+} = Astro.props;
+---
+
+<section id={id} aria-labelledby={`${id}-title`} class="bg-[#0f0f0f] py-12 lg:py-16">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <header class="mb-8 flex items-end justify-between gap-4">
+      <div>
+        <h2 id={`${id}-title`} class="text-lg font-bold tracking-tight text-white sm:text-xl">
+          {titulo}
+        </h2>
+        {subtitulo && (
+          <p class="mt-1 text-sm text-white/60">{subtitulo}</p>
+        )}
+      </div>
+      <a
+        href="/noticias"
+        class="hidden items-center gap-1 text-xs font-bold uppercase tracking-[0.14em] text-white/60 transition hover:text-white sm:inline-flex"
+      >
+        Ver todas
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </header>
+
+    {noticias.length === 0 ? (
+      <p class="rounded-xl border border-white/10 bg-white/5 px-6 py-12 text-center text-sm text-white/60">
+        No hay noticias para esta categoría.
+      </p>
+    ) : (
+      <ul
+        role="list"
+        class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5"
+      >
+        {noticias.map((noticia, i) => (
+          <li class="flex">
+            <NoticiasCard noticia={noticia} eager={i < 2} />
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <div class="mt-8 flex justify-center sm:hidden">
+      <a
+        href="/noticias"
+        class="inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-white hover:text-black"
+      >
+        Ver todas las noticias
+      </a>
+    </div>
+  </div>
+</section>

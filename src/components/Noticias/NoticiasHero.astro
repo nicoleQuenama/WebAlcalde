@@ -1,0 +1,84 @@
+---
+/**
+ * NoticiasHero — Banner superior inspirado en el modelo de la imagen.
+ * Izquierda: eyebrow + título + CTA (botón rojo/accent)
+ * Derecha: imagen destacada con degradado/overlay rojo anaranjado.
+ * Reutiliza tokens del design system (primary, accent) y es 100% semántico.
+ */
+interface Props {
+  titulo?: string;
+  subtitulo?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  imagenSrc: string;
+  imagenAlt: string;
+  eyebrow?: string;
+}
+
+const {
+  titulo = 'Música, mensajes y fe en cada emisión',
+  subtitulo = 'La programación cultural que une a Cochabamba con sus artistas, su gente y sus tradiciones.',
+  ctaLabel = 'Saber más',
+  ctaHref = '#ultimas-noticias',
+  imagenSrc,
+  imagenAlt,
+  eyebrow = 'Radio y cultura',
+} = Astro.props;
+---
+
+<section
+  aria-labelledby="noticias-hero-title"
+  class="relative overflow-hidden bg-[#0f0f0f] text-white"
+>
+  <div class="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-[1.05fr_1.45fr]">
+    <!-- Columna texto -->
+    <div class="relative z-10 flex flex-col justify-center px-6 py-12 lg:px-10 lg:py-16 xl:px-14">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/60">
+        {eyebrow}
+      </p>
+      <h1
+        id="noticias-hero-title"
+        class="mt-3 max-w-xl text-[1.9rem] font-black leading-[1.06] tracking-tight sm:text-[2.1rem] lg:text-[2.55rem]"
+      >
+        {titulo}
+      </h1>
+      {subtitulo && (
+        <p class="mt-4 max-w-md text-[15px] leading-relaxed text-white/70">
+          {subtitulo}
+        </p>
+      )}
+      <div class="mt-7">
+        <a
+          href={ctaHref}
+          class="inline-flex items-center justify-center rounded-full bg-[#e5312d] px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#c92a27] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+        >
+          {ctaLabel}
+        </a>
+      </div>
+    </div>
+
+    <!-- Columna imagen -->
+    <div class="relative min-h-[280px] overflow-hidden bg-neutral-900 lg:min-h-[420px]">
+      <img
+        src={imagenSrc}
+        alt={imagenAlt}
+        width="1200"
+        height="800"
+        loading="eager"
+        decoding="async"
+        class="absolute inset-0 h-full w-full object-cover object-[50%_18%]"
+      />
+      <!-- degradado rojo característico del modelo -->
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-transparent lg:from-[#0f0f0f] lg:via-[#0f0f0f]/20"
+      ></div>
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 bg-gradient-to-t from-[#e5312d]/35 via-transparent to-transparent mix-blend-multiply"
+      ></div>
+      <!-- viñeta lateral roja en desktop -->
+      <span aria-hidden="true" class="absolute bottom-0 right-0 top-0 hidden w-2 bg-[#e5312d] lg:block"></span>
+    </div>
+  </div>
+</section>

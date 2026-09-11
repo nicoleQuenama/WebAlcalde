@@ -1,0 +1,34 @@
+---
+/**
+ * NoticiasSection — Wrapper semántico que combina Hero + Grid.
+ * Pensado para ser reutilizado en home o en página dedicada.
+ * - Usa <main> lógica fuera, aquí es <section> compuesta.
+ */
+import NoticiasHero from './NoticiasHero.astro';
+import NoticiasGrid from './NoticiasGrid.astro';
+import type { Noticia } from '@types/noticias';
+
+interface Props {
+  heroImagen: string;
+  heroAlt: string;
+  noticias: Noticia[];
+  heroTitulo?: string;
+  heroSubtitulo?: string;
+  heroCtaLabel?: string;
+  heroCtaHref?: string;
+}
+
+const { heroImagen, heroAlt, noticias, heroTitulo, heroSubtitulo, heroCtaLabel, heroCtaHref } = Astro.props;
+---
+
+<div class="bg-[#0f0f0f]">
+  <NoticiasHero
+    imagenSrc={heroImagen}
+    imagenAlt={heroAlt}
+    titulo={heroTitulo}
+    subtitulo={heroSubtitulo}
+    ctaLabel={heroCtaLabel}
+    ctaHref={heroCtaHref}
+  />
+  <NoticiasGrid noticias={noticias} />
+</div>
