@@ -1,0 +1,35 @@
+.project-pagination-dot{
+    height:0.625rem;
+    border-radius: 9999px;
+    transition: all 0.3s ease-in-out;
+}
+.project-pagination-dot.active{
+    background-color: rgba(var(--primary-color),1);
+    width: 1.75rem;
+}
+
+.project-pagination-dot.is_active{
+    background-color: rgba(var(--primary-color),1);
+    width: 1.75rem;
+}
+.project-pagination-dot.is-inactive{
+    background-color: #cbd5e1;
+    width: 0.625rem;
+}
+.project-pagination-dot.is-inactive:hover{
+    background-color: #94a3b8;
+}
+.biography-video-wrapper{
+    margin-top: 2rem;
+    overflow:hidden;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+}
+
+.biography-video-player{
+    aspect-ratio:16/9;
+    width: 100%;
+    background-color: #0f172a;
+    object-fit: cover;
+    object-position: 50% 7%;
+}

@@ -1,0 +1,19 @@
+---
+import SectionComponent from '@/components/global/Section_Component.astro';
+import Book3D from './Book3D';
+import type { BookProps } from './Book3D';
+
+interface Props {
+  bookProps: BookProps;
+}
+
+const { bookProps } = Astro.props;
+---
+
+<SectionComponent
+  theme="purple"
+  subtitle="El libro digital"
+  description="Un recorrido en imágenes por las obras que transformaron Cochabamba, de los años 90 a la gestión 2021–2026. Ábrelo y hojéalo página por página, con fotos y videos."
+>
+  <Book3D {...bookProps} client:visible />
+</SectionComponent>

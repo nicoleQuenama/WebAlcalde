@@ -1,0 +1,19 @@
+---
+import SectionComponent from '@/components/global/SectionComponent.astro';
+import ProjectSlide from './ProjectSlide';
+import type {parComparador} from './ProjectSlide';
+
+interface Props{
+    pares: parComparador[];
+}
+
+const {pares} = Astro.props;
+---
+
+<SectionComponent 
+    theme="white"
+    subtitle="Antes y Despues"
+    title="De una ciudad de ayer a una que mira al futuro"
+    description="Desliza del tirados para ver el antes y el despues">
+    <ProjectSlide pares={pares} client:visible/>
+</SectionComponent>

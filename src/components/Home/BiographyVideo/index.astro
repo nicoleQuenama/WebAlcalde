@@ -1,0 +1,31 @@
+---
+import SectionComponent from '@/componentes/global/SectionComponent.astro';
+import VideoPlayer from './VideoPlayer';
+
+interface Props{
+    videoBiografia:string;
+    posterBiografia:string;
+}
+
+const{videoBiografia, posterBiografia} = Astro.props;
+---
+
+<SectionComponent 
+    theme="white"
+    subtitle="Manfred Reyes Villa"
+    title="La ciudad, contada en un video">
+
+    <!-- Se llama al componente y al hook-->
+    <VideoPlayer 
+        src={videoBiografia}
+        poster{posterBiografia}
+        client:load
+    />
+
+    <div class="mt-8">
+        <a href= "/sobre" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-transform hover:-translate-y-0.5">
+        Conocer al alcalde
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+    </div>
+</SectionComponent>
