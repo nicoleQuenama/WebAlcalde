@@ -1,23 +1,3 @@
-/**
- * db.ts — capa de acceso a la base de datos SQLite de contenido.
- *
- * Objetivo: que el contenido editorial (textos, estructura del temario, hitos,
- * proyectos, pilares) viva en una base SQLite y no hardcodeado en código.
- *
- * Cómo funciona:
- *   - Usamos `node:sqlite` (síncrono, sin binarios nativos) para leer la DB
- *     durante el BUILD (las páginas Astro son estáticas, se generan en build).
- *   - La DB vive en `data/webalcalde.db`. Si no existe o está vacía, se SIEMBRA
- *     automáticamente desde el seed de ABAJO (que usa `MEDIA` para las URLs de
- *     Supabase). La fuente de verdad es SQLite; este archivo es el seed inicial.
- *     (Antes ese seed vivía en src/constants/* — se eliminó esa carpeta.)
- *   - Las imágenes y videos SIGUEN en Supabase: en la DB guardamos la URL
- *     pública (string) que resuelve `src/lib/media.ts`. Ningún binario aquí.
- *
- * Enfoque "no-relacional": una sola tabla `contenido` con filas de tipo
- * (dominio, clave, orden, data-json). Es flexible, fácil de editar a mano y no
- * obliga a migrar esquema para añadir campos.
- */
 
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -46,16 +26,9 @@ export interface SeccionTemario {
   /** Párrafo introductorio del temario. */
   bajada?: string;
   obras: Obra[];
-  /**
-   * Imagen ilustrativa de la subsección (columna lateral en /gestion).
-   */
   imagen?: string;
   imagenAlt?: string;
 
-  /**
-   * Metadata de optimización/encuadre de la imagen, resuelta desde
-   * `MEDIA.temarioDims` al sembrar la DB.
-   */
   imagenW?: number;
   imagenH?: number;
   encuadre?: Encuadre;
@@ -167,37 +140,6 @@ const GESTION_HERO = {
     'proyectan hacia el futuro. Cada avenida, parque, puente y programa social cuenta ' +
     'una parte de esa historia.',
 };
-
-/**
- * Las 3 tarjetas que van después del hero de gestión.
- * Formato de <ValueCards>: el `id` DEBE ser 'bio' | 'mision' | 'vision' (lo usa la animación).
- */
-const PILARES = [
-  {
-    id: 'bio',
-    eyebrow: '01 · Biografía',
-    title: 'Biografía',
-    body:
-      'Manfred Armando Antonio Reyes Villa Bacigalupi, militar de carrera y varias veces autoridad del valle. ' +
-      'Alcalde de la ciudad para el período 2021–2026.',
-  },
-  {
-    id: 'mision',
-    eyebrow: '02 · Misión',
-    title: 'Misión',
-    body:
-      'Prestar servicios municipales eficientes y cercanos, con obras que mejoren la vida ' +
-      'cotidiana de las y los cochabambinos y una administración transparente de los recursos.',
-  },
-  {
-    id: 'vision',
-    eyebrow: '03 · Visión',
-    title: 'Visión',
-    body:
-      'Una Cochabamba conectada, segura y moderna: la ciudad inteligente del corredor central, ' +
-      'referente regional en gestión pública y calidad de vida.',
-  },
-];
 
 const PROYECTOS_TITULO = {
   kicker: 'Proyectos',
@@ -953,11 +895,6 @@ function sembrar(): void {
     guardar('gestion_hero', 'principal', GESTION_HERO as unknown as Mapa, 0);
   }
 
-  // Pilares (biografía / misión / visión)
-  if (estaVacio('pilar')) {
-    PILARES.forEach((p, i) => guardar('pilar', p.id, p as unknown as Mapa, i));
-  }
-
   // Título de la sección de proyectos + lista de proyectos
   if (estaVacio('proyectos_titulo')) {
     guardar('proyectos_titulo', 'principal', PROYECTOS_TITULO as unknown as Mapa, 0);
@@ -1011,11 +948,6 @@ export function getGestionHero() {
   asegurarSembrada();
   const [row] = leer('gestion_hero');
   return row?.data as unknown as typeof GESTION_HERO;
-}
-
-export function getPilares() {
-  asegurarSembrada();
-  return leer('pilar').map((r) => r.data as unknown as (typeof PILARES)[number]);
 }
 
 export function getProyectosTitulo() {

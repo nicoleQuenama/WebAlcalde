@@ -1,17 +1,4 @@
 ---
-/**
- * Home — portada del sitio.
- *
- * Sigue el libro "Cocha, la mejor ciudad de Bolivia":
- *   1. Hero          — título del libro + nombre del alcalde (carrusel de fotos).
- *   2. VideoBiografia — el video, justo después del hero.
- *   3. AntesDespues   — comparador grande "antes / después" (imágenes de referencia).
- *   4. IntroLibro     — introducción al libro digital; se abre ahí mismo.
- *
- * Todo el contenido (capítulos, eras, hitos, proyectos…) sale de la base SQLite
- * (src/lib/db.ts); las fotos/videos resuelven Supabase (src/lib/media.ts).
- * Las secciones viven AQUÍ dentro: ya no hay componentes .astro intermedios.
- */
 import { getImage } from 'astro:assets';
 import Layout from '@layouts/Layout.astro';
 import { getCapitulos, getEras } from '@lib/db';

@@ -1,8 +1,3 @@
-/**
- * Declaraciones mínimas de tipos para `node:sqlite` y los módulos de Node
- * que se usan en el build (src/lib/db.ts). El proyecto no instala @types/node;
- * estos tipos están acotados a lo que realmente usamos.
- */
 
 declare module 'node:sqlite' {
   export interface StatementSync {

@@ -1,19 +1,3 @@
-/**
- * media.ts — Única fuente de verdad de las imágenes y videos del sitio.
- *
- * Todo vive en el bucket público `media` de Supabase
- * (proyecto fsuxvbuupswucnsvrdce), organizado así:
- *
- *   imagenes/raiz/                     → retratos del alcalde + fotos con la gente
- *   imagenes/recursos-graficos-home/   → tomas aéreas / recursos gráficos del home
- *   imagenes/cocha-antes-y-ahora/      → fotos "antes" (históricas)
- *   imagenes/cocha-antes-y-ahora/ahora/→ fotos "ahora" (mismos lugares hoy)
- *   imagenes/premios-manfred/          → reconocimientos y actos oficiales
- *   videos/                            → 01..07 de obras + Biografia.mp4
- *
- * Los componentes NO deben construir rutas a mano: importan `MEDIA` de acá.
- * (Antes vivía en src/constants/media.ts; ahora vive junto a la capa de datos.)
- */
 import type { Encuadre, AjusteCarrusel } from './ajusteImagen';
 
 const BASE =
@@ -56,12 +40,6 @@ export interface ParAntesDespues {
   titulo: string;
   antes: string;
   despues: string;
-  /**
-   * Altura explícita (px) para la imagen "después" al optimizarla.
-   * Evita depender de `inferSize` en webps remotos (Astro algunos los lee
-   * mal, p. ej. 6P9A2287.webp lee como vertical cuando es horizontal) y el
-   * fallo transitorio "failed to fetch remote image dimensions".
-   */
   despuesHeight?: number;
   afterFit?: string;
   afterPosition?: string;
@@ -79,10 +57,6 @@ export const MEDIA = {
   hero: {
     /** Panorámica desenfocada de fondo. */
     panoramica: ahora('DJI_0001-Pano.webp'),
-    /**
-     * Carrusel de tarjetas grandes (formato vertical). Sólo fotos donde el
-     * alcalde se ve claro y de cerca: el recorte vertical nunca le corta el rostro.
-     */
     carrusel: [
       { id: 'gente-1', src: raiz('DSC_0802'), titulo: 'Manfred Reyes Villa', w: 2549, h: 3568, encuadre: 'rostro', zoomOut: true },
       { id: 'gente-2', src: raiz('IMG_2941'), titulo: 'Cerca de la gente', w: 12480, h: 8320, ajuste: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 } },
@@ -193,11 +167,6 @@ export const MEDIA = {
     alianzas: premio('01 ALCALDE FRANCIA OK.webp'), // distinción internacional (París)
   } as Record<string, string>,
 
-  /**
-   * Dimensiones reales y encuadre por subsección del temario.
-   * Clave = `id` de la subsección (misma que `MEDIA.temario`).
-   * Misma lógica que las cards del hero (ver ajusteImagen).
-   */
   temarioDims: {
     puentes: { w: 4000, h: 3000, encuadre: 'centro' },
     conectividad: { w: 6240, h: 4160, encuadre: 'centro' },

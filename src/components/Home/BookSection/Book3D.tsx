@@ -1,29 +1,7 @@
 import type { ReactNode } from 'react';
-import styles from '../../Book/Book.module.css';
+import styles from './Book.module.css';
 import type { Capitulo, SeccionTemario, EraTemario } from '@lib/db';
 
-/**
- * Book — páginas del libro digital (FlipBook).
- *
- * El texto y el orden salen de la base SQLite (src/lib/db.ts), así el libro que se
- * hojea sigue exactamente la misma estructura que la página /gestion:
- *
- *   Portada
- *   → Presentación del alcalde        (retrato grande, foto completa)
- *   → Cómo ha crecido Cochabamba      (antes / después)
- *   → El inicio de una nueva Cochabamba
- *   → "Las obras son memorias" (intro) + 1 página por subsección de los años 90
- *   → "Cuando una ciudad vuelve a soñar en grande" (intro, retrato del alcalde)
- *     + 1 página por subsección 2021–2026
- *   Contraportada
- *
- * Reglas de imagen:
- *   - Donde el alcalde es el protagonista → clase `mediaPortrait`: la foto se ve
- *     COMPLETA (object-fit: contain) y ocupa casi toda la página. Nunca recortada.
- *   - Fotos de contexto / gente → `mediaFeature` / `mediaStrip`, que ahora crecen
- *     para llenar el espacio libre (imágenes más grandes que antes).
- *   - Cada imagen/video con `data-expand` se abre a pantalla completa.
- */
 
 export interface IMG {
   src: string;
