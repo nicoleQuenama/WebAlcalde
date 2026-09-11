@@ -58,16 +58,14 @@ const { videoBiografia, posterBiografia } = Astro.props;
             </div>
 
             <!-- ═══ COLUMNA DERECHA: Video grande (7/12) ═══ -->
-            <!-- En móvil va después, en desktop a la derecha y más grande -->
             <div class="lg:col-span-7">
-                <div class="relative overflow-hidden rounded-2xl border border-slate-200 shadow-2xl transition-shadow duration-300 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)]">
-                    <!-- Video aspect-ratio 16:9, ancho completo -->
-                    <VideoPlayer
-                        src={videoBiografia}
-                        poster={posterBiografia}
-                        client:load
-                    />
-                </div>
+                <VideoPlayer
+                    client:load
+                    src={videoBiografia}
+                    poster={posterBiografia}
+                    title="Biografía de Manfred Reyes Villa"
+                    className="shadow-2xl transition-shadow duration-300 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)]"
+                />
             </div>
         </div>
     </div>
