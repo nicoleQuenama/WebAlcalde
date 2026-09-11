@@ -1,47 +1,74 @@
 ---
-import Section from '@/components/global/Section/Section.astro';
+/**
+ * BiographyVideo — Sección de biografía del home.
+ *
+ * Diseño asimétrico: texto biográfico a la izquierda (columna angosta),
+ * video grande a la derecha (columna amplia). Sin wrapper Section para
+ * tener control total del ancho y espaciado.
+ */
 import VideoPlayer from './VideoPlayer';
-interface Props{
-    videoBiografia:string;
-    posterBiografia:string;
+
+interface Props {
+    videoBiografia: string;
+    posterBiografia: string;
 }
-const{videoBiografia, posterBiografia} = Astro.props;
+
+const { videoBiografia, posterBiografia } = Astro.props;
 ---
 
-<Section 
-    theme="white"
-    subtitle="Manfred Reyes Villa"
-    title="Biografia">
+<!-- ═══ BIOGRAFÍA — diseño asimétrico: texto + video grande ═══ -->
+<section class="relative overflow-hidden bg-white pt-20 pb-8 lg:pt-28 lg:pb-12">
+    <!-- Barra de acento superior -->
+    <div class="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-primary via-accent to-primary"></div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <!-- Columna izquierda: Texto biográfico -->
-        <div class="space-y-6">
-            <p class="text-lg leading-relaxed text-slate-700">
-                Manfred Reyes Villa es un líder político boliviano con una trayectoria dedicada al desarrollo 
-                de Cochabamba. Con experiencia en gestión pública y un compromiso inquebrantable con el 
-                progreso de su ciudad, ha impulsado proyectos fundamentales que transforman la vida de los 
-                cochabambinos.
-            </p>
-            <!-- Botones de acción -->
-            <div class="flex flex-wrap gap-4 pt-4">
-                <a href="/sobre" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
-                    Conoce más sobre él
-                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                </a>
-                <a href="/gestion" class="inline-flex items-center gap-2 rounded-full border-2 border-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
-                    Ver gestión completa
-                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                </a>
+    <div class="mx-auto max-w-7xl px-6 lg:px-12">
+        <!-- Grid asimétrico: 5 columnas de texto / 7 de video -->
+        <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+
+            <!-- ═══ COLUMNA IZQUIERDA: Texto biográfico (5/12) ═══ -->
+            <div class="space-y-6 lg:col-span-5">
+                <!-- Etiqueta -->
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
+                    Manfred Reyes Villa
+                </p>
+
+                <!-- Título -->
+                <h2 class="text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
+                    Biografía
+                </h2>
+                <!-- Párrafo biográfico -->
+                <p class="text-base leading-relaxed text-slate-600 lg:text-lg">
+                    Manfred Reyes Villa es un líder político boliviano con una trayectoria dedicada al desarrollo 
+                    de Cochabamba. Con experiencia en gestión pública y un compromiso inquebrantable con el 
+                    progreso de su ciudad, ha impulsado proyectos fundamentales que transforman la vida de los 
+                    cochabambinos.
+                </p>
+
+                <!-- Botones de acción -->
+                <div class="flex flex-wrap gap-4 pt-2">
+                    <a href="/sobre" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
+                        Más sobre él
+                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                    </a>
+                    <a href="/gestion" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary border-2 border-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
+                        Gestión completa
+                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ═══ COLUMNA DERECHA: Video grande (7/12) ═══ -->
+            <!-- En móvil va después, en desktop a la derecha y más grande -->
+            <div class="lg:col-span-7">
+                <div class="relative overflow-hidden rounded-2xl border border-slate-200 shadow-2xl transition-shadow duration-300 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)]">
+                    <!-- Video aspect-ratio 16:9, ancho completo -->
+                    <VideoPlayer
+                        src={videoBiografia}
+                        poster={posterBiografia}
+                        client:load
+                    />
+                </div>
             </div>
         </div>
-
-        <!-- Columna derecha: Video -->
-        <div class="order-first lg:order-last">
-            <VideoPlayer 
-                src={videoBiografia}
-                poster={posterBiografia}
-                client:load
-            />
-        </div>
     </div>
-</Section>
+</section>

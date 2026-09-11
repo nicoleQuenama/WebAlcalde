@@ -23,6 +23,7 @@ import ComparadorAntesDespues from '@components/Home/ComparatingProjects/Project
 import type { ParComparador } from '@components/Home/ComparatingProjects/ProjectSlide.tsx';
 import FlipBook from '@components/FlipBook/FlipBook';
 import Book from '@components/Home/BookSection/Book3D';
+import BiographyVideo from '@components/Home/BiographyVideo/index.astro';
 import '@styles/sobre.css';
 
 // ── HERO ──────────────────────────────────────────────────────────────
@@ -134,62 +135,7 @@ const toc = [
     </Hero>
 
     <!-- ═══ BIOGRAFÍA ═══ -->
-    <section class="bg-white">
-        <div class="mx-auto max-w-6xl px-6 py-16 lg:px-8 lg:py-24">
-            <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
-                Manfred Reyes Villa
-            </p>
-            <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
-                Biografia
-            </h2>
-
-            <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <!-- Columna izquierda: Texto biográfico -->
-                <div class="space-y-6">
-                    <p class="text-lg leading-relaxed text-slate-700">
-                        Manfred Reyes Villa es un líder político boliviano con una trayectoria dedicada al desarrollo 
-                        de Cochabamba. Con experiencia en gestión pública y un compromiso inquebrantable con el 
-                        progreso de su ciudad, ha impulsado proyectos fundamentales que transforman la vida de los 
-                        cochabambinos.
-                    </p>
-                    <p class="text-lg leading-relaxed text-slate-700">
-                        Su visión de gobierno se centra en la modernización de la infraestructura urbana, 
-                        la mejora de servicios públicos y el fortalecimiento de la participación ciudadana 
-                        como pilares para construir una ciudad más próspera y equitativa.
-                    </p>
-                    
-                    <!-- Botones de acción -->
-                    <div class="flex flex-wrap gap-4 pt-4">
-                        <a href="/sobre" class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
-                            Conoce más sobre él
-                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
-                        <a href="/gestion" class="inline-flex items-center gap-2 rounded-full border-2 border-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-primary transition-all hover:-translate-y-0.5 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30">
-                            Ver gestión completa
-                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Columna derecha: Video -->
-                <div class="order-first lg:order-last">
-                    <figure class="overflow-hidden rounded-2xl border border-slate-200 shadow-lg">
-                        <video
-                            class="aspect-video bg-slate-900 object-cover object-[50%_7%]"
-                            src={videoBiografia}
-                            poster={posterBiografia}
-                            controls
-                            preload="metadata"
-                            playsinline
-                        ></video>
-                        <figcaption class="bg-slate-50 px-4 py-2 text-xs font-medium italic text-slate-400">
-                            Manfred Reyes Villa — su historia y su vínculo con Cochabamba.
-                        </figcaption>
-                    </figure>
-                </div>
-            </div>
-        </div>
-    </section>
+    <BiographyVideo videoBiografia={videoBiografia} posterBiografia={posterBiografia} />
 
     <!-- ═══ ANTES / DESPUÉS ═══ -->
     <section class="bg-white">

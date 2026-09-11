@@ -13,7 +13,7 @@
  */
 import Layout from '@layouts/Layout.astro';
 import { Image, getImage } from 'astro:assets';
-import { getCapitulos, getHitos, getHistoriaIntro, getFiltrosHito, getPilares } from '@lib/db';
+import { getHitos, getHistoriaIntro, getFiltrosHito, getPilares } from '@lib/db';
 import { MEDIA } from '@lib/media';
 import { ajusteImagen } from '@lib/ajusteImagen';
 import type { ImagenFaceta } from '@components/global/Hero/GaleriaModal';
@@ -45,9 +45,6 @@ const fondo = await getImage({
   quality: 30,
   format: 'webp',
 });
-
-// ── BIOGRAFÍA ────────────────────────────────────────────────────────
-const PRESENTACION = getCapitulos().find((c) => c.id === 'presentacion')!;
 
 // ── TARJETAS (biografía / misión / visión) ───────────────────────────
 const PILARES = getPilares();
@@ -122,28 +119,6 @@ const galeriaImagenes: ImagenFaceta[] = HISTORIA.filter((h) => h.imagen).map((h)
             </div>
         </section>
 
-        <!-- ═══ BIOGRAFÍA ═══ -->
-        <section class="bg-white">
-            <div class="mx-auto max-w-3xl px-6 py-20 lg:px-8 lg:py-24">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
-                    Biografía
-                </p>
-                <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
-                    Una vida dedicada a Cochabamba
-                </h2>
-                <p class="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
-                    {PRESENTACION.bajada}
-                </p>
-                <a
-                    href="/gestion#presentacion"
-                    class="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-transform hover:-translate-y-0.5"
-                >
-                    Ver la gestión completa
-                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                </a>
-            </div>
-        </section>
-
         <!-- ═══ TARJETAS: biografía, misión y visión ═══ -->
         <section class="bg-primary text-white">
             <div class="mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-24">
@@ -153,7 +128,7 @@ const galeriaImagenes: ImagenFaceta[] = HISTORIA.filter((h) => h.imagen).map((h)
                     </h2>
                 </header>
 
-                <ValueCards client:visible cards={PILARES} />
+                <ValueCards client:idle cards={PILARES} />
             </div>
         </section>
 
