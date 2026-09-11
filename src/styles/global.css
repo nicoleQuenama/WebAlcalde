@@ -25,12 +25,17 @@ body {
   /* Tokens visuales de la marca. Únicos colores de acento del sitio:
      - primary:  color de marca (mismo del navbar) — fondos oscuros, textos acento.
      - accent:   tono claro de la marca — etiquetas/eyebrows sobre primary.
-     - primary-deep/deepest: degradado de la marca (libros, tapas). */
+     - primary-deep/deepest: degradado de la marca (libros, tapas).
+     - hero-*:   degradado del hero (morado oscuro a azul marino). */
   --color-primary: #472d82;
   --color-primary-rgb: 71, 45, 130;
   --color-accent: #c9b8e8;
   --color-primary-deep: #38235f;
   --color-primary-deepest: #2a1a49;
+
+  --color-hero-from: #3b1f6b;
+  --color-hero-via: #1e1040;
+  --color-hero-to: #0c1a3d;
 
   --animate-zoomIn: zoomIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   --animate-fadeIn: fadeIn 0.3s ease-out forwards;
