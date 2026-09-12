@@ -1,4 +1,5 @@
 ---
+export const prerender = true;
 import Layout from '@layouts/Layout.astro';
 import { getImage } from 'astro:assets';
 import { getCapitulos } from '@lib/db';
@@ -6,7 +7,7 @@ import { MEDIA } from '@lib/media';
 import Hero from '@components/global/Hero/Hero.astro';
 import HeroCards from '@components/global/Hero/HeroCard.tsx';
 import type { TarjetaImagen } from '@components/global/Hero/HeroCard.tsx';
-import ValueCards from '@components/About/InstitutionalProfile/Institutional.component.astro';
+import InstitutionalProfile from '@components/About/InstitutionalProfile/Institutional.component.astro';
 import Timeline from '@components/About/LifeJourney/Timeline/Timeline.component.astro';
 import '@styles/sobre.css';
 
@@ -50,7 +51,7 @@ const PRESENTACION = getCapitulos().find((c) => c.id === 'presentacion')!;
             titulo="Manfred Reyes Villa"
             quote="Una vida dedicada a Cochabamba"
         >
-            <HeroCards client:load imagenes={imgs} autoplayMs={4500} slot="media" />
+            <HeroCards client:visible imagenes={imgs} autoplayMs={4500} slot="media" />
         </Hero>
 
         <!-- ═══ BIOGRAFÍA ═══ -->
@@ -75,16 +76,16 @@ const PRESENTACION = getCapitulos().find((c) => c.id === 'presentacion')!;
             </div>
         </section>
 
-        <!-- ═══ TARJETAS: biografía, misión y visión ═══ -->
+        <!-- ═══ TARJETAS: misión y visión ═══ -->
         <section class="bg-primary text-white">
             <div class="mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-24">
                 <header class="max-w-2xl">
                     <h2 class="text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl">
-                        Biografía, misión y visión
+                        Misión y visión
                     </h2>
                 </header>
 
-                <ValueCards />
+                <InstitutionalProfile />
             </div>
         </section>
 

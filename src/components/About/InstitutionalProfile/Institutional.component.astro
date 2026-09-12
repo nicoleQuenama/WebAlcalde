@@ -1,15 +1,15 @@
 ---
-import Card from './Card.component.astro';
+import Card from '@components/About/InstitutionalProfile/Card.component.astro';
 import { INSTITUTIONAL_CARDS } from '@constants/institutionalProfile/content';
 
 const { class: extraClass } = Astro.props;
 
-const Z_INDEX: Record<string, number> = { bio: 3, mision: 2, vision: 1 };
+const Z_INDEX: Record<string, number> = { mision: 2, vision: 1 };
 ---
 
 <div
   class:list={[
-    'relative mx-auto mt-6 w-[min(1080px,100%)] overflow-visible h-[min(960px,290vw)] md:h-[clamp(380px,48vh,460px)] lg:h-[clamp(380px,52vh,520px)]',
+    'relative mx-auto w-[min(1080px,100%)] overflow-visible mt-4 md:mt-6 h-[clamp(440px,118vw,520px)] md:h-[clamp(340px,45vh,420px)] lg:h-[clamp(360px,48vh,460px)]',
     extraClass,
   ]}
   data-stage
@@ -43,34 +43,34 @@ const Z_INDEX: Record<string, number> = { bio: 3, mision: 2, vision: 1 };
       mobile: '(max-width: 560px)',
     },
     (ctx) => {
-      const stage = document.querySelector('[data-stage]');
+      const stage = document.querySelector<HTMLElement>('[data-stage]');
       if (!stage) return;
 
       const cardEls = Array.from(stage.querySelectorAll<HTMLElement>('[data-card]'));
       if (cardEls.length === 0) return;
 
       const byId = new Map(cardEls.map((el) => [el.dataset.card, el]));
-      const bio = byId.get('bio');
       const mision = byId.get('mision');
       const vision = byId.get('vision');
-      if (!bio || !mision || !vision) return;
+      if (!mision || !vision) return;
 
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const mobile = !!ctx.conditions?.mobile;
       const dir = mobile ? 'vertical' : 'horizontal';
       const GAP = mobile ? 14 : 20;
 
-      const rect = bio.getBoundingClientRect();
-      const w = rect.width;
-      const h = rect.height;
+      const w = mision.offsetWidth;
+      const h = mision.offsetHeight;
       const side = dir === 'vertical' ? h : w;
       const overlap = Math.round(side * 0.62);
 
       const computeSpread = () => {
-        if (dir !== 'horizontal') return Math.round(h * 1.1);
+        // Antes: h*1.1 y w+GAP*2 separaba ~380px. Ahora quedan unidas con gap = GAP
+        if (dir !== 'horizontal') return Math.round(h / 2 + GAP / 2 + 4);
         const W = stage.offsetWidth;
-        const raw = w + GAP * 2;
-        return Math.round(Math.max(0, Math.min(raw, (W - w) / 2 - GAP / 2)));
+        const ideal = w / 2 + GAP / 2 + 4;
+        const max = (W - w) / 2 - 8;
+        return Math.round(Math.max(0, Math.min(ideal, Math.max(0, max))));
       };
       let spread = computeSpread();
       ScrollTrigger.addEventListener('refreshInit', () => {
@@ -85,7 +85,6 @@ const Z_INDEX: Record<string, number> = { bio: 3, mision: 2, vision: 1 };
           gsap.set(mision, { x: -spread, y: 0, rotation: 0, scale: 1, opacity: 1 });
           gsap.set(vision, { x: spread, y: 0, rotation: 0, scale: 1, opacity: 1 });
         }
-        gsap.set(bio, { x: 0, y: 0, scale: 1, opacity: 1 });
       };
 
       if (reduce) {
@@ -97,8 +96,8 @@ const Z_INDEX: Record<string, number> = { bio: 3, mision: 2, vision: 1 };
         defaults: { ease: 'none' },
         scrollTrigger: {
           trigger: stage,
-          start: 'top bottom',
-          end: '+=600',
+          start: 'top 85%',
+          end: '+=380',
           scrub: 1,
         },
       });
@@ -115,7 +114,6 @@ const Z_INDEX: Record<string, number> = { bio: 3, mision: 2, vision: 1 };
           { x: dir === 'vertical' ? 0 : () => spread, y: dir === 'vertical' ? () => spread : 0, rotation: 0, scale: 1, opacity: 1 },
           0
         )
-        .fromTo(bio, { scale: 0.98 }, { scale: 1 }, 0);
     }
   );
 </script>

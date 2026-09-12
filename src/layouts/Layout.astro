@@ -1,29 +1,93 @@
 ---
 // src/layouts/Layout.astro
+import { ClientRouter } from 'astro:transitions';
 import Header from '@components/Header/Header.astro';
 import Preloader from '@components/Preloader/Preloader.astro';
 
-// AGREGAR ESTA LÍNEA:
 import '../styles/global.css';
 
 interface Props {
     title: string;
+    description?: string;
 }
-const {title} = Astro.props;
+const {title, description = 'Manfred Reyes Villa — Cocha, la mejor ciudad de Bolivia. Obras, gestión y trayectoria.'} = Astro.props;
 ---
 <!doctype html>
 <html lang="es">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="color-scheme" content="light" />
+        <meta name="description" content={description} />
+        <meta name="generator" content={Astro.generator} />
         <title>{title}</title>
+        <!-- Performance: preconnect críticos -->
+        <link rel="preconnect" href="https://fsuxvbuupswucnsvrdce.supabase.co" crossorigin />
+        <link rel="dns-prefetch" href="https://fsuxvbuupswucnsvrdce.supabase.co" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <!-- Tipografía no bloqueante: preload + media print trick -->
+        <link
+            rel="preload"
+            as="style"
+            href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,400;1,8..144,400&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,400;1,8..144,400&display=swap"
+            media="print"
+            onload="this.media='all'"
+        />
+        <noscript>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,400;1,8..144,400&display=swap" />
+        </noscript>
+        <!-- View Transitions SPA: navegación sin reload -->
+        <ClientRouter fallback="swap" />
+        <style>
+            @view-transition { navigation: auto; }
+            ::view-transition-old(root),
+            ::view-transition-new(root) { animation-duration: 0.22s; animation-timing-function: ease; }
+            ::view-transition-old(root) { animation-name: vt-fade-out; }
+            ::view-transition-new(root) { animation-name: vt-fade-in; }
+            @keyframes vt-fade-out { from{opacity:1} to{opacity:0} }
+            @keyframes vt-fade-in { from{opacity:0} to{opacity:1} }
+            html { view-transition-name: root; scrollbar-gutter: stable; }
+        </style>
     </head>
-    <body class="m-0 font-sans bg-gray-50">
+    <body class="m-0 font-sans bg-gray-50 antialiased">
         <Preloader />
-        <Header/>
+        <div transition:persist="header">
+            <Header/>
+        </div>
         
-        <main>
+        <main transition:animate="fade">
             <slot/>
         </main>
+
+        <script>
+            document.addEventListener('astro:page-load', () => {
+                const links = document.querySelectorAll('a[href^="/"]:not([data-astro-reload])');
+                links.forEach((a) => {
+                    // @ts-ignore
+                    if (a.dataset.prefetchBound) return;
+                    // @ts-ignore
+                    a.dataset.prefetchBound = '1';
+                    const doPrefetch = () => {
+                        const href = a.getAttribute('href');
+                        if (!href) return;
+                        try {
+                            const url = new URL(href, location.origin);
+                            if (url.origin !== location.origin) return;
+                            // @ts-ignore
+                            if (window.__astro_prefetch) window.__astro_prefetch(href);
+                        } catch {}
+                    };
+                    a.addEventListener('mouseenter', doPrefetch, { once: true });
+                    a.addEventListener('touchstart', doPrefetch, { once: true, passive: true });
+                    a.addEventListener('focus', doPrefetch, { once: true });
+                });
+                if (!location.hash) window.scrollTo(0, 0);
+            });
+        </script>
     </body>
 </html>
