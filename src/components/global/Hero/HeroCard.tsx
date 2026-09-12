@@ -27,7 +27,7 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
       setActual((prev) => (prev + 1) % IMAGENES.length);
     }, autoplayMs);
     return () => clearInterval(intervalo);
-  }, [actual, autoplayMs, modalAbierto, IMAGENES.length]);
+  }, [autoplayMs, modalAbierto, IMAGENES.length]);
 
   const siguiente = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -53,6 +53,12 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
             else if (index === (actual - 1 + IMAGENES.length) % IMAGENES.length) posicion = 'hero-card-izquierda';
             else if (index === (actual + 1) % IMAGENES.length) posicion = 'hero-card-derecha';
 
+            const isActive = posicion === 'hero-card-centro';
+            const isAdjacent = posicion === 'hero-card-izquierda' || posicion === 'hero-card-derecha';
+            const shouldEager = isActive || isAdjacent;
+            // Solo la card central y adyacentes cargan eager; el resto lazy para no saturar.
+            // Primera render (index 0) siempre eager si es central
+
             return (
               <div
                 key={img.id}
@@ -66,7 +72,12 @@ export default function HeroCards({ imagenes, autoplayMs = 3500 }: Props) {
                 <img
                   src={img.src}
                   alt={img.titulo ?? ''}
-                  loading="lazy"
+                  loading={shouldEager ? 'eager' : 'lazy'}
+                  decoding="async"
+                  fetchPriority={isActive ? 'high' : 'low'}
+                  // @ts-ignore - fetchPriority React 19
+                  fetchpriority={isActive ? 'high' : 'low'}
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 400px"
                   className="absolute inset-0 w-full h-full"
                   style={cardAjuste(img)}
                 />

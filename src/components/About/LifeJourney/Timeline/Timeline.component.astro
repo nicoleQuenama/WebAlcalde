@@ -3,8 +3,8 @@ import { getImage } from 'astro:assets';
 import { getFiltrosHito, getHistoriaIntro, getHitos } from '@lib/db';
 import type { Hito } from '@lib/db';
 import { ajusteImagen } from '@lib/ajusteImagen';
-import TimelineDolly from './TimelineDolly';
-import type { PlacaDolly, TabDolly } from './types';
+import TimelineDolly from '@components/About/LifeJourney/Timeline/TimelineDolly';
+import type { PlacaDolly, TabDolly } from '@types';
 
 const HISTORIA = getHitos();
 const INTRO = getHistoriaIntro();
@@ -74,6 +74,6 @@ const tabs: TabDolly[] = await Promise.all(
             </p>
         </header>
 
-        <TimelineDolly client:load tabs={tabs} />
+        <TimelineDolly client:visible tabs={tabs} />
     </div>
 </section>

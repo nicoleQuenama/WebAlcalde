@@ -7,11 +7,20 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  // SSR: cada request se renderiza en el servidor Node (dist/server/entry.mjs).
-  // Las páginas que no necesiten datos frescos pueden marcar
-  // `export const prerender = true` para volver a ser estáticas.
+  // SSR con páginas estáticas prerenderizadas donde se pueda.
+  // `export const prerender = true` en cada página estática evita render en cada request.
   output: 'server',
   adapter: node({ mode: 'standalone' }),
+
+  // Prefetch + View Transitions: navegación SPA sin reload.
+  // viewport = precarga al entrar en viewport (más rápido que hover), hover como refuerzo.
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'viewport',
+  },
+  experimental: {
+    clientPrerender: true,
+  },
 
   integrations: [
     react({
@@ -24,6 +33,11 @@ export default defineConfig({
     remotePatterns: [
       { protocol: 'https', hostname: 'fsuxvbuupswucnsvrdce.supabase.co' },
     ],
+    service: { entrypoint: 'astro/assets/services/sharp' },
+  },
+  compressHTML: true,
+  build: {
+    inlineStylesheets: 'auto',
   },
 
   vite: {
@@ -41,6 +55,10 @@ export default defineConfig({
         '@pages': path.resolve('./src/pages'),
         '@layouts': path.resolve('./src/layouts'),
       },
+    },
+    build: {
+      // Code splitting para que el JS no sea un monolito
+      cssCodeSplit: true,
     },
     server: {
       host: true,

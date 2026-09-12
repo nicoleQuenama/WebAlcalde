@@ -23,6 +23,10 @@ export default function HeaderMovil({ enlaces }: Props) {
               src={MEDIA.logo}
               alt="Manfred Reyes Villa"
               className="h-10 lg:h-12 w-auto object-contain"
+              loading="eager"
+              decoding="async"
+              width={160}
+              height={48}
             />
              </a>
           </div>
