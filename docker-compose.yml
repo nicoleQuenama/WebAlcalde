@@ -1,4 +1,20 @@
 services:
+  db:
+    image: postgres:18-alpine
+    container_name: webalcalde-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-alcalde}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-alcalde}
+      POSTGRES_DB: ${POSTGRES_DB:-webalcalde}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-alcalde} -d ${POSTGRES_DB:-webalcalde}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   web:
     build:
       context: .
@@ -11,9 +27,21 @@ services:
       # El servidor Node lee estas al arrancar.
       HOST: 0.0.0.0
       PORT: 4321
-    # Credenciales de Supabase / Postgres para el fetch en runtime.
-    # Definilas en un archivo .env junto a este compose (ver .env.example).
+      # Apunta al servicio `db` de este compose (no a «localhost»): dentro de la
+      # red de Compose, el host de Postgres es el nombre del servicio.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-alcalde}:${POSTGRES_PASSWORD:-alcalde}@db:5432/${POSTGRES_DB:-webalcalde}
+      # Admin: definilas en .env (o exportalas) para sobreescribir los defaults.
+      ADMIN_SECRET_PATH: ${ADMIN_SECRET_PATH:-}
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    depends_on:
+      db:
+        condition: service_healthy
     env_file:
       - path: .env
         required: false
     restart: unless-stopped
+
+volumes:
+  pgdata:

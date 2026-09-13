@@ -10,7 +10,6 @@ ARG NODE_IMAGE=node:24-alpine
 
 # =============================================================================
 #  Etapa 1 — dependencias + build
-#    node:sqlite viene incluido en Node 24 sin flags (lo usa src/lib/db.ts).
 # =============================================================================
 FROM ${NODE_IMAGE} AS build
 
@@ -44,10 +43,6 @@ ENV NODE_ENV=production \
     PORT=4321
 
 WORKDIR /app
-
-# Carpeta writable para la DB de contenido que siembra src/lib/db.ts.
-# (cuando el contenido pase a Postgres/fetch, esto deja de usarse)
-RUN mkdir -p /app/data && chown -R node:node /app
 
 # Artefacto SSR + dependencias de runtime, como usuario sin privilegios.
 COPY --from=build --chown=node:node /app/dist         ./dist

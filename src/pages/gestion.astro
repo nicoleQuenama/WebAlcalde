@@ -16,13 +16,13 @@ import { efectivo, efectivoLista, efectivoOrden } from '@lib/cms/resolve';
 import { DEFAULT_GESTION_LAYOUT } from '../admin/defaults';
 
 // ── HERO DE GESTIÓN ──────────────────────────────────────────────────
-const GESTION_HERO = efectivo('gestion_hero', 'principal', getGestionHero());
+const GESTION_HERO = efectivo('gestion_hero', 'principal', await getGestionHero());
 
 // ── CAPÍTULOS DE APERTURA ────────────────────────────────────────────
-const capitulosApertura = efectivoLista('capitulo', getCapitulos());
+const capitulosApertura = efectivoLista('capitulo', await getCapitulos());
 
 // ── ERAS DE OBRAS ────────────────────────────────────────────────────
-const erasCompletas = getEras();
+const erasCompletas = await getEras();
 const erasBase = erasCompletas.map(({ secciones: _s, ...resto }) => resto);
 const seccionesBase: (SeccionTemario & { eraId: string })[] = erasCompletas.flatMap((era) =>
   era.secciones.map((s) => ({ ...s, eraId: era.id })),
@@ -37,9 +37,9 @@ const ERAS: EraTemario[] = erasEfectivas.map((era) => ({
 // ── PROYECTOS ────────────────────────────────────────────────────────
 const PROYECTOS = efectivoLista(
   'proyecto',
-  getProyectos().map((p, i) => ({ ...p, id: String(i) })),
+  (await getProyectos()).map((p, i) => ({ ...p, id: String(i) })),
 );
-const PROYECTOS_TITULO = efectivo('proyectos_titulo', 'principal', getProyectosTitulo());
+const PROYECTOS_TITULO = efectivo('proyectos_titulo', 'principal', await getProyectosTitulo());
 
 // ── ORDEN DE SECCIONES (CMS beta) ────────────────────────────────────
 const orden = efectivoOrden('gestion_layout', DEFAULT_GESTION_LAYOUT);
@@ -204,7 +204,7 @@ const colorEstado: Record<string, string> = {
 											? { w: seccion.imagenW, h: seccion.imagenH, encuadre: seccion.encuadre, ajuste: seccion.ajuste }
 											: undefined;
 									const imagenPos: string = dims ? ajusteImagen(dims).objectPosition : '50% 30%';
-									const imagenH: number | undefined = dims ? Math.round((704 * dims.h) / dims.w) : undefined;
+									const imagenH: number = dims ? Math.round((704 * dims.h) / dims.w) : 528;
 									return (
 										<section id={seccion.id} class="scroll-mt-24 border-b border-slate-900/10 py-16 lg:py-20" data-cms-dominio="seccion" data-cms-clave={seccion.id}>
 											<div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16">

@@ -1,7 +1,7 @@
 
-import { existsSync, mkdirSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
+import 'dotenv/config';
+import { randomUUID } from 'node:crypto';
+import { Pool } from 'pg';
 import { MEDIA } from './media';
 import type { Encuadre, AjusteCarrusel } from './ajusteImagen';
 
@@ -88,6 +88,38 @@ export interface IntroHistoria {
   kicker: string;
   titulo: string;
   bajada: string;
+}
+
+// ── Tipos del Buzón Ciudadano ────────────────────────────────────────────────
+
+/** Categorías aceptadas por el Buzón Ciudadano. */
+export type TipoBuzon = 'sugerencia' | 'felicitacion';
+
+/** Un mensaje recibido por el Buzón Ciudadano. */
+export interface BuzonMensaje {
+  id: string;
+  nombre: string;
+  tipo: TipoBuzon;
+  mensaje: string;
+  /** ISO-8601 (UTC) del momento en que se recibió. */
+  creadoEn: string;
+}
+
+// ── Tipos de autenticación (administrador del panel) ─────────────────────────
+
+/** Cuenta del administrador. Nunca guardamos la clave en texto plano. */
+export interface Usuario {
+  usuario: string;
+  passHash: string;
+  creadoEn: string;
+}
+
+/** Sesión activa del administrador (token único = cookie de sesión). */
+export interface Sesion {
+  token: string;
+  usuario: string;
+  creadoEn: string;
+  expiraEn: string;
 }
 
 // ── Seed: apertura del libro (capítulos sin lista de obras) ─────────────────
@@ -783,77 +815,231 @@ const HISTORIA: Hito[] = [
   },
 ];
 
-// ── Persistencia (SQLite) ────────────────────────────────────────────────────
+// ── Persistencia: PostgreSQL (única opción) ───────────────────────────────────
 
-const DB_PATH = join(process.cwd(), 'data', 'webalcalde.db');
-const DB_DIR = dirname(DB_PATH);
-
-let _db: DatabaseSync | null = null;
-
-function open(): DatabaseSync {
-  if (_db) return _db;
-  if (!existsSync(DB_DIR)) mkdirSync(DB_DIR, { recursive: true });
-  const db = new DatabaseSync(DB_PATH);
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS contenido (
-      dominio TEXT NOT NULL,
-      clave   TEXT NOT NULL,
-      orden   INTEGER NOT NULL DEFAULT 0,
-      data    TEXT NOT NULL,
-      PRIMARY KEY (dominio, clave)
-    );
-  `);
-  _db = db;
-  return db;
-}
+// URL de conexión (Postgres local o administrado, p. ej. Supabase). Es
+// obligatoria: sin ella el servidor no arranca (no hay fallback a SQLite).
+const DATABASE_URL: string | undefined =
+  import.meta.env.DATABASE_URL || process.env.DATABASE_URL;
 
 type Mapa = Record<string, unknown>;
 
-function guardar(dominio: string, clave: string, data: Mapa, orden = 0): void {
-  const db = open();
-  db.prepare(
-    `INSERT INTO contenido (dominio, clave, orden, data)
-     VALUES (?, ?, ?, ?)
-     ON CONFLICT(dominio, clave) DO UPDATE SET
-       orden = excluded.orden,
-       data  = excluded.data`,
-  ).run(dominio, clave, orden, JSON.stringify(data));
+interface Almacen {
+  asegurarTabla(): Promise<void>;
+  guardar(dominio: string, clave: string, data: string, orden: number): Promise<void>;
+  leer(dominio: string): Promise<{ clave: string; orden: number; data: string }[]>;
+  contar(dominio: string): Promise<number>;
+  asegurarTablaBuzon(): Promise<void>;
+  guardarMensaje(mensaje: BuzonMensaje): Promise<void>;
+  listarMensajes(): Promise<BuzonMensaje[]>;
+  asegurarTablaAuth(): Promise<void>;
+  crearUsuario(usuario: Usuario): Promise<void>;
+  obtenerUsuario(usuario: string): Promise<Usuario | undefined>;
+  crearSesion(sesion: Sesion): Promise<void>;
+  obtenerSesion(token: string): Promise<Sesion | undefined>;
+  eliminarSesion(token: string): Promise<void>;
+  renovarSesion(token: string, expiraEn: string): Promise<void>;
 }
 
-function leer(dominio: string): { clave: string; data: Mapa; orden: number }[] {
-  const db = open();
-  const rows = db
-    .prepare(`SELECT clave, orden, data FROM contenido WHERE dominio = ? ORDER BY orden`)
-    .all(dominio) as { clave: string; orden: number; data: string }[];
-  return rows.map((r) => ({ clave: r.clave, orden: r.orden, data: JSON.parse(r.data) as Mapa }));
+class AlmacenPostgres implements Almacen {
+  private _pool: Pool | null = null;
+
+  constructor(private readonly url: string) {}
+
+  private pool(): Pool {
+    if (!this._pool) {
+      this._pool = new Pool({ connectionString: this.url, max: 10 });
+    }
+    return this._pool;
+  }
+
+  async asegurarTabla(): Promise<void> {
+    await this.pool().query(`
+      CREATE TABLE IF NOT EXISTS contenido (
+        dominio TEXT NOT NULL,
+        clave   TEXT NOT NULL,
+        orden   INTEGER NOT NULL DEFAULT 0,
+        data    TEXT NOT NULL,
+        PRIMARY KEY (dominio, clave)
+      );
+    `);
+  }
+
+  async guardar(dominio: string, clave: string, data: string, orden: number): Promise<void> {
+    await this.pool().query(
+      `INSERT INTO contenido (dominio, clave, orden, data)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (dominio, clave) DO UPDATE SET
+         orden = EXCLUDED.orden,
+         data  = EXCLUDED.data`,
+      [dominio, clave, orden, data],
+    );
+  }
+
+  async leer(dominio: string): Promise<{ clave: string; orden: number; data: string }[]> {
+    const res = await this.pool().query<{ clave: string; orden: number; data: string }>(
+      `SELECT clave, orden, data FROM contenido WHERE dominio = $1 ORDER BY orden`,
+      [dominio],
+    );
+    return res.rows;
+  }
+
+  async contar(dominio: string): Promise<number> {
+    const res = await this.pool().query<{ n: number }>(
+      `SELECT COUNT(*)::int AS n FROM contenido WHERE dominio = $1`,
+      [dominio],
+    );
+    return res.rows[0].n;
+  }
+
+  async asegurarTablaBuzon(): Promise<void> {
+    await this.pool().query(`
+      CREATE TABLE IF NOT EXISTS buzon (
+        id        TEXT PRIMARY KEY,
+        nombre    TEXT NOT NULL,
+        tipo      TEXT NOT NULL,
+        mensaje   TEXT NOT NULL,
+        creado_en TEXT NOT NULL
+      );
+    `);
+  }
+
+  async guardarMensaje(mensaje: BuzonMensaje): Promise<void> {
+    await this.pool().query(
+      `INSERT INTO buzon (id, nombre, tipo, mensaje, creado_en)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [mensaje.id, mensaje.nombre, mensaje.tipo, mensaje.mensaje, mensaje.creadoEn],
+    );
+  }
+
+  async listarMensajes(): Promise<BuzonMensaje[]> {
+    const res = await this.pool().query<{
+      id: string;
+      nombre: string;
+      tipo: TipoBuzon;
+      mensaje: string;
+      creado_en: string;
+    }>(`SELECT id, nombre, tipo, mensaje, creado_en FROM buzon ORDER BY creado_en DESC`);
+    return res.rows.map((r) => ({
+      id: r.id,
+      nombre: r.nombre,
+      tipo: r.tipo,
+      mensaje: r.mensaje,
+      creadoEn: r.creado_en,
+    }));
+  }
+
+  async asegurarTablaAuth(): Promise<void> {
+    await this.pool().query(`
+      CREATE TABLE IF NOT EXISTS usuario (
+        usuario    TEXT PRIMARY KEY,
+        pass_hash  TEXT NOT NULL,
+        creado_en  TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS sesion (
+        token      TEXT PRIMARY KEY,
+        usuario    TEXT NOT NULL,
+        creado_en  TEXT NOT NULL,
+        expira_en  TEXT NOT NULL
+      );
+    `);
+  }
+
+  async crearUsuario(u: Usuario): Promise<void> {
+    await this.pool().query(
+      `INSERT INTO usuario (usuario, pass_hash, creado_en) VALUES ($1, $2, $3)
+       ON CONFLICT (usuario) DO NOTHING`,
+      [u.usuario, u.passHash, u.creadoEn],
+    );
+  }
+
+  async obtenerUsuario(usuario: string): Promise<Usuario | undefined> {
+    const res = await this.pool().query<{ usuario: string; pass_hash: string; creado_en: string }>(
+      `SELECT usuario, pass_hash, creado_en FROM usuario WHERE usuario = $1`,
+      [usuario],
+    );
+    const r = res.rows[0];
+    return r
+      ? { usuario: r.usuario, passHash: r.pass_hash, creadoEn: r.creado_en }
+      : undefined;
+  }
+
+  async crearSesion(sesion: Sesion): Promise<void> {
+    await this.pool().query(
+      `INSERT INTO sesion (token, usuario, creado_en, expira_en) VALUES ($1, $2, $3, $4)
+       ON CONFLICT (token) DO NOTHING`,
+      [sesion.token, sesion.usuario, sesion.creadoEn, sesion.expiraEn],
+    );
+  }
+
+  async obtenerSesion(token: string): Promise<Sesion | undefined> {
+    const res = await this.pool().query<{
+      token: string;
+      usuario: string;
+      creado_en: string;
+      expira_en: string;
+    }>(`SELECT token, usuario, creado_en, expira_en FROM sesion WHERE token = $1`, [token]);
+    const r = res.rows[0];
+    return r
+      ? { token: r.token, usuario: r.usuario, creadoEn: r.creado_en, expiraEn: r.expira_en }
+      : undefined;
+  }
+
+  async eliminarSesion(token: string): Promise<void> {
+    await this.pool().query(`DELETE FROM sesion WHERE token = $1`, [token]);
+  }
+
+  async renovarSesion(token: string, expiraEn: string): Promise<void> {
+    await this.pool().query(`UPDATE sesion SET expira_en = $2 WHERE token = $1`, [token, expiraEn]);
+  }
 }
 
-function estaVacio(dominio: string): boolean {
-  const db = open();
-  const r = db
-    .prepare(`SELECT COUNT(*) AS n FROM contenido WHERE dominio = ?`)
-    .get(dominio) as { n: number };
-  return r.n === 0;
+let _almacen: Almacen | null = null;
+
+function getAlmacen(): Almacen {
+  if (!DATABASE_URL) {
+    throw new Error(
+      '[db] Falta DATABASE_URL en el entorno. Configurá la conexión a Postgres ' +
+        'en .env o como variable de entorno.',
+    );
+  }
+  if (!_almacen) {
+    _almacen = new AlmacenPostgres(DATABASE_URL);
+  }
+  return _almacen;
+}
+
+async function guardar(dominio: string, clave: string, data: Mapa, orden = 0): Promise<void> {
+  await getAlmacen().guardar(dominio, clave, JSON.stringify(data), orden);
+}
+
+async function leer(dominio: string): Promise<{ clave: string; data: Mapa; orden: number }[]> {
+  const filas = await getAlmacen().leer(dominio);
+  return filas.map((r) => ({ clave: r.clave, orden: r.orden, data: JSON.parse(r.data) as Mapa }));
+}
+
+async function estaVacio(dominio: string): Promise<boolean> {
+  return (await getAlmacen().contar(dominio)) === 0;
 }
 
 // ── Siembra desde el seed de este archivo ────────────────────────────────────
 
-function sembrar(): void {
-  const db = open();
+async function sembrar(): Promise<void> {
+  await getAlmacen().asegurarTabla();
 
   // Capítulos de apertura
-  if (estaVacio('capitulo')) {
-    [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA].forEach((cap: Capitulo, i: number) =>
-      guardar('capitulo', cap.id, cap as unknown as Mapa, i),
-    );
+  if (await estaVacio('capitulo')) {
+    for (const [i, cap] of [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA].entries()) {
+      await guardar('capitulo', cap.id, cap as unknown as Mapa, i);
+    }
   }
 
   // Eras + sus subsecciones. Guardamos en cada sección su metadata de imagen
   // (dims/encuadre) resuelta desde MEDIA.temarioDims para no depender de ella
   // en los componentes.
-  if (estaVacio('era')) {
-    ERAS.forEach((era: EraTemario, ei: number) => {
-      guardar(
+  if (await estaVacio('era')) {
+    for (const [ei, era] of ERAS.entries()) {
+      await guardar(
         'era',
         era.id,
         {
@@ -864,11 +1050,11 @@ function sembrar(): void {
         },
         ei,
       );
-      era.secciones.forEach((sec: SeccionTemario, si: number) => {
+      for (const [si, sec] of era.secciones.entries()) {
         const dims = MEDIA.temarioDims[sec.id] as
           | (Mapa & { w?: number; h?: number; encuadre?: string; ajuste?: Mapa })
           | undefined;
-        guardar(
+        await guardar(
           'seccion',
           sec.id,
           {
@@ -886,55 +1072,63 @@ function sembrar(): void {
           },
           si,
         );
-      });
-    });
+      }
+    }
   }
 
   // Hero de gestión
-  if (estaVacio('gestion_hero')) {
-    guardar('gestion_hero', 'principal', GESTION_HERO as unknown as Mapa, 0);
+  if (await estaVacio('gestion_hero')) {
+    await guardar('gestion_hero', 'principal', GESTION_HERO as unknown as Mapa, 0);
   }
 
   // Título de la sección de proyectos + lista de proyectos
-  if (estaVacio('proyectos_titulo')) {
-    guardar('proyectos_titulo', 'principal', PROYECTOS_TITULO as unknown as Mapa, 0);
+  if (await estaVacio('proyectos_titulo')) {
+    await guardar('proyectos_titulo', 'principal', PROYECTOS_TITULO as unknown as Mapa, 0);
   }
-  if (estaVacio('proyecto')) {
-    PROYECTOS.forEach((p: Proyecto, i: number) => guardar('proyecto', String(i), p as unknown as Mapa, i));
+  if (await estaVacio('proyecto')) {
+    for (const [i, p] of PROYECTOS.entries()) {
+      await guardar('proyecto', String(i), p as unknown as Mapa, i);
+    }
   }
 
   // Historia: intro + filtros + hitos
-  if (estaVacio('historia_intro')) {
-    guardar('historia_intro', 'principal', HISTORIA_INTRO as unknown as Mapa, 0);
+  if (await estaVacio('historia_intro')) {
+    await guardar('historia_intro', 'principal', HISTORIA_INTRO as unknown as Mapa, 0);
   }
-  if (estaVacio('filtro')) {
-    FILTROS_HITO.forEach((f, i) => guardar('filtro', f.id, f as unknown as Mapa, i));
+  if (await estaVacio('filtro')) {
+    for (const [i, f] of FILTROS_HITO.entries()) {
+      await guardar('filtro', f.id, f as unknown as Mapa, i);
+    }
   }
-  if (estaVacio('hito')) {
-    HISTORIA.forEach((h: Hito, i: number) => guardar('hito', `${i}`, h as unknown as Mapa, i));
+  if (await estaVacio('hito')) {
+    for (const [i, h] of HISTORIA.entries()) {
+      await guardar('hito', `${i}`, h as unknown as Mapa, i);
+    }
   }
-
-  void db;
 }
 
 // ── API pública ──────────────────────────────────────────────────────────────
 
-function asegurarSembrada(): void {
-  open();
-  if (estaVacio('capitulo') || estaVacio('era') || estaVacio('hito')) {
-    sembrar();
+async function asegurarSembrada(): Promise<void> {
+  await getAlmacen().asegurarTabla();
+  if (
+    (await estaVacio('capitulo')) ||
+    (await estaVacio('era')) ||
+    (await estaVacio('hito'))
+  ) {
+    await sembrar();
   }
 }
 
-export function getCapitulos(): Capitulo[] {
-  asegurarSembrada();
-  return leer('capitulo').map((r) => r.data as unknown as Capitulo);
+export async function getCapitulos(): Promise<Capitulo[]> {
+  await asegurarSembrada();
+  return (await leer('capitulo')).map((r) => r.data as unknown as Capitulo);
 }
 
-export function getEras(): EraTemario[] {
-  asegurarSembrada();
-  const eras = leer('era').map((r) => r.data as unknown as Capitulo);
-  const secciones = leer('seccion').map((r) =>
+export async function getEras(): Promise<EraTemario[]> {
+  await asegurarSembrada();
+  const eras = (await leer('era')).map((r) => r.data as unknown as Capitulo);
+  const secciones = (await leer('seccion')).map((r) =>
     r.data as unknown as SeccionTemario & { eraId: string },
   );
 
@@ -944,35 +1138,96 @@ export function getEras(): EraTemario[] {
   })) as EraTemario[];
 }
 
-export function getGestionHero() {
-  asegurarSembrada();
-  const [row] = leer('gestion_hero');
+export async function getGestionHero() {
+  await asegurarSembrada();
+  const [row] = await leer('gestion_hero');
   return row?.data as unknown as typeof GESTION_HERO;
 }
 
-export function getProyectosTitulo() {
-  asegurarSembrada();
-  const [row] = leer('proyectos_titulo');
+export async function getProyectosTitulo() {
+  await asegurarSembrada();
+  const [row] = await leer('proyectos_titulo');
   return row?.data as unknown as typeof PROYECTOS_TITULO;
 }
 
-export function getProyectos(): Proyecto[] {
-  asegurarSembrada();
-  return leer('proyecto').map((r) => r.data as unknown as Proyecto);
+export async function getProyectos(): Promise<Proyecto[]> {
+  await asegurarSembrada();
+  return (await leer('proyecto')).map((r) => r.data as unknown as Proyecto);
 }
 
-export function getHistoriaIntro() {
-  asegurarSembrada();
-  const [row] = leer('historia_intro');
+export async function getHistoriaIntro() {
+  await asegurarSembrada();
+  const [row] = await leer('historia_intro');
   return row?.data as unknown as typeof HISTORIA_INTRO;
 }
 
-export function getFiltrosHito() {
-  asegurarSembrada();
-  return leer('filtro').map((r) => r.data as unknown as (typeof FILTROS_HITO)[number]);
+export async function getFiltrosHito() {
+  await asegurarSembrada();
+  return (await leer('filtro')).map((r) => r.data as unknown as (typeof FILTROS_HITO)[number]);
 }
 
-export function getHitos(): Hito[] {
-  asegurarSembrada();
-  return leer('hito').map((r) => r.data as unknown as Hito);
+export async function getHitos(): Promise<Hito[]> {
+  await asegurarSembrada();
+  return (await leer('hito')).map((r) => r.data as unknown as Hito);
+}
+
+// ── Buzón Ciudadano ──────────────────────────────────────────────────────────
+
+/** Guarda un mensaje del buzón (la validación previa ya ocurrió en la API). */
+export async function guardarMensaje(input: {
+  nombre: string;
+  tipo: TipoBuzon;
+  mensaje: string;
+}): Promise<void> {
+  const mensaje: BuzonMensaje = {
+    id: randomUUID(),
+    nombre: input.nombre.trim(),
+    tipo: input.tipo,
+    mensaje: input.mensaje.trim(),
+    creadoEn: new Date().toISOString(),
+  };
+  await getAlmacen().asegurarTablaBuzon();
+  await getAlmacen().guardarMensaje(mensaje);
+}
+
+/** Lista todos los mensajes del buzón, del más reciente al más antiguo. */
+export async function listarMensajes(): Promise<BuzonMensaje[]> {
+  await getAlmacen().asegurarTablaBuzon();
+  return getAlmacen().listarMensajes();
+}
+
+// ── Autenticación del administrador (tablas usuario / sesion) ─────────────────
+
+export async function asegurarTablaAuth(): Promise<void> {
+  await getAlmacen().asegurarTablaAuth();
+}
+
+export async function crearUsuario(u: Usuario): Promise<void> {
+  await getAlmacen().asegurarTablaAuth();
+  await getAlmacen().crearUsuario(u);
+}
+
+export async function obtenerUsuario(usuario: string): Promise<Usuario | undefined> {
+  await getAlmacen().asegurarTablaAuth();
+  return getAlmacen().obtenerUsuario(usuario);
+}
+
+export async function crearSesion(sesion: Sesion): Promise<void> {
+  await getAlmacen().asegurarTablaAuth();
+  await getAlmacen().crearSesion(sesion);
+}
+
+export async function obtenerSesion(token: string): Promise<Sesion | undefined> {
+  await getAlmacen().asegurarTablaAuth();
+  return getAlmacen().obtenerSesion(token);
+}
+
+export async function eliminarSesion(token: string): Promise<void> {
+  await getAlmacen().asegurarTablaAuth();
+  await getAlmacen().eliminarSesion(token);
+}
+
+export async function renovarSesion(token: string, expiraEn: string): Promise<void> {
+  await getAlmacen().asegurarTablaAuth();
+  await getAlmacen().renovarSesion(token, expiraEn);
 }

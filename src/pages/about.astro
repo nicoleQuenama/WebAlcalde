@@ -33,7 +33,7 @@ const fondo = await getImage({
 });
 
 // ── BIOGRAFÍA ────────────────────────────────────────────────────────
-const PRESENTACION = getCapitulos().find((c) => c.id === 'presentacion')!;
+const PRESENTACION = (await getCapitulos()).find((c) => c.id === 'presentacion')!;
 
 // ── TARJETAS (biografía / misión / visión) ───────────────────────────
 // El contenido de las cards vive en src/constants/institutionalProfile/content.ts.
