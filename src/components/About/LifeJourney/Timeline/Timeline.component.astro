@@ -4,11 +4,11 @@ import { getFiltrosHito, getHistoriaIntro, getHitos } from '@lib/db';
 import type { Hito } from '@lib/db';
 import { ajusteImagen } from '@lib/ajusteImagen';
 import TimelineDolly from '@components/About/LifeJourney/Timeline/TimelineDolly';
-import type { PlacaDolly, TabDolly } from '@types';
+import type { PlacaDolly, TabDolly } from './types';
 
-const HISTORIA = getHitos();
-const INTRO = getHistoriaIntro();
-const FILTROS = getFiltrosHito();
+const HISTORIA = await getHitos();
+const INTRO = await getHistoriaIntro();
+const FILTROS = await getFiltrosHito();
 
 const { style } = Astro.props as { style?: string };
 

@@ -32,7 +32,7 @@
   color: #fff;
 }
 
-/* ── Galería (un contenedor relativo: escenario + eje + panel) ─────── */
+/* ── Galería (escenario + eje, centrados) ──────────────────────────── */
 .timeline-galeria {
   position: relative;
   margin-top: 2.5rem;
@@ -43,7 +43,9 @@
   --placa-w: min(268px, 72vw);
   position: relative;
   height: clamp(420px, 62vh, 520px);
-  perspective: 1200px;
+  perspective: 800px;
+  overflow-y: clip;
+  overflow-x: visible;
   touch-action: none;
   user-select: none;
   cursor: grab;
@@ -53,7 +55,7 @@
 }
 @media (min-width: 1024px) {
   .timeline-escenario {
-    --placa-w: 318px;
+    --placa-w: 370px;
     height: 600px;
   }
 }
@@ -71,11 +73,6 @@
   will-change: transform, opacity, filter;
   transform-style: preserve-3d;
   cursor: zoom-in;
-}
-@media (min-width: 1024px) {
-  .timeline-placa {
-    left: 40%;
-  }
 }
 .timeline-placa img {
   display: block;
@@ -127,10 +124,8 @@
 .timeline-eje-marca {
   position: absolute;
   left: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
   transform: translate(-50%, -50%);
   border: 0;
   background: transparent;
@@ -138,17 +133,25 @@
 }
 .timeline-eje-marca:hover .timeline-eje-punto {
   background: #a855f7;
-  transform: scale(1.2);
+  transform: translate(-50%, -50%) scale(1.2);
 }
 .timeline-eje-punto {
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: 0.75rem;
   height: 0.75rem;
+  transform: translate(-50%, -50%);
   border: 2px solid #3a2568;
   border-radius: 9999px;
   background: #fff;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 .timeline-eje-anio {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, 1rem);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -168,100 +171,294 @@
   box-shadow: 0 6px 16px rgb(58 37 104 / 0.45);
 }
 
-/* ── Panel de contenido de la placa enfocada ───────────────────────── */
-.timeline-panel {
-  margin-top: 1.25rem;
-  padding: 1.5rem;
+/* ── Card de información (lado opuesto a la placa enfocada) ───────── */
+.timeline-info {
+  position: relative;
+  z-index: 600;
+  margin: 1.5rem auto 0;
+  width: min(340px, 92%);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  padding: 1.6rem 1.6rem 1.35rem;
   border: 1px solid rgb(226 232 240);
-  border-radius: 1.25rem;
+  border-radius: 1.1rem;
   background: #fff;
-  box-shadow: 0 30px 70px -30px rgb(15 23 42 / 0.35);
-  opacity: 0.4;
-  transform: translateY(0.4rem);
-  transition: opacity 0.45s ease, transform 0.45s ease;
+  box-shadow: 0 24px 60px -22px rgb(15 23 42 / 0.4);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  cursor: zoom-in;
+  text-align: left;
+  user-select: none;
+  will-change: opacity;
 }
-.timeline-panel.is-activa {
-  opacity: 1;
-  transform: none;
-}
-@media (min-width: 1024px) {
-  .timeline-panel {
-    position: absolute;
-    top: 50%;
-    right: 2%;
-    width: 350px;
-    margin-top: 0;
-    transform: translateY(-50%) translateX(0.75rem);
-  }
-  .timeline-panel.is-activa {
-    transform: translateY(-50%) translateX(0);
-  }
-}
-.timeline-panel-etapa {
+.timeline-info-kicker {
   font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: #a855f7;
-}
-.timeline-panel-anio {
-  margin-top: 0.35rem;
-  font-size: 2rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  color: #3a2568;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a855f7;
+  margin-bottom: 0.6rem;
 }
-.timeline-panel-titulo {
-  margin-top: 0.5rem;
-  font-size: 1.15rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+.timeline-info-titulo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.18;
   color: rgb(15 23 42);
 }
-.timeline-panel-desc {
-  margin-top: 0.75rem;
-  font-size: 15px;
-  line-height: 1.6;
-  color: rgb(71 85 105);
-}
-.timeline-panel-pie {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgb(226 232 240);
-}
-.timeline-panel-cont {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 13px;
-  color: rgb(100 116 139);
-}
-.timeline-panel-zoom {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  border: 0;
+.timeline-info-anio {
+  align-self: flex-start;
+  margin-top: 0.7rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 9999px;
   background: #3a2568;
   color: #fff;
-  padding: 0.45rem 0.85rem;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.timeline-info-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 1rem;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  transition: background-color 0.2s ease;
+  color: #3a2568;
 }
-.timeline-panel-zoom:hover {
-  background: #2a1a4f;
+@media (min-width: 1024px) {
+  .timeline-info {
+    position: absolute;
+    top: 50%;
+    margin: 0;
+    width: 340px;
+    height: 300px;
+    min-height: 0;
+    transform: translateY(-50%);
+  }
+  .timeline-info--der {
+    right: 1.25rem;
+    text-align: left;
+  }
+  .timeline-info--izq {
+    left: 1.25rem;
+    text-align: right;
+  }
+  .timeline-info--izq .timeline-info-anio {
+    align-self: flex-end;
+  }
 }
 
+/* ── Pistas de uso ─────────────────────────────────────────────────── */
 .timeline-pistas {
   margin-top: 1rem;
   font-size: 12px;
   letter-spacing: 0.04em;
   color: rgb(148 163 184);
+}
+
+/* ── Móvil: carrusel inmersivo ─────────────────────────────────────── */
+.timeline-movil {
+  margin-top: 2rem;
+}
+@media (min-width: 1024px) {
+  .timeline-movil {
+    display: none;
+  }
+}
+.timeline-movil-progreso {
+  height: 4px;
+  margin-bottom: 0.65rem;
+  border-radius: 9999px;
+  background: rgb(226 232 240);
+  overflow: hidden;
+}
+.timeline-movil-progreso-bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #a855f7, #3a2568);
+}
+.timeline-movil-pista {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding-bottom: 0.5rem;
+}
+.timeline-movil-pista::-webkit-scrollbar {
+  display: none;
+}
+.timeline-movil-pista:focus-visible {
+  outline: 3px solid rgb(58 37 104 / 0.55);
+  outline-offset: 4px;
+  border-radius: 1rem;
+}
+.timeline-movil-placa {
+  position: relative;
+  flex: 0 0 calc(100% - 3rem);
+  scroll-snap-align: center;
+  height: 68vh;
+  min-height: 460px;
+  max-height: 640px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 24px 60px -22px rgb(15 23 42 / 0.45);
+}
+.timeline-movil-placa img {
+  display: block;
+  width: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  object-fit: cover;
+  object-position: var(--obj, center);
+}
+.timeline-movil-grad {
+  display: none;
+}
+.timeline-movil-anio {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 9999px;
+  background: rgb(248 250 252);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #3a2568;
+}
+.timeline-movil-info {
+  flex: 0 0 auto;
+  padding: 1rem 1.25rem 1.35rem;
+}
+.timeline-movil-info-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.timeline-movil-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a855f7;
+}
+.timeline-movil-titulo {
+  margin-top: 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.18;
+  color: rgb(15 23 42);
+}
+.timeline-movil-ver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.7rem;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3a2568;
+}
+
+/* ── Modal de detalle (resumen + leer más, texto completo) ─────────── */
+.timeline-detalle-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgb(15 23 42 / 0.6);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+.timeline-detalle {
+  cursor: default;
+  width: min(420px, 94%);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 30px 80px -20px rgb(15 23 42 / 0.6);
+}
+.timeline-detalle-img {
+  display: block;
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  object-position: var(--obj, center);
+}
+.timeline-detalle-cuerpo {
+  padding: 1.15rem 1.3rem 0.4rem;
+  overflow-y: auto;
+}
+.timeline-detalle-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.timeline-detalle-anio {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgb(226 232 240);
+  border-radius: 9999px;
+  background: rgb(248 250 252);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #3a2568;
+}
+.timeline-detalle-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a855f7;
+}
+.timeline-detalle-titulo {
+  margin-top: 0.7rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: rgb(15 23 42);
+}
+.timeline-detalle-desc {
+  margin-top: 0.75rem;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgb(71 85 105);
+  white-space: pre-line;
+}
+.timeline-detalle-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 0.9rem 1.3rem 1.3rem;
+}
+.timeline-detalle-boton {
+  border: 1px solid rgb(226 232 240);
+  border-radius: 9999px;
+  padding: 0.5rem 1.1rem;
+  background: #3a2568;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.timeline-detalle-boton-borde {
+  background: #fff;
+  color: rgb(71 85 105);
 }
 
 /* ── Vínculo sin JS / prefers-reduced-motion: lista estática ───────── */
@@ -298,6 +495,15 @@
 }
 .timeline-estatico div {
   padding: 1rem 1rem 1rem 0;
+}
+.timeline-estatico li:nth-child(odd) {
+  grid-template-columns: 1fr 8rem;
+}
+.timeline-estatico li:nth-child(odd) > img {
+  order: 2;
+}
+.timeline-estatico li:nth-child(odd) div {
+  padding: 1rem 0 1rem 1rem;
 }
 .timeline-estatico p:first-child {
   font-size: 12px;
