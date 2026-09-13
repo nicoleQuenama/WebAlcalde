@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { calcularDatosPagina } from '@lib/cms/datosPagina';
+import { obtenerTokenDeRequest, usuarioValido } from '@lib/auth';
 
 /**
  * Datos editables de UNA página, para cuando el admin navega DENTRO del
@@ -16,7 +17,10 @@ function autorizado(request: Request): boolean {
 
 export const GET: APIRoute = async ({ params, request }) => {
   if (!autorizado(request)) return new Response(JSON.stringify({ error: 'no autorizado' }), { status: 401 });
-  const datos = calcularDatosPagina(params.pagina!);
+  if (!(await usuarioValido(obtenerTokenDeRequest(request)))) {
+    return new Response(JSON.stringify({ error: 'sesión inválida' }), { status: 401 });
+  }
+  const datos = await calcularDatosPagina(params.pagina!);
   if (!datos) return new Response(JSON.stringify({ error: 'página desconocida' }), { status: 404 });
   return new Response(JSON.stringify(datos), { status: 200, headers: { 'Content-Type': 'application/json' } });
 };

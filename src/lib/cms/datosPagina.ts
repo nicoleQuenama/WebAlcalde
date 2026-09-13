@@ -33,7 +33,7 @@ export interface DatosPagina {
   secciones: SeccionData[];
 }
 
-export function calcularDatosPagina(paginaId: string): DatosPagina | undefined {
+export async function calcularDatosPagina(paginaId: string): Promise<DatosPagina | undefined> {
   const paginaConfig = paginaPorId(paginaId);
   if (!paginaConfig) return undefined;
 
@@ -50,13 +50,13 @@ export function calcularDatosPagina(paginaId: string): DatosPagina | undefined {
     );
   } else if (paginaConfig.pagina === 'gestion') {
     ordenLayoutDefault = DEFAULT_GESTION_LAYOUT;
-    const erasCompletas = getEras();
+    const erasCompletas = await getEras();
     const erasDefault = erasCompletas.map(({ secciones: _s, ...resto }) => resto);
     const seccionesDefault = erasCompletas.flatMap((era) => era.secciones.map((s) => ({ ...s, eraId: era.id })));
-    const capitulosDefault = getCapitulos().map((c) => ({ ...c }));
+    const capitulosDefault = (await getCapitulos()).map((c) => ({ ...c }));
 
     secciones.push(
-      { ...paginaConfig.secciones[0], valor: efectivo('gestion_hero', 'principal', getGestionHero()) },
+      { ...paginaConfig.secciones[0], valor: efectivo('gestion_hero', 'principal', await getGestionHero()) },
       {
         ...paginaConfig.secciones[1],
         items: efectivoLista(
@@ -72,18 +72,18 @@ export function calcularDatosPagina(paginaId: string): DatosPagina | undefined {
         ...paginaConfig.secciones[3],
         items: efectivoLista('seccion', seccionesDefault).map((s) => ({ clave: s.id as string, data: s })),
       },
-      { ...paginaConfig.secciones[4], valor: efectivo('proyectos_titulo', 'principal', getProyectosTitulo()) },
+      { ...paginaConfig.secciones[4], valor: efectivo('proyectos_titulo', 'principal', await getProyectosTitulo()) },
       {
         ...paginaConfig.secciones[5],
         items: efectivoLista(
           'proyecto',
-          getProyectos().map((p, i) => ({ ...p, id: String(i) })),
+          (await getProyectos()).map((p, i) => ({ ...p, id: String(i) })),
         ).map((p) => ({ clave: p.id as string, data: p })),
       },
     );
   } else {
     ordenLayoutDefault = DEFAULT_SOBRE_LAYOUT;
-    const presentacion = getCapitulos().find((c) => c.id === 'presentacion');
+    const presentacion = (await getCapitulos()).find((c) => c.id === 'presentacion');
     secciones.push(
       { ...paginaConfig.secciones[0], valor: efectivo('sobre_hero', 'principal', DEFAULT_SOBRE_HERO) },
       {

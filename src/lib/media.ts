@@ -1,4 +1,5 @@
 import type { Encuadre, AjusteCarrusel } from './ajusteImagen';
+import type { TarjetaImagen } from '@components/global/Hero/types';
 
 const BASE =
   'https://fsuxvbuupswucnsvrdce.supabase.co/storage/v1/object/public/media';
@@ -41,7 +42,7 @@ export interface ParAntesDespues {
   antes: string;
   despues: string;
   despuesHeight?: number;
-  afterFit?: string;
+  afterFit?: 'cover' | 'contain' | 'fill' | 'none';
   afterPosition?: string;
   afterScale?: number;
 }
@@ -62,7 +63,7 @@ export const MEDIA = {
       { id: 'gente-2', src: raiz('IMG_2941'), titulo: 'Cerca de la gente', w: 12480, h: 8320, ajuste: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 } },
       { id: 'gente-3', src: raiz('DSC_0807'), titulo: 'Alcalde de Cochabamba', w: 2832, h: 3826, encuadre: 'rostro', zoomOut: true },
       { id: 'gente-4', src: premio('01 ALCALDE FRANCIA OK.webp'), titulo: 'Reconocimiento internacional', w: 1032, h: 1207, encuadre: 'rostro', zoomOut: true },
-    ],
+    ] satisfies TarjetaImagen[],
   },
 
   // ── Video de biografía (home, debajo del hero) ────────────────────

@@ -91,8 +91,8 @@ const pares: ParComparador[] = await Promise.all(
 // ── LIBRO DIGITAL ─────────────────────────────────────────────────────
 // capitulo/era/seccion pasan por el store del CMS (beta): lo editado desde
 // /admin/[secret]?pagina=gestion se refleja acá también, son el mismo dominio.
-const [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA] = efectivoLista('capitulo', getCapitulos());
-const erasCompletas = getEras();
+const [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA] = efectivoLista('capitulo', await getCapitulos());
+const erasCompletas = await getEras();
 const erasBase = erasCompletas.map(({ secciones: _s, ...resto }) => resto);
 const seccionesBase: (SeccionTemario & { eraId: string })[] = erasCompletas.flatMap((era) =>
   era.secciones.map((s) => ({ ...s, eraId: era.id })),

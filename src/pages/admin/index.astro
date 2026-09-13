@@ -1,0 +1,77 @@
+---
+import AdminLayout from '@layouts/AdminLayout.astro';
+import { obtenerTokenDeRequest, usuarioValido } from '@lib/auth';
+
+const sesionToken = obtenerTokenDeRequest(Astro.request);
+const autenticado = (await usuarioValido(sesionToken)) !== null;
+
+const secreto = import.meta.env.ADMIN_SECRET_PATH;
+const hayEditor = Boolean(secreto && autenticado);
+const rutaEditor = secreto ? `/admin/${secreto}?pagina=inicio` : '/admin/login';
+const rutaBuzon = secreto ? `/admin/buzon/${secreto}` : '/admin/login';
+---
+
+<AdminLayout title="Panel de administración">
+    <main class="relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-primary px-6 py-12">
+        <div class="absolute inset-0 bg-gradient-to-br from-hero-from via-hero-via to-hero-to" aria-hidden="true"></div>
+        <div class="absolute inset-0 bg-primary/40 mix-blend-multiply" aria-hidden="true"></div>
+
+        <div class="relative z-10 w-full max-w-md">
+            <div class="rounded-3xl bg-white p-8 text-center shadow-2xl shadow-black/30 sm:p-10">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
+                    Administración
+                </p>
+                <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900">
+                    Panel de administración
+                </h1>
+                <p class="mt-3 text-sm leading-relaxed text-slate-500">
+                    {autenticado
+                        ? 'Has ingresado correctamente. Elige una sección para continuar.'
+                        : 'Acceso restringido. Inicia sesión para entrar al panel.'}
+                </p>
+
+                <div class="mt-8 flex flex-col gap-3">
+                    {autenticado ? (
+                        <>
+                            {hayEditor && (
+                                <a
+                                    href={rutaEditor}
+                                    class="rounded-xl bg-primary px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30"
+                                >
+                                    Editar contenido
+                                </a>
+                            )}
+                            <a
+                                href={rutaBuzon}
+                                class="rounded-xl bg-primary px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30"
+                            >
+                                Ver buzón ciudadano
+                            </a>
+                            <form method="post" action="/api/auth/logout">
+                                <button
+                                    type="submit"
+                                    class="w-full rounded-xl border border-red-200 px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-red-600 transition-colors hover:border-red-400 hover:text-red-700"
+                                >
+                                    Cerrar sesión
+                                </button>
+                            </form>
+                        </>
+                    ) : (
+                        <a
+                            href="/admin/login"
+                            class="rounded-xl bg-primary px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30"
+                        >
+                            Iniciar sesión
+                        </a>
+                    )}
+                    <a
+                        href="/"
+                        class="rounded-xl border border-slate-300 px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-slate-600 transition-colors hover:border-primary hover:text-primary"
+                    >
+                        Volver al sitio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</AdminLayout>

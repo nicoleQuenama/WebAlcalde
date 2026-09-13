@@ -41,7 +41,7 @@ const { minDuration = 250, cabinColor = '#ffc31e', ghostColor = 'rgba(255,255,25
   import { gsap } from 'gsap';
 
   function initPreloader() {
-    const el = document.querySelector('[data-preloader]');
+    const el = document.querySelector<HTMLElement>('[data-preloader]');
     if (!el || el.hasAttribute('data-hidden')) return;
     // Solo primera carga: en navegaciones SPA nunca bloquear
     // @ts-ignore
@@ -98,7 +98,7 @@ const { minDuration = 250, cabinColor = '#ffc31e', ghostColor = 'rgba(255,255,25
       tl.fromTo(letters, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.32, stagger: 0.12 }, 0);
       tl.fromTo(solidEls, { xPercent: -100 }, { xPercent: 0, duration: 0.5, stagger: 0.12 }, 0);
       if (cabin) {
-        const band = cabin.parentElement.getBoundingClientRect().width;
+        const band = cabin.parentElement?.getBoundingClientRect().width ?? 0;
         gsap.fromTo(cabin, { x: -48 }, { x: band + 48, duration: 1.1, ease: 'power1.inOut' });
       }
     }

@@ -2,6 +2,7 @@
 // src/layouts/Layout.astro
 import { ClientRouter } from 'astro:transitions';
 import Header from '@components/Header/Header.astro';
+import Footer from '@components/global/Footer/Footer.astro';
 import Preloader from '@components/Preloader/Preloader.astro';
 
 import '../styles/global.css';
@@ -53,6 +54,17 @@ const {title, description = 'Manfred Reyes Villa — Cocha, la mejor ciudad de B
             @keyframes vt-fade-in { from{opacity:0} to{opacity:1} }
             html { view-transition-name: root; scrollbar-gutter: stable; }
         </style>
+        <style>
+            /* El libro abierto ocupa toda la pantalla: el header y el footer
+               se ocultan mientras dure la vista (overlay abierto). La clase
+               `flipbook-open` la agrega FlipBook en el body. */
+            body.flipbook-open [data-astro-transition-persist='header'],
+            body.flipbook-open :global(footer) {
+                visibility: hidden;
+                opacity: 0;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+            }
+        </style>
     </head>
     <body class="m-0 font-sans bg-gray-50 antialiased">
         <Preloader />
@@ -64,6 +76,7 @@ const {title, description = 'Manfred Reyes Villa — Cocha, la mejor ciudad de B
             <slot/>
         </main>
 
+        <Footer />
         <script>
             document.addEventListener('astro:page-load', () => {
                 const links = document.querySelectorAll('a[href^="/"]:not([data-astro-reload])');
