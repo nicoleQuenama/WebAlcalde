@@ -85,8 +85,8 @@ function loadFlipBook(): Promise<ComponentType<Record<string, unknown>>> {
 
 function flattenPages(target: ReactNode): ReactNode {
   if (isValidElement(target)) {
-    const element = target as ReactElement;
-    if (element.type === 'astro-slot') return element.props.children;
+    const element = target as ReactElement<Record<string, unknown>>;
+    if (element.type === 'astro-slot') return element.props.children as ReactNode;
   }
   return target;
 }
@@ -168,8 +168,6 @@ export default function FlipBook({
   const [openSize, setOpenSize] = useState<OpenSize | null>(null);
   const [mediaMode, setMediaMode] = useState<MediaItem | null>(null);
   const [textSize, setTextSize] = useState(0);
-  const [textCtlOpen, setTextCtlOpen] = useState(false);
-  const [scrubOpen, setScrubOpen] = useState(false);
   const [scrubVal, setScrubVal] = useState(0);
 
   const closedSlotRef = useRef<HTMLDivElement>(null);
@@ -179,6 +177,7 @@ export default function FlipBook({
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bodyOverflowRef = useRef('');
+  const htmlOverflowRef = useRef('');
   const phaseRef = useRef<Phase>('closed');
   const closingFlushedRef = useRef(false);
   const mediaRef = useRef<MediaItem | null>(null);
@@ -499,38 +498,31 @@ export default function FlipBook({
     animateBetween(fromRect, toRect, 1, scaleTo);
   }, [phase, openSize, animateBetween, finalizeClose]);
 
-  /* ---- scrubber: mostrar brevemente al abrir el libro ---- */
-  const openedOnceRef = useRef(false);
-  useEffect(() => {
-    if (phase === 'open' && !openedOnceRef.current) {
-      openedOnceRef.current = true;
-      setScrubOpen(true);
-    } else if (phase === 'closed') {
-      openedOnceRef.current = false;
-    }
-  }, [phase]);
-
-  /* ---- control de letra: ocultar tras un rato sin interacción ---- */
-  useEffect(() => {
-    if (!textCtlOpen) return;
-    const t = setTimeout(() => setTextCtlOpen(false), 2600);
-    return () => clearTimeout(t);
-  }, [textCtlOpen, textSize]);
-
-  /* ---- scrubber: ocultar tras un rato sin interacción ---- */
-  useEffect(() => {
-    if (!scrubOpen || scrubbingRef.current) return;
-    const t = setTimeout(() => setScrubOpen(false), 2600);
-    return () => clearTimeout(t);
-  }, [scrubOpen, scrubVal]);
+  /* Índice (slider) y tamaño de letra (A−/A+) quedan visibles mientras el libro está abierto. */
 
   /* ---- scroll lock + ESC ---- */
+  /* ---- scroll lock + header oculto mientras el libro esté abierto ---- */
   useEffect(() => {
     if (phase === 'closed') return;
 
-    const prev = document.body.style.overflow;
-    bodyOverflowRef.current = prev;
+    const prevBody = document.body.style.overflow;
+    const prevHtml = document.documentElement.style.overflow;
+    bodyOverflowRef.current = prevBody;
+    htmlOverflowRef.current = prevHtml;
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.classList.add('flipbook-open');
+
+    return () => {
+      document.body.style.overflow = bodyOverflowRef.current;
+      document.documentElement.style.overflow = htmlOverflowRef.current;
+      document.body.classList.remove('flipbook-open');
+    };
+  }, [phase]);
+
+  /* ---- teclado: Esc / flechas ---- */
+  useEffect(() => {
+    if (phase === 'closed') return;
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -569,7 +561,6 @@ export default function FlipBook({
     window.addEventListener('keydown', onKey);
 
     return () => {
-      document.body.style.overflow = bodyOverflowRef.current;
       window.removeEventListener('keydown', onKey);
     };
   }, [phase, close, pageIndex, pageCount]);
@@ -634,13 +625,11 @@ export default function FlipBook({
     scrubbingRef.current = true;
     scrubValRef.current = v;
     setScrubVal(v);
-    setScrubOpen(true);
   }, []);
 
   const handleScrubCommit = useCallback(() => {
     scrubbingRef.current = false;
     const target = pageOfSpread(scrubValRef.current);
-    setScrubOpen(false);
     jumpToPage(target);
   }, [pageOfSpread, jumpToPage]);
 
@@ -873,18 +862,10 @@ export default function FlipBook({
 
           {!mediaMode && (
             <>
-              {/* ---- Slider de páginas: línea fina que se expande al pasar el cursor ---- */}
+              {/* ---- Slider de páginas / índice: siempre visible con el libro abierto ---- */}
               <div
-                className={`${styles.scrubWrap}${
-                  scrubOpen ? ` ${styles.scrubWrapOpen}` : ''
-                }`}
+                className={`${styles.scrubWrap} ${styles.scrubWrapOpen}`}
                 title="Navegar entre páginas"
-                onPointerEnter={() => {
-                  if (!scrubbingRef.current) setScrubOpen(true);
-                }}
-                onPointerLeave={() => {
-                  if (!scrubbingRef.current) setScrubOpen(false);
-                }}
               >
                 <div className={styles.scrubInner}>
                   <input
@@ -922,46 +903,36 @@ export default function FlipBook({
                 </div>
               </div>
 
-              {/* ---- Tamaño de letra: slider ocultable arriba-izquierda ---- */}
+              {/* ---- Tamaño de letra: control siempre visible arriba-izquierda ---- */}
               <div
-                className={`${styles.fontWrap}${
-                  textCtlOpen ? ` ${styles.fontWrapOpen}` : ''
-                }`}
+                className={`${styles.fontWrap} ${styles.fontWrapOpen}`}
                 title="Tamaño de letra"
-                onPointerEnter={() => setTextCtlOpen(true)}
-                onPointerLeave={() => setTextCtlOpen(false)}
               >
-                {textCtlOpen ? (
-                  <div className={styles.fontInner} role="group" aria-label="Tamaño de letra">
-                    <span className={styles.fontIcon} aria-hidden="true">
-                      A−
-                    </span>
-                    <input
-                      type="range"
-                      className={styles.fontRange}
-                      min={0}
-                      max={2}
-                      step={1}
-                      value={textSize}
-                      onChange={(e) =>
-                        setTextSize(
-                          Number((e.target as HTMLInputElement).value)
-                        )
-                      }
-                      aria-label="Tamaño de letra"
-                    />
-                    <span className={styles.fontIcon} aria-hidden="true">
-                      A+
-                    </span>
-                    <span className={styles.fontValue}>
-                      {TEXT_SIZES[textSize]}
-                    </span>
-                  </div>
-                ) : (
-                  <span className={styles.fontHandle} aria-hidden="true">
-                    Aa
+                <div className={styles.fontInner} role="group" aria-label="Tamaño de letra">
+                  <span className={styles.fontIcon} aria-hidden="true">
+                    A−
                   </span>
-                )}
+                  <input
+                    type="range"
+                    className={styles.fontRange}
+                    min={0}
+                    max={2}
+                    step={1}
+                    value={textSize}
+                    onChange={(e) =>
+                      setTextSize(
+                        Number((e.target as HTMLInputElement).value)
+                      )
+                    }
+                    aria-label="Tamaño de letra"
+                  />
+                  <span className={styles.fontIcon} aria-hidden="true">
+                    A+
+                  </span>
+                  <span className={styles.fontValue}>
+                    {TEXT_SIZES[textSize]}
+                  </span>
+                </div>
               </div>
             </>
           )}
