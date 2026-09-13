@@ -1,10 +1,15 @@
 ---
 import Card from '@components/About/InstitutionalProfile/Card.component.astro';
 import { INSTITUTIONAL_CARDS } from '@constants/institutionalProfile/content';
+import { efectivoLista } from '@lib/cms/resolve';
 
 const { class: extraClass } = Astro.props;
 
 const Z_INDEX: Record<string, number> = { mision: 2, vision: 1 };
+// El CMS (beta) solo permite editar el texto de estas dos tarjetas, nunca
+// agregar/quitar/reordenar: la animación GSAP de abajo asume exactamente
+// dos tarjetas con estos ids.
+const CARDS = efectivoLista('sobre_institutional', INSTITUTIONAL_CARDS);
 ---
 
 <div
@@ -14,11 +19,13 @@ const Z_INDEX: Record<string, number> = { mision: 2, vision: 1 };
   ]}
   data-stage
 >
-  {INSTITUTIONAL_CARDS.map((card) => (
+  {CARDS.map((card) => (
     <div
       class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
       style={`z-index: ${Z_INDEX[card.id] ?? 1};`}
       data-slot={card.id}
+      data-cms-dominio="sobre_institutional"
+      data-cms-clave={card.id}
     >
       <Card
         title={card.title}

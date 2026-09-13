@@ -11,13 +11,37 @@ import VideoPlayer from './VideoPlayer';
 interface Props {
     videoBiografia: string;
     posterBiografia: string;
+    eyebrow?: string;
+    titulo?: string;
+    parrafo?: string;
+    cta1Label?: string;
+    cta1Href?: string;
+    cta2Label?: string;
+    cta2Href?: string;
+    style?: string;
+    dominio?: string;
 }
 
-const { videoBiografia, posterBiografia } = Astro.props;
+const {
+    videoBiografia,
+    posterBiografia,
+    eyebrow = 'Manfred Reyes Villa',
+    titulo = 'Biografía',
+    parrafo = 'Manfred Reyes Villa es un líder político boliviano con una trayectoria dedicada al desarrollo ' +
+        'de Cochabamba. Con experiencia en gestión pública y un compromiso inquebrantable con el ' +
+        'progreso de su ciudad, ha impulsado proyectos fundamentales que transforman la vida de los ' +
+        'cochabambinos.',
+    cta1Label = 'Más sobre mí',
+    cta1Href = '/sobre',
+    cta2Label = 'Gestión completa',
+    cta2Href = '/gestion',
+    style,
+    dominio,
+} = Astro.props;
 ---
 
 <!-- ═══ BIOGRAFÍA — diseño asimétrico: texto + video grande ═══ -->
-<section class="relative overflow-hidden bg-white pt-20 pb-8 lg:pt-28 lg:pb-12">
+<section class="relative overflow-hidden bg-white pt-20 pb-8 lg:pt-28 lg:pb-12" style={style} data-cms-dominio={dominio}>
     <!-- Barra de acento superior -->
     <div class="absolute left-0 top-0 h-1 w-full bg-linear-to-r from-primary via-accent to-primary"></div>
 
@@ -28,30 +52,27 @@ const { videoBiografia, posterBiografia } = Astro.props;
             <!-- ═══ COLUMNA IZQUIERDA: Texto biográfico (5/12) ═══ -->
             <div class="space-y-6 lg:col-span-5">
                 <!-- Etiqueta -->
-                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
-                    Manfred Reyes Villa
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary" data-cms-campo="eyebrow">
+                    {eyebrow}
                 </p>
 
                 <!-- Título -->
-                <h2 class="text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
-                    Biografía
+                <h2 class="text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl" data-cms-campo="titulo">
+                    {titulo}
                 </h2>
                 <!-- Párrafo biográfico -->
-                <p class="text-base leading-relaxed text-slate-600 lg:text-lg">
-                    Manfred Reyes Villa es un líder político boliviano con una trayectoria dedicada al desarrollo 
-                    de Cochabamba. Con experiencia en gestión pública y un compromiso inquebrantable con el 
-                    progreso de su ciudad, ha impulsado proyectos fundamentales que transforman la vida de los 
-                    cochabambinos.
+                <p class="text-base leading-relaxed text-slate-600 lg:text-lg" data-cms-campo="parrafo" data-cms-multilinea>
+                    {parrafo}
                 </p>
 
                 <!-- Botones de acción -->
                 <div class="flex flex-wrap gap-4 pt-2">
-                    <a href="/sobre" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
-                        Más sobre mí
+                    <a href={cta1Href} class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
+                        <span data-cms-campo="cta1Label">{cta1Label}</span>
                         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                     </a>
-                    <a href="/gestion" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary border-2 border-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
-                        Gestión completa
+                    <a href={cta2Href} class="inline-flex items-center justify-center gap-2 rounded-full bg-primary border-2 border-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30">
+                        <span data-cms-campo="cta2Label">{cta2Label}</span>
                         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                     </a>
                 </div>

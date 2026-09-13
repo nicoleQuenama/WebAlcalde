@@ -89,5 +89,115 @@ const {title, description = 'Manfred Reyes Villa — Cocha, la mejor ciudad de B
                 if (!location.hash) window.scrollTo(0, 0);
             });
         </script>
+
+        <!--
+            Modo "vista previa del CMS": esta página se sirve tal cual siempre,
+            pero cuando alguien la abre DENTRO del iframe del editor
+            (`/admin/[secret]`), este script activa clicks para seleccionar la
+            sección/tarjeta editable en vez de navegar — igual que Wix/Squarespace.
+            Se activa solo si `window.top !== window.self` (embebida).
+        -->
+        <script>
+            // Guarda contra doble registro: con View Transitions este script
+            // vuelve a ejecutarse en cada navegación interna (igual que el
+            // bloque de prefetch de arriba), pero `document` sobrevive el
+            // morph — así que el listener de clicks debe registrarse UNA sola vez.
+            if (window.top !== window.self && !(window as any).__cmsPreviewBound) {
+                (window as any).__cmsPreviewBound = true;
+                const estilo = document.createElement('style');
+                estilo.textContent = `
+                    [data-cms-dominio] { cursor: pointer; }
+                    [data-cms-dominio]:hover { outline: 2px dashed #472d82; outline-offset: -2px; }
+                    [data-cms-clave]:hover { outline: 2px solid #472d82; outline-offset: -2px; }
+                    .cms-seleccionado { outline: 2px solid #472d82 !important; outline-offset: -2px; }
+                    [data-cms-campo] { cursor: text; border-radius: 3px; }
+                    [data-cms-campo]:hover { background: rgba(71, 45, 130, 0.08); outline: 2px dashed #472d82; outline-offset: 2px; }
+                    [data-cms-campo][contenteditable="true"] { background: rgba(71, 45, 130, 0.08); outline: 2px solid #472d82 !important; outline-offset: 2px; cursor: text; }
+                `;
+                document.head.appendChild(estilo);
+
+                let seleccionado: HTMLElement | null = null;
+
+                function avisarPagina() {
+                    window.parent.postMessage({ source: 'cms-preview', type: 'pagina', ruta: location.pathname }, '*');
+                }
+                document.addEventListener('astro:page-load', avisarPagina);
+                avisarPagina();
+
+                function terminarEdicion(campoEl: HTMLElement, dominio: string, clave: string | undefined) {
+                    campoEl.contentEditable = 'false';
+                    window.parent.postMessage(
+                        {
+                            source: 'cms-preview',
+                            type: 'campo',
+                            dominio,
+                            clave,
+                            campo: campoEl.dataset.cmsCampo,
+                            valor: campoEl.innerText.trim(),
+                        },
+                        '*',
+                    );
+                }
+
+                document.addEventListener(
+                    'click',
+                    (e) => {
+                        const target = e.target as HTMLElement;
+                        const conCampo = target.closest('[data-cms-campo]') as HTMLElement | null;
+                        const conClave = target.closest('[data-cms-clave]') as HTMLElement | null;
+                        const conDominio = (conClave ?? target.closest('[data-cms-dominio]')) as HTMLElement | null;
+                        if (!conDominio) return;
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        seleccionado?.classList.remove('cms-seleccionado');
+                        seleccionado = conClave ?? conDominio;
+                        seleccionado.classList.add('cms-seleccionado');
+
+                        // Texto simple (título, párrafo, etc.): editable ahí mismo, sin modal.
+                        if (conCampo) {
+                            if (conCampo.isContentEditable) return; // ya se está editando
+                            conCampo.contentEditable = 'true';
+                            conCampo.focus();
+                            const rango = document.createRange();
+                            rango.selectNodeContents(conCampo);
+                            const seleccion = window.getSelection();
+                            seleccion?.removeAllRanges();
+                            seleccion?.addRange(rango);
+
+                            const dominio = conDominio.dataset.cmsDominio!;
+                            const clave = conClave?.dataset.cmsClave;
+                            const alPerderFoco = () => {
+                                terminarEdicion(conCampo, dominio, clave);
+                                conCampo.removeEventListener('blur', alPerderFoco);
+                                conCampo.removeEventListener('keydown', alTeclear);
+                            };
+                            const alTeclear = (ke: KeyboardEvent) => {
+                                if (ke.key === 'Enter' && !conCampo.hasAttribute('data-cms-multilinea')) {
+                                    ke.preventDefault();
+                                    conCampo.blur();
+                                }
+                                if (ke.key === 'Escape') conCampo.blur();
+                            };
+                            conCampo.addEventListener('blur', alPerderFoco);
+                            conCampo.addEventListener('keydown', alTeclear);
+                            return;
+                        }
+
+                        // Cualquier otra cosa (imagen, selector, obras, o la sección en general): abre el modal.
+                        window.parent.postMessage(
+                            {
+                                source: 'cms-preview',
+                                type: 'seleccionar',
+                                dominio: conDominio.dataset.cmsDominio,
+                                clave: conClave?.dataset.cmsClave,
+                            },
+                            '*',
+                        );
+                    },
+                    true,
+                );
+            }
+        </script>
     </body>
 </html>

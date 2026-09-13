@@ -1,35 +1,79 @@
 ---
-export const prerender = true;
 import Layout from '@layouts/Layout.astro';
 import { Image, getImage } from 'astro:assets';
 import HeroCards from '@components/global/Hero/HeroCard.tsx';
 import { ajusteImagen } from '@lib/ajusteImagen';
-import { getCapitulos, getGestionHero, getEras, getProyectos, getProyectosTitulo } from '@lib/db';
+import {
+  getCapitulos,
+  getGestionHero,
+  getEras,
+  getProyectos,
+  getProyectosTitulo,
+  type EraTemario,
+  type SeccionTemario,
+} from '@lib/db';
+import { efectivo, efectivoLista, efectivoOrden } from '@lib/cms/resolve';
+import { DEFAULT_GESTION_LAYOUT } from '../admin/defaults';
 
 // ── HERO DE GESTIÓN ──────────────────────────────────────────────────
-const GESTION_HERO = getGestionHero();
+const GESTION_HERO = efectivo('gestion_hero', 'principal', getGestionHero());
 
 // ── CAPÍTULOS DE APERTURA ────────────────────────────────────────────
-const capitulosApertura = getCapitulos();
+const capitulosApertura = efectivoLista('capitulo', getCapitulos());
 
 // ── ERAS DE OBRAS ────────────────────────────────────────────────────
-const ERAS = getEras();
+const erasCompletas = getEras();
+const erasBase = erasCompletas.map(({ secciones: _s, ...resto }) => resto);
+const seccionesBase: (SeccionTemario & { eraId: string })[] = erasCompletas.flatMap((era) =>
+  era.secciones.map((s) => ({ ...s, eraId: era.id })),
+);
+const erasEfectivas = efectivoLista('era', erasBase);
+const seccionesEfectivas = efectivoLista('seccion', seccionesBase);
+const ERAS: EraTemario[] = erasEfectivas.map((era) => ({
+  ...era,
+  secciones: seccionesEfectivas.filter((s) => s.eraId === era.id),
+})) as EraTemario[];
 
 // ── PROYECTOS ────────────────────────────────────────────────────────
-const PROYECTOS = getProyectos();
-const PROYECTOS_TITULO = getProyectosTitulo();
+const PROYECTOS = efectivoLista(
+  'proyecto',
+  getProyectos().map((p, i) => ({ ...p, id: String(i) })),
+);
+const PROYECTOS_TITULO = efectivo('proyectos_titulo', 'principal', getProyectosTitulo());
+
+// ── ORDEN DE SECCIONES (CMS beta) ────────────────────────────────────
+const orden = efectivoOrden('gestion_layout', DEFAULT_GESTION_LAYOUT);
+const ordenDe = (clave: string) => {
+  const i = orden.indexOf(clave);
+  return i === -1 ? 999 : i;
+};
 
 const imagenes = await Promise.all(
   PROYECTOS.map(async (p, i) => ({
     id: i,
+    // `p.imagen` puede llegar vacío desde el CMS (beta) mientras el admin
+    // todavía no carga una foto para una tarjeta nueva: sin este resguardo,
+    // `getImage` revienta la página entera con un string vacío. El placeholder
+    // es una imagen "remota" (string, no importada) así que necesita w/h propios
+    // (relación real de /cocha.jpg: 1281×960) en vez de los de `p`.
     src: (
-      await getImage({
-        src: p.imagen,
-        width: 900,
-        ...(p.w && p.h ? { height: Math.max(1, Math.round((900 * p.h) / p.w)) } : {}),
-        fit: 'cover',
-        format: 'webp',
-      })
+      await getImage(
+        p.imagen
+          ? {
+              src: p.imagen,
+              width: 900,
+              ...(p.w && p.h ? { height: Math.max(1, Math.round((900 * p.h) / p.w)) } : {}),
+              fit: 'cover',
+              format: 'webp',
+            }
+          : {
+              src: '/cocha.jpg',
+              width: 900,
+              height: Math.round((900 * 960) / 1281),
+              fit: 'cover',
+              format: 'webp',
+            },
+      )
     ).src,
     titulo: p.titulo,
     encuadre: p.encuadre ?? ('centro' as const),
@@ -45,11 +89,13 @@ const colorEstado: Record<string, string> = {
 ---
 
 <Layout title="Gestión — Cocha, la mejor ciudad de Bolivia">
-	<main>
+	<main style="display:flex; flex-direction:column;">
 		<!-- ═══ HERO DE GESTIÓN ═══ -->
 		<section
 			aria-labelledby="gestion-title"
 			class="relative flex min-h-[88vh] w-full items-center overflow-hidden bg-primary pt-[64px] text-white"
+			style={`order:${ordenDe('hero')}`}
+			data-cms-dominio="gestion_hero"
 		>
 			<span
 				aria-hidden="true"
@@ -72,7 +118,7 @@ const colorEstado: Record<string, string> = {
 			</div>
 
 			<div class="relative z-10 mx-auto w-full max-w-6xl px-6 lg:px-10" data-hero-gestion>
-				<p class="anim text-[11px] font-semibold uppercase tracking-[0.4em] text-accent" style="--d:0ms">
+				<p class="anim text-[11px] font-semibold uppercase tracking-[0.4em] text-accent" style="--d:0ms" data-cms-campo="kicker">
 					{GESTION_HERO.kicker}
 				</p>
 
@@ -80,18 +126,19 @@ const colorEstado: Record<string, string> = {
 					id="gestion-title"
 					class="anim mt-5 max-w-4xl text-[2.4rem] font-black leading-[1.02] tracking-tight sm:text-5xl lg:text-[4rem]"
 					style="--d:80ms"
+					data-cms-campo="titulo"
 				>
 					{GESTION_HERO.titulo}
 				</h1>
 
-				<p class="anim mt-6 max-w-2xl text-base leading-relaxed text-white/70 lg:text-lg" style="--d:160ms">
+				<p class="anim mt-6 max-w-2xl text-base leading-relaxed text-white/70 lg:text-lg" style="--d:160ms" data-cms-campo="bajada" data-cms-multilinea>
 					{GESTION_HERO.bajada}
 				</p>
 
 				<div class="anim mt-9 flex flex-wrap items-center gap-3" style="--d:240ms">
 					<span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-white/90">
 						<span class="h-1.5 w-1.5 rounded-full bg-accent"></span>
-						{GESTION_HERO.periodo}
+						<span data-cms-campo="periodo">{GESTION_HERO.periodo}</span>
 					</span>
 					<a
 						href="#proyectos"
@@ -105,18 +152,18 @@ const colorEstado: Record<string, string> = {
 		</section>
 
 		<!-- ═══ CAPÍTULOS DE APERTURA (sin lista de obras) ═══ -->
-		<section class="bg-white">
+		<section class="bg-white" style={`order:${ordenDe('capitulos')}`}>
 			<div class="mx-auto max-w-5xl divide-y divide-slate-900/10 px-6 lg:px-8">
 				{
 					capitulosApertura.map((cap) => (
-						<article id={cap.id} class="scroll-mt-24 py-16 lg:py-20">
-							<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
+						<article id={cap.id} class="scroll-mt-24 py-16 lg:py-20" data-cms-dominio="capitulo" data-cms-clave={cap.id}>
+							<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary" data-cms-campo="eyebrow">
 								{cap.eyebrow}
 							</p>
-							<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
+							<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl" data-cms-campo="titulo">
 								{cap.titulo}
 							</h2>
-							<p class="mt-5 max-w-3xl text-base leading-relaxed text-slate-600 lg:text-lg">
+							<p class="mt-5 max-w-3xl text-base leading-relaxed text-slate-600 lg:text-lg" data-cms-campo="bajada" data-cms-multilinea>
 								{cap.bajada}
 							</p>
 						</article>
@@ -128,17 +175,17 @@ const colorEstado: Record<string, string> = {
 		<!-- ═══ LAS DOS ERAS DE OBRAS COMPLETAS ═══ -->
 		{
 			ERAS.map((era) => (
-				<section id={era.id} class="scroll-mt-20">
+				<section id={era.id} class="scroll-mt-20" style={`order:${ordenDe('eras')}`} data-cms-dominio="era" data-cms-clave={era.id}>
 					<!-- Encabezado del capítulo (color de marca, igual que el navbar) -->
 					<div class="bg-primary text-white">
 						<div class="mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-24">
-							<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent">
+							<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent" data-cms-campo="eyebrow">
 								{era.eyebrow}
 							</p>
-							<h2 class="mt-4 max-w-4xl text-[2rem] font-black leading-[1.05] tracking-tight sm:text-4xl lg:text-[3rem]">
+							<h2 class="mt-4 max-w-4xl text-[2rem] font-black leading-[1.05] tracking-tight sm:text-4xl lg:text-[3rem]" data-cms-campo="titulo">
 								{era.titulo}
 							</h2>
-							<p class="mt-6 max-w-3xl text-base leading-relaxed text-white/70 lg:text-lg">
+							<p class="mt-6 max-w-3xl text-base leading-relaxed text-white/70 lg:text-lg" data-cms-campo="bajada" data-cms-multilinea>
 								{era.bajada}
 							</p>
 						</div>
@@ -159,7 +206,7 @@ const colorEstado: Record<string, string> = {
 									const imagenPos: string = dims ? ajusteImagen(dims).objectPosition : '50% 30%';
 									const imagenH: number | undefined = dims ? Math.round((704 * dims.h) / dims.w) : undefined;
 									return (
-										<section id={seccion.id} class="scroll-mt-24 border-b border-slate-900/10 py-16 lg:py-20">
+										<section id={seccion.id} class="scroll-mt-24 border-b border-slate-900/10 py-16 lg:py-20" data-cms-dominio="seccion" data-cms-clave={seccion.id}>
 											<div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16">
 												{seccion.imagen && (
 													<figure class:list={['lg:w-[22rem] lg:shrink-0 lg:sticky lg:top-28', imagenDerecha && 'lg:order-2']}>
@@ -195,11 +242,11 @@ const colorEstado: Record<string, string> = {
 												)}
 
 												<div class="min-w-0 flex-1">
-													<h3 class="text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.75rem]">
+													<h3 class="text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.75rem]" data-cms-campo="titulo">
 														{seccion.titulo}
 													</h3>
 													{seccion.bajada && (
-														<p class="mt-4 max-w-2xl text-[15px] leading-relaxed text-slate-600 lg:text-base">
+														<p class="mt-4 max-w-2xl text-[15px] leading-relaxed text-slate-600 lg:text-base" data-cms-campo="bajada" data-cms-multilinea>
 															{seccion.bajada}
 														</p>
 													)}
@@ -250,16 +297,16 @@ const colorEstado: Record<string, string> = {
 		}
 
 		<!-- ═══ CARRUSEL DE PROYECTOS CON FOTO/VIDEO REAL ═══ -->
-		<section id="proyectos" class="scroll-mt-20 bg-primary text-white">
+		<section id="proyectos" class="scroll-mt-20 bg-primary text-white" style={`order:${ordenDe('proyectos')}`}>
 			<div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
-				<header class="max-w-2xl">
-					<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent">
+				<header class="max-w-2xl" data-cms-dominio="proyectos_titulo">
+					<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent" data-cms-campo="kicker">
 						{PROYECTOS_TITULO.kicker}
 					</p>
-					<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]">
+					<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]" data-cms-campo="titulo">
 						{PROYECTOS_TITULO.titulo}
 					</h2>
-					<p class="mt-5 text-base leading-relaxed text-white/65 lg:text-lg">{PROYECTOS_TITULO.bajada}</p>
+					<p class="mt-5 text-base leading-relaxed text-white/65 lg:text-lg" data-cms-campo="bajada" data-cms-multilinea>{PROYECTOS_TITULO.bajada}</p>
 				</header>
 
 				<!-- Carrusel de tarjetas (mismo formato que la página Sobre) -->
@@ -271,17 +318,17 @@ const colorEstado: Record<string, string> = {
 				<ul class="mt-16 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
 					{
 						PROYECTOS.map((p) => (
-							<li class="flex flex-col gap-3 bg-primary p-7">
+							<li class="flex flex-col gap-3 bg-primary p-7" data-cms-dominio="proyecto" data-cms-clave={p.id}>
 								<div class="flex items-center justify-between gap-3">
-									<span class="text-[10px] font-semibold uppercase tracking-[0.24em] text-accent">
+									<span class="text-[10px] font-semibold uppercase tracking-[0.24em] text-accent" data-cms-campo="categoria">
 										{p.categoria}
 									</span>
 									<span class={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${colorEstado[p.estado] ?? 'border-white/20 text-white/70'}`}>
 										{p.estado}
 									</span>
 								</div>
-								<h3 class="text-lg font-bold tracking-tight">{p.titulo}</h3>
-								<p class="text-[15px] leading-relaxed text-white/65">{p.descripcion}</p>
+								<h3 class="text-lg font-bold tracking-tight" data-cms-campo="titulo">{p.titulo}</h3>
+								<p class="text-[15px] leading-relaxed text-white/65" data-cms-campo="descripcion" data-cms-multilinea>{p.descripcion}</p>
 							</li>
 						))
 					}
