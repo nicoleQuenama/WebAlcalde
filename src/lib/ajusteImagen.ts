@@ -15,7 +15,7 @@ export interface FotoAjustable {
 
 /** Estilos CSS aplicables a un <img> dentro de un marco con overflow oculto. */
 export function ajusteImagen(img?: FotoAjustable): {
-  objectFit: string;
+  objectFit: 'cover' | 'contain';
   objectPosition: string;
   transform?: string;
 } {
