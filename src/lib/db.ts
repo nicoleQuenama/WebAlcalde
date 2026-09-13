@@ -832,6 +832,7 @@ interface Almacen {
   asegurarTablaBuzon(): Promise<void>;
   guardarMensaje(mensaje: BuzonMensaje): Promise<void>;
   listarMensajes(): Promise<BuzonMensaje[]>;
+  eliminarMensaje(id: string): Promise<boolean>;
   asegurarTablaAuth(): Promise<void>;
   crearUsuario(usuario: Usuario): Promise<void>;
   obtenerUsuario(usuario: string): Promise<Usuario | undefined>;
@@ -927,6 +928,11 @@ class AlmacenPostgres implements Almacen {
       mensaje: r.mensaje,
       creadoEn: r.creado_en,
     }));
+  }
+
+  async eliminarMensaje(id: string): Promise<boolean> {
+    const res = await this.pool().query(`DELETE FROM buzon WHERE id = $1`, [id]);
+    return (res.rowCount ?? 0) > 0;
   }
 
   async asegurarTablaAuth(): Promise<void> {
@@ -1194,6 +1200,12 @@ export async function guardarMensaje(input: {
 export async function listarMensajes(): Promise<BuzonMensaje[]> {
   await getAlmacen().asegurarTablaBuzon();
   return getAlmacen().listarMensajes();
+}
+
+/** Elimina un mensaje del buzón por id (retorna false si no existía). */
+export async function eliminarMensaje(id: string): Promise<boolean> {
+  await getAlmacen().asegurarTablaBuzon();
+  return getAlmacen().eliminarMensaje(id);
 }
 
 // ── Autenticación del administrador (tablas usuario / sesion) ─────────────────

@@ -33,7 +33,7 @@ function admitirEnvio(ip: string): boolean {
 export const POST: APIRoute = async ({ request }) => {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
   if (!admitirEnvio(ip)) {
-    return json(429, { ok: false, error: 'Demasiados envíos. Esperá unos minutos y volvé a intentar.' });
+    return json(429, { ok: false, error: 'Demasiados envíos. Espere unos minutos e intente de nuevo.' });
   }
 
   let cuerpo: Record<string, unknown>;
@@ -54,7 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
   const mensaje = typeof cuerpo.mensaje === 'string' ? cuerpo.mensaje.trim() : '';
 
   if (nombre.length < 2 || nombre.length > 80) {
-    return json(400, { ok: false, error: 'Ingresá tu nombre (entre 2 y 80 caracteres).' });
+    return json(400, { ok: false, error: 'Ingrese su nombre (entre 2 y 80 caracteres).' });
   }
   if (!(TIPOS as readonly string[]).includes(tipo)) {
     return json(400, { ok: false, error: 'Elegí un tipo de mensaje válido.' });
@@ -70,7 +70,7 @@ export const POST: APIRoute = async ({ request }) => {
     return json(400, {
       ok: false,
       error:
-        'Tu mensaje contiene lenguaje que no se permite. Por favor, ajustá el texto para poder enviarlo.',
+        'Su mensaje contiene lenguaje que no se permite. Ajuste el texto para poder enviarlo.',
       palabra: palabraProhibida,
     });
   }
@@ -78,7 +78,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     await guardarMensaje({ nombre, tipo: tipo as TipoBuzon, mensaje });
   } catch {
-    return json(500, { ok: false, error: 'No se pudo guardar el mensaje. Intentá de nuevo.' });
+    return json(500, { ok: false, error: 'No se pudo guardar el mensaje. Intente de nuevo.' });
   }
 
   return json(200, { ok: true });

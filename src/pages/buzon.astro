@@ -4,7 +4,7 @@ import Layout from '@layouts/Layout.astro';
 
 <Layout
   title="Buzón Ciudadano — Manfred Reyes Villa"
-  description="Enviá una sugerencia o felicitación a la Alcaldía de Cochabamba."
+  description="Envíenos una sugerencia o felicitación a la Alcaldía de Cochabamba."
 >
     <!-- ═══ Intro ═══ -->
     <section class="relative overflow-hidden bg-primary-deepest text-white">
@@ -16,11 +16,12 @@ import Layout from '@layouts/Layout.astro';
                 Buzón Ciudadano
             </p>
             <h1 class="mt-4 text-[2rem] font-bold leading-[1.08] tracking-tight sm:text-5xl">
-                Tu voz cuenta
+                Su voz cuenta
             </h1>
             <p class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-purple-100 lg:text-lg">
-                ¿Tenés una sugerencia o querés felicitar a un equipo de la gestión?
-                Escribinos. Leemos cada mensaje que llega a este buzón.
+                Este espacio está a su disposición para enviar sugerencias o
+                felicitaciones al equipo de la gestión. Cada mensaje que llega
+                a este buzón es leído y considerado.
             </p>
         </div>
     </section>
@@ -45,7 +46,7 @@ import Layout from '@layouts/Layout.astro';
                         required
                         minlength="2"
                         maxlength="80"
-                        placeholder="Tu nombre"
+                        placeholder="Su nombre"
                         class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                 </div>
@@ -76,7 +77,7 @@ import Layout from '@layouts/Layout.astro';
                         minlength="5"
                         maxlength="1000"
                         rows="6"
-                        placeholder="Contanos tu sugerencia o felicitación…"
+                        placeholder="Describa su sugerencia o felicitación…"
                         class="w-full resize-y rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                     ></textarea>
                     <p class="mt-2 text-right text-xs text-slate-400">Máximo 1000 caracteres</p>
@@ -92,8 +93,8 @@ import Layout from '@layouts/Layout.astro';
             </form>
 
             <p class="mt-8 text-center text-xs leading-relaxed text-slate-400">
-                Tu mensaje es público para el equipo de la Alcaldía. Evitá compartir datos
-                personales sensibles y usá un lenguaje respetuoso.
+                Su mensaje es visto por el equipo de la Alcaldía. Evite compartir datos
+                personales sensibles y utilice un lenguaje respetuoso.
             </p>
         </div>
     </section>
@@ -134,7 +135,7 @@ import Layout from '@layouts/Layout.astro';
             detectarPalabraInapropiada(nombre) ?? detectarPalabraInapropiada(mensaje);
         if (prohibida) {
             mostrarAviso(
-                'Tu mensaje contiene lenguaje que no se permite. Por favor, ajustá el texto para poder enviarlo.',
+                'Su mensaje contiene lenguaje que no se permite. Ajuste el texto para poder enviarlo.',
                 false,
             );
             return;
@@ -155,10 +156,10 @@ import Layout from '@layouts/Layout.astro';
             const datosRespuesta = (await respuesta.json()) as { ok?: boolean; error?: string };
             if (respuesta.ok && datosRespuesta.ok) {
                 form.reset();
-                mostrarAviso('¡Gracias! Tu mensaje fue recibido correctamente.', true);
+                mostrarAviso('Gracias. Su mensaje fue recibido correctamente.', true);
             } else {
                 mostrarAviso(
-                    datosRespuesta.error ?? 'No se pudo enviar el mensaje. Intentá de nuevo.',
+                    datosRespuesta.error ?? 'No se pudo enviar el mensaje. Intente de nuevo.',
                     false,
                 );
             }
