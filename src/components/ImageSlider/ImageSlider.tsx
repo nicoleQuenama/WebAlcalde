@@ -64,6 +64,11 @@ export default function ImageSlider({
         alt={afterLabel}
         draggable={false}
         loading="lazy"
+        decoding="async"
+        fetchPriority="low"
+        sizes="(min-width: 1024px) 640px, 100vw"
+        width={1200}
+        height={800}
         style={
           afterFit || afterPosition || afterScale
             ? {
@@ -85,6 +90,11 @@ export default function ImageSlider({
           alt={beforeLabel}
           draggable={false}
           loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          sizes="(min-width: 1024px) 640px, 100vw"
+          width={1200}
+          height={800}
         />
       </div>
 

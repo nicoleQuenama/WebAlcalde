@@ -46,6 +46,8 @@ export interface FlipBookProps {
   subtitle?: ReactNode;
   ctaLabel?: string;
   coverImage?: string;
+  /** Título mostrado en la portada 3D (canvas). Por defecto, el mismo texto de siempre. */
+  coverLabel3D?: string;
   /** Índice: grupos de entradas con página (0-based). Soporta `TocGroup[]` o plano `TocItem[]`. Si se omite, se auto-deriva de los `h2/h3` de cada página. */
   toc?: TocGroup[] | TocItem[];
   initialPage?: number;
@@ -153,6 +155,7 @@ export default function FlipBook({
   subtitle,
   ctaLabel = 'Abrir libro',
   coverImage,
+  coverLabel3D = 'Cocha,\nla mejor ciudad\nde Bolivia',
   initialPage = 0,
   toc,
   onOpen,
@@ -747,7 +750,7 @@ export default function FlipBook({
 
         <div ref={closedSlotRef} className={styles.closedSlot}>
           <ThreeBook
-            coverLabel={'Cocha,\nla mejor ciudad\nde Bolivia'}
+            coverLabel={coverLabel3D}
             coverImage={coverImage}
             onOpen={open}
           />

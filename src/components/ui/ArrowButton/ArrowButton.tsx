@@ -11,9 +11,9 @@ interface Props {
 }
 
 const variantClasses: Record<ArrowVariant, string> = {
-  hero: 'bg-white/20 hover:bg-white/40 backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110',
-  modal: 'text-white/70 hover:text-white bg-black/20 hover:bg-black/50 rounded-full p-4 hover:scale-110 transition-all',
-  comparison: 'flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-white transition-transform hover:scale-110 sm:h-14 sm:w-14',
+  hero: 'bg-white/20 hover:bg-white/40 cursor-pointer backdrop-blur-md p-4 rounded-full text-white transition-transform hover:scale-110',
+  modal: 'text-white/70 hover:text-white cursor-pointer bg-black/20 hover:bg-black/50 rounded-full p-4 hover:scale-110 transition-all',
+  comparison: 'flex h-11 w-11 cursor-pointer -translate-y-1/2 items-center justify-center rounded-full bg-primary text-white transition-transform hover:scale-110 sm:h-14 sm:w-14',
 };
 
 const svgSize: Record<ArrowVariant, number> = {

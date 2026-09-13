@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import styles from './Book.module.css';
 import type { Capitulo, SeccionTemario, EraTemario } from '@lib/db';
 
@@ -12,6 +12,24 @@ export interface Video {
   alt: string;
 }
 
+export interface BookMeta {
+  coverBadge?: string;
+  coverTitle?: string;
+  coverSubtitle?: string;
+  backTitle?: string;
+  backText?: string;
+  antesDespuesCaption?: string;
+}
+
+const META_POR_DEFECTO: Required<BookMeta> = {
+  coverBadge: 'Libro digital',
+  coverTitle: 'Cocha,\nla mejor ciudad de Bolivia',
+  coverSubtitle: 'De los años 90 a la gestión 2021 — 2026',
+  backTitle: 'Fin',
+  backText: 'Cochabamba, una ciudad que vuelve a soñar en grande.',
+  antesDespuesCaption: 'Fotografías comparativas a través de los años — imágenes de referencia.',
+};
+
 export interface BookProps {
   /** Imagen de portada. */
   coverImage: string;
@@ -23,6 +41,8 @@ export interface BookProps {
   fotos: IMG[];
   /** Videos en orden del temario: playa, laguna, terminal, fexco, market, vet, permiso. */
   videos: Video[];
+  /** Textos editables de portada/contraportada (CMS beta) — sin valor, usa los de siempre. */
+  meta?: BookMeta;
   children?: ReactNode;
 }
 
@@ -166,7 +186,8 @@ function PaginaEraIntro({ era, foto }: { era: EraTemario; foto?: IMG }) {
   );
 }
 
-export default function Book({ coverImage, capitulos, eras, fotos, videos }: BookProps) {
+export default function Book({ coverImage, capitulos, eras, fotos, videos, meta }: BookProps) {
+  const m = { ...META_POR_DEFECTO, ...meta };
   const [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA] = capitulos;
   const ERAS = eras;
   // Fotos con más presencia del alcalde (retrato). El resto son de contexto.
@@ -191,15 +212,18 @@ export default function Book({ coverImage, capitulos, eras, fotos, videos }: Boo
         <div className={s('coverColor')}></div>
         <div className={s('coverContent')}>
           <span className={s('coverBadge')} data-reveal>
-            Libro digital
+            {m.coverBadge}
           </span>
           <h2 className={s('coverTitle')} data-reveal>
-            Cocha,
-            <br />
-            la mejor ciudad de Bolivia
+            {m.coverTitle.split('\n').map((linea, i) => (
+              <Fragment key={i}>
+                {i > 0 && <br />}
+                {linea}
+              </Fragment>
+            ))}
           </h2>
           <p className={s('coverSubtitle')} data-reveal>
-            De los años 90 a la gestión 2021 — 2026
+            {m.coverSubtitle}
           </p>
         </div>
         <div className={s('coverShine')}></div>
@@ -239,7 +263,7 @@ export default function Book({ coverImage, capitulos, eras, fotos, videos }: Boo
             </figure>
           </div>
           <p className={s('caption')} data-reveal>
-            Fotografías comparativas a través de los años — imágenes de referencia.
+            {m.antesDespuesCaption}
           </p>
         </div>
       </div>
@@ -288,10 +312,10 @@ export default function Book({ coverImage, capitulos, eras, fotos, videos }: Boo
       <div className={s('backCover')}>
         <div className={s('backCoverContent')}>
           <h3 className={s('backTitle')} data-reveal>
-            Fin
+            {m.backTitle}
           </h3>
           <p className={s('backText')} data-reveal>
-            Cochabamba, una ciudad que vuelve a soñar en grande.
+            {m.backText}
           </p>
         </div>
         <div className={s('coverShine')}></div>

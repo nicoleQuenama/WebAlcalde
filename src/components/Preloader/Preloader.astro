@@ -7,7 +7,7 @@ interface Props {
   ghostColor?: string;
 }
 
-const { minDuration = 400, cabinColor = '#ffc31e', ghostColor = 'rgba(255,255,255,0.22)' } = Astro.props;
+const { minDuration = 250, cabinColor = '#ffc31e', ghostColor = 'rgba(255,255,255,0.22)' } = Astro.props;
 ---
 <div
   class={styles.overlay}
@@ -40,8 +40,17 @@ const { minDuration = 400, cabinColor = '#ffc31e', ghostColor = 'rgba(255,255,25
 <script>
   import { gsap } from 'gsap';
 
-  const el = document.querySelector('[data-preloader]');
-  if (el) {
+  function initPreloader() {
+    const el = document.querySelector('[data-preloader]');
+    if (!el || el.hasAttribute('data-hidden')) return;
+    // Solo primera carga: en navegaciones SPA nunca bloquear
+    // @ts-ignore
+    if (window.__preloaderDone || document.documentElement.hasAttribute('data-astro-transition')) {
+      el.setAttribute('data-hidden', 'true');
+      document.body.style.overflow = '';
+      return;
+    }
+
     const body = document.body;
     const scol = body.style.overflow;
     body.style.overflow = 'hidden';
@@ -57,6 +66,8 @@ const { minDuration = 400, cabinColor = '#ffc31e', ghostColor = 'rgba(255,255,25
     const close = () => {
       if (closed) return;
       closed = true;
+      // @ts-ignore
+      window.__preloaderDone = true;
       el.setAttribute('data-hiding', 'true');
       setTimeout(() => {
         el.setAttribute('data-hidden', 'true');
@@ -64,20 +75,15 @@ const { minDuration = 400, cabinColor = '#ffc31e', ghostColor = 'rgba(255,255,25
       }, 340);
     };
 
-    // Cerrar solo cuando: página cargada + tiempo mínimo + animación lista.
     const flags = { loaded: false, minPassed: false, animDone: false };
     const maybeClose = () => {
       if (flags.loaded && flags.minPassed && flags.animDone) close();
     };
 
-    window.addEventListener('load', () => {
-      flags.loaded = true;
-      maybeClose();
-    });
-    setTimeout(() => {
-      flags.minPassed = true;
-      maybeClose();
-    }, min);
+    if (document.readyState === 'complete') flags.loaded = true;
+    else window.addEventListener('load', () => { flags.loaded = true; maybeClose(); }, { once: true });
+
+    setTimeout(() => { flags.minPassed = true; maybeClose(); }, min);
 
     if (reduce) {
       gsap.set(solidEls, { xPercent: 0 });
@@ -87,34 +93,35 @@ const { minDuration = 400, cabinColor = '#ffc31e', ghostColor = 'rgba(255,255,25
     } else {
       const tl = gsap.timeline({
         defaults: { ease: 'power2.inOut' },
-        onComplete: () => {
-          flags.animDone = true;
-          maybeClose();
-        },
+        onComplete: () => { flags.animDone = true; maybeClose(); },
       });
-
-      tl.fromTo(
-        letters,
-        { y: 12, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.32, stagger: 0.12 },
-        0
-      );
-
-      tl.fromTo(
-        solidEls,
-        { xPercent: -100 },
-        { xPercent: 0, duration: 0.5, stagger: 0.12 },
-        0
-      );
-
+      tl.fromTo(letters, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.32, stagger: 0.12 }, 0);
+      tl.fromTo(solidEls, { xPercent: -100 }, { xPercent: 0, duration: 0.5, stagger: 0.12 }, 0);
       if (cabin) {
         const band = cabin.parentElement.getBoundingClientRect().width;
-        gsap.fromTo(
-          cabin,
-          { x: -48 },
-          { x: band + 48, duration: 1.1, ease: 'power1.inOut' }
-        );
+        gsap.fromTo(cabin, { x: -48 }, { x: band + 48, duration: 1.1, ease: 'power1.inOut' });
       }
     }
+    if (flags.loaded && flags.minPassed && flags.animDone) close();
   }
+
+  initPreloader();
+  document.addEventListener('astro:page-load', initPreloader);
+  document.addEventListener('astro:after-swap', () => {
+    const el = document.querySelector('[data-preloader]');
+    if (el) el.setAttribute('data-hidden', 'true');
+    document.body.style.overflow = '';
+    // @ts-ignore
+    window.__preloaderDone = true;
+  });
+  // Fallback: nunca dejar bloqueado más de 1.2s aunque falte load
+  setTimeout(() => {
+    const el = document.querySelector('[data-preloader]');
+    if (el && !el.hasAttribute('data-hidden')) {
+      el.setAttribute('data-hidden', 'true');
+      document.body.style.overflow = '';
+      // @ts-ignore
+      window.__preloaderDone = true;
+    }
+  }, 1200);
 </script>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import GaleriaModal from '@components/global/Hero/GaleriaModal';
-import type { PlacaDolly, TabDolly } from './types';
+import type { PlacaDolly, TabDolly } from '@types';
 import './timeline.css';
 
 interface Props {
