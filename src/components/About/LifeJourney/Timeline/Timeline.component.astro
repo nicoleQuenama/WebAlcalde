@@ -10,6 +10,8 @@ const HISTORIA = getHitos();
 const INTRO = getHistoriaIntro();
 const FILTROS = getFiltrosHito();
 
+const { style } = Astro.props as { style?: string };
+
 const ANCHO = 640;
 
 async function placaDe(hito: Hito & { imagen: string }, id: string): Promise<PlacaDolly> {
@@ -58,7 +60,7 @@ const tabs: TabDolly[] = await Promise.all(
 );
 ---
 
-<section class="relative bg-white text-slate-900" id="trayectoria">
+<section class="relative bg-white text-slate-900" id="trayectoria" style={style}>
     <div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
         <header class="max-w-2xl">
             {INTRO.kicker && (

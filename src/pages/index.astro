@@ -1,9 +1,16 @@
 ---
-export const prerender = true;
 import { getImage } from 'astro:assets';
 import Layout from '@layouts/Layout.astro';
-import { getCapitulos, getEras } from '@lib/db';
+import { getCapitulos, getEras, type EraTemario, type SeccionTemario } from '@lib/db';
 import { MEDIA } from '@lib/media';
+import { efectivo, efectivoLista, efectivoOrden } from '@lib/cms/resolve';
+import {
+  DEFAULT_HOME_HERO,
+  DEFAULT_HOME_ANTES_DESPUES,
+  DEFAULT_HOME_BIOGRAFIA,
+  DEFAULT_FLIPBOOK_META,
+  DEFAULT_HOME_LAYOUT,
+} from '../admin/defaults';
 import Hero from '@components/global/Hero/Hero.astro';
 import HeroCards from '@components/global/Hero/HeroCard.tsx';
 import type { TarjetaImagen } from '@components/global/Hero/HeroCard.tsx';
@@ -13,6 +20,17 @@ import FlipBook from '@components/FlipBook/FlipBook';
 import Book from '@components/Home/BookSection/Book3D';
 import BiographyVideo from '@components/Home/BiographyVideo/index.astro';
 import '@styles/sobre.css';
+
+// ── CMS (beta, en memoria) ───────────────────────────────────────────
+const heroTexto = efectivo('home_hero', 'principal', DEFAULT_HOME_HERO);
+const antesDespuesTexto = efectivo('home_antes_despues', 'principal', DEFAULT_HOME_ANTES_DESPUES);
+const biografiaTexto = efectivo('home_biografia', 'principal', DEFAULT_HOME_BIOGRAFIA);
+const libro = efectivo('flipbook_meta', 'principal', DEFAULT_FLIPBOOK_META);
+const orden = efectivoOrden('home_layout', DEFAULT_HOME_LAYOUT);
+const ordenDe = (clave: string) => {
+  const i = orden.indexOf(clave);
+  return i === -1 ? 999 : i;
+};
 
 // ── HERO ──────────────────────────────────────────────────────────────
 // Optimización en build: el carrusel se sirve a ~900px webp; el fondo, chico
@@ -71,8 +89,20 @@ const pares: ParComparador[] = await Promise.all(
 );
 
 // ── LIBRO DIGITAL ─────────────────────────────────────────────────────
-const [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA] = getCapitulos();
-const ERAS = getEras();
+// capitulo/era/seccion pasan por el store del CMS (beta): lo editado desde
+// /admin/[secret]?pagina=gestion se refleja acá también, son el mismo dominio.
+const [PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA] = efectivoLista('capitulo', getCapitulos());
+const erasCompletas = getEras();
+const erasBase = erasCompletas.map(({ secciones: _s, ...resto }) => resto);
+const seccionesBase: (SeccionTemario & { eraId: string })[] = erasCompletas.flatMap((era) =>
+  era.secciones.map((s) => ({ ...s, eraId: era.id })),
+);
+const erasEfectivas = efectivoLista('era', erasBase);
+const seccionesEfectivas = efectivoLista('seccion', seccionesBase);
+const ERAS: EraTemario[] = erasEfectivas.map((era) => ({
+  ...era,
+  secciones: seccionesEfectivas.filter((s) => s.eraId === era.id),
+})) as EraTemario[];
 
 // Fotos y videos que Book.tsx reparte entre las páginas (todo en Supabase).
 // Las fotos se optimizan en build (~700px webp) CONSERVANDO su proporción real. Bajo demanda, no bloquean LCP.
@@ -114,30 +144,45 @@ const toc = [
 ---
 
 <Layout title="Manfred Reyes Villa — Cocha, la mejor ciudad de Bolivia">
+    <div style="display:flex; flex-direction:column;">
     <!-- ═══ HERO (mismo diseño que /sobre, con el texto del home) ═══ -->
     <Hero
         fondoSrc={fondo.src}
-        eyebrow="Cocha, la mejor ciudad de Bolivia"
-        titulo="Manfred Reyes Villa"
+        eyebrow={heroTexto.eyebrow}
+        titulo={heroTexto.titulo}
+        style={`order:${ordenDe('hero')}`}
+        dominio="home_hero"
     >
         <HeroCards client:load imagenes={imgs} autoplayMs={4500} slot="media" />
     </Hero>
 
     <!-- ═══ BIOGRAFÍA ═══ -->
-    <BiographyVideo videoBiografia={videoBiografia} posterBiografia={posterBiografia} />
+    <BiographyVideo
+        videoBiografia={videoBiografia}
+        posterBiografia={posterBiografia}
+        eyebrow={biografiaTexto.eyebrow}
+        titulo={biografiaTexto.titulo}
+        parrafo={biografiaTexto.parrafo}
+        cta1Label={biografiaTexto.cta1Label}
+        cta1Href={biografiaTexto.cta1Href}
+        cta2Label={biografiaTexto.cta2Label}
+        cta2Href={biografiaTexto.cta2Href}
+        style={`order:${ordenDe('biografia')}`}
+        dominio="home_biografia"
+    />
 
     <!-- ═══ ANTES / DESPUÉS ═══ -->
-    <section class="bg-white">
+    <section class="bg-white" style={`order:${ordenDe('antes_despues')}`} data-cms-dominio="home_antes_despues">
         <div class="mx-auto max-w-5xl px-6 py-20 lg:px-8 lg:py-28">
             <header class="max-w-2xl">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
-                    Antes y después
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary" data-cms-campo="kicker">
+                    {antesDespuesTexto.kicker}
                 </p>
-                <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
-                    De una ciudad de ayer a una que mira al futuro
+                <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl" data-cms-campo="titulo">
+                    {antesDespuesTexto.titulo}
                 </h2>
-                <p class="mt-4 max-w-xl text-base leading-relaxed text-slate-600">
-                    Desliza el tirador para comparar cada punto; usa las flechas para pasar al siguiente.
+                <p class="mt-4 max-w-xl text-base leading-relaxed text-slate-600" data-cms-campo="parrafo" data-cms-multilinea>
+                    {antesDespuesTexto.parrafo}
                 </p>
             </header>
 
@@ -148,15 +193,14 @@ const toc = [
     </section>
 
     <!-- ═══ INTRODUCCIÓN AL LIBRO DIGITAL ═══ -->
-    <section class="bg-primary text-white">
+    <section class="bg-primary text-white" style={`order:${ordenDe('libro')}`} data-cms-dominio="flipbook_meta">
         <div class="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-16 lg:px-8 lg:py-20">
             <header class="max-w-2xl">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent">
-                    El libro digital
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent" data-cms-campo="kicker">
+                    {libro.kicker}
                 </p>
-                <p class="mt-4 text-base leading-relaxed text-white/75">
-                    Un recorrido en imágenes por las obras que transformaron Cochabamba, de los años 90 a
-                    la gestión 2021–2026. Ábrelo y hojéalo página por página, con fotos y videos.
+                <p class="mt-4 text-base leading-relaxed text-white/75" data-cms-campo="parrafo" data-cms-multilinea>
+                    {libro.parrafo}
                 </p>
             </header>
 
@@ -164,14 +208,23 @@ const toc = [
                 client:visible
                 width={350}
                 height={560}
-                title="Cocha, la mejor ciudad de Bolivia"
-                subtitle="Las obras, los servicios y la gestión de la ciudad, contadas como un álbum."
-                ctaLabel="Abrir libro"
-                coverImage="/cocha.jpg"
+                title={libro.title}
+                subtitle={libro.subtitle}
+                ctaLabel={libro.ctaLabel}
+                coverImage={libro.coverImage}
+                coverLabel3D={libro.coverLabel3D}
                 toc={toc}
             >
-                <Book coverImage="/cocha.jpg" capitulos={[PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA]} eras={ERAS} fotos={fotos} videos={videos} />
+                <Book
+                    coverImage={libro.coverImage}
+                    capitulos={[PRESENTACION, CRECIMIENTO, NUEVA_COCHABAMBA]}
+                    eras={ERAS}
+                    fotos={fotos}
+                    videos={videos}
+                    meta={libro}
+                />
             </FlipBook>
         </div>
     </section>
+    </div>
 </Layout>

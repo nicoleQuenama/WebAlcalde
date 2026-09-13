@@ -18,11 +18,11 @@ const { title, subtitle, description, eyebrow, class: extraClass, 'data-card': d
   ]}
 >
   {eyebrow && (
-    <p class="text-[0.72rem] font-bold uppercase tracking-[2.5px] text-[#c9b8e8]">{eyebrow}</p>
+    <p class="text-[0.72rem] font-bold uppercase tracking-[2.5px] text-[#c9b8e8]" data-cms-campo="eyebrow">{eyebrow}</p>
   )}
-  <h3 class="text-[clamp(1.35rem,4vw,1.6rem)] font-extrabold tracking-[0.3px] text-white">
+  <h3 class="text-[clamp(1.35rem,4vw,1.6rem)] font-extrabold tracking-[0.3px] text-white" data-cms-campo="title">
     {title}
   </h3>
   {subtitle && <p class="text-sm font-semibold text-[#d4cbe8]">{subtitle}</p>}
-  <p class="text-[0.95rem] leading-[1.6] text-[#b9b9d6]">{description}</p>
+  <p class="text-[0.95rem] leading-[1.6] text-[#b9b9d6]" data-cms-campo="body" data-cms-multilinea>{description}</p>
 </article>

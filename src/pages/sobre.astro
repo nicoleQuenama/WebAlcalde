@@ -1,5 +1,4 @@
 ---
-export const prerender = true;
 import Layout from '@layouts/Layout.astro';
 import { getImage } from 'astro:assets';
 import { getCapitulos } from '@lib/db';
@@ -9,6 +8,8 @@ import HeroCards from '@components/global/Hero/HeroCard.tsx';
 import type { TarjetaImagen } from '@components/global/Hero/HeroCard.tsx';
 import InstitutionalProfile from '@components/About/InstitutionalProfile/Institutional.component.astro';
 import Timeline from '@components/About/LifeJourney/Timeline/Timeline.component.astro';
+import { efectivo, efectivoOrden } from '@lib/cms/resolve';
+import { DEFAULT_SOBRE_HERO, DEFAULT_SOBRE_BIOGRAFIA, DEFAULT_SOBRE_LAYOUT } from '../admin/defaults';
 import '@styles/sobre.css';
 
 // ── HERO ──────────────────────────────────────────────────────────────
@@ -38,46 +39,61 @@ const fondo = await getImage({
 const PRESENTACION = getCapitulos().find((c) => c.id === 'presentacion')!;
 
 // ── TARJETAS (biografía / misión / visión) ───────────────────────────
-// El contenido de las cards vive en src/constants/institutionalProfile/content.ts.
+// El contenido de las cards vive en src/constants/institutionalProfile/content.ts
+// (vía Institutional.component.astro, que ya resuelve sus propios overrides).
 // La línea de tiempo vive en @components/About/LifeJourney/Timeline (lee la DB sola).
+
+// ── CMS (beta, en memoria) ───────────────────────────────────────────
+const heroTexto = efectivo('sobre_hero', 'principal', DEFAULT_SOBRE_HERO);
+const biografiaTexto = efectivo('sobre_biografia', 'principal', {
+  ...DEFAULT_SOBRE_BIOGRAFIA,
+  parrafo: PRESENTACION.bajada,
+});
+const orden = efectivoOrden('sobre_layout', DEFAULT_SOBRE_LAYOUT);
+const ordenDe = (clave: string) => {
+  const i = orden.indexOf(clave);
+  return i === -1 ? 999 : i;
+};
 ---
 
 <Layout title="Sobre — Manfred Reyes Villa">
-    <main>
+    <main style="display:flex; flex-direction:column;">
         <!-- ═══ HERO (mismo diseño que el home, con el contenido de /sobre) ═══ -->
         <Hero
             fondoSrc={fondo.src}
-            eyebrow="Biografía y trayectoria"
-            titulo="Manfred Reyes Villa"
-            quote="Una vida dedicada a Cochabamba"
+            eyebrow={heroTexto.eyebrow}
+            titulo={heroTexto.titulo}
+            quote={heroTexto.quote}
+            style={`order:${ordenDe('hero')}`}
+            dominio="sobre_hero"
         >
             <HeroCards client:visible imagenes={imgs} autoplayMs={4500} slot="media" />
         </Hero>
 
         <!-- ═══ BIOGRAFÍA ═══ -->
-        <section class="bg-white">
+        <section class="bg-white" style={`order:${ordenDe('biografia')}`} data-cms-dominio="sobre_biografia">
             <div class="mx-auto max-w-3xl px-6 py-20 lg:px-8 lg:py-24">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
-                    Biografía
+                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary" data-cms-campo="eyebrow">
+                    {biografiaTexto.eyebrow}
                 </p>
-                <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl">
-                    Una vida dedicada a Cochabamba
+                <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl" data-cms-campo="titulo">
+                    {biografiaTexto.titulo}
                 </h2>
-                <p class="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
-                    {PRESENTACION.bajada}
+                <p class="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg" data-cms-campo="parrafo" data-cms-multilinea>
+                    {biografiaTexto.parrafo}
                 </p>
                 <a
-                    href="/gestion#presentacion"
+                    href={biografiaTexto.ctaHref}
                     class="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white transition-transform hover:-translate-y-0.5"
                 >
-                    Ver la gestión completa
+                    <span data-cms-campo="ctaLabel">{biografiaTexto.ctaLabel}</span>
                     <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                 </a>
             </div>
         </section>
 
         <!-- ═══ TARJETAS: misión y visión ═══ -->
-        <section class="bg-primary text-white">
+        <section class="bg-primary text-white" style={`order:${ordenDe('institutional')}`} data-cms-dominio="sobre_institutional">
             <div class="mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-24">
                 <header class="max-w-2xl">
                     <h2 class="text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl">
@@ -90,6 +106,6 @@ const PRESENTACION = getCapitulos().find((c) => c.id === 'presentacion')!;
         </section>
 
         <!-- ═══ LÍNEA DE TIEMPO (Dolly Gallery) ═══ -->
-        <Timeline />
+        <Timeline style={`order:${ordenDe('timeline')}`} />
     </main>
 </Layout>

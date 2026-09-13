@@ -1,10 +1,17 @@
 ---
 import type { HeroProps } from './types';
 
-const { fondoSrc, eyebrow, titulo, subtitulo, quote } = Astro.props as HeroProps;
+const { fondoSrc, eyebrow, titulo, subtitulo, quote, style, dominio } = Astro.props as HeroProps & {
+    style?: string;
+    dominio?: string;
+};
 ---
 
-<section class="relative flex min-h-[100svh] w-full items-center justify-center bg-primary px-0 pb-16 pt-24 lg:pt-28">
+<section
+    class="relative flex min-h-[100svh] w-full items-center justify-center bg-primary px-0 pb-16 pt-24 lg:pt-28"
+    style={style}
+    data-cms-dominio={dominio}
+>
     <!-- Fondo: panorámica desenfocada + velo del color de marca -->
     <div class="absolute inset-0 z-0 overflow-hidden">
         <div
@@ -29,7 +36,10 @@ const { fondoSrc, eyebrow, titulo, subtitulo, quote } = Astro.props as HeroProps
                 <p class="invisible whitespace-nowrap pr-2 font-roboto-serif text-[11px] uppercase tracking-[0.14em] opacity-0 sm:text-sm sm:tracking-[0.2em]">
                     {eyebrow}
                 </p>
-                <p class="typewriter-1 absolute left-0 top-0 h-full overflow-hidden whitespace-nowrap pr-2 font-roboto-serif text-[11px] uppercase tracking-[0.14em] text-accent sm:text-sm sm:tracking-[0.2em]">
+                <p
+                    class="typewriter-1 absolute left-0 top-0 h-full overflow-hidden whitespace-nowrap pr-2 font-roboto-serif text-[11px] uppercase tracking-[0.14em] text-accent sm:text-sm sm:tracking-[0.2em]"
+                    data-cms-campo="eyebrow"
+                >
                     {eyebrow}
                 </p>
             </div>
@@ -39,7 +49,10 @@ const { fondoSrc, eyebrow, titulo, subtitulo, quote } = Astro.props as HeroProps
                 <h1 class="invisible whitespace-nowrap py-1 pr-4 font-roboto-serif text-4xl leading-[1.1] text-white opacity-0 sm:text-5xl lg:text-7xl">
                     {titulo}
                 </h1>
-                <h1 class="typewriter-2 absolute left-0 top-0 h-full overflow-hidden whitespace-nowrap py-1 font-serif text-3xl leading-[1.1] text-white sm:text-4xl lg:text-6xl">
+                <h1
+                    class="typewriter-2 absolute left-0 top-0 h-full overflow-hidden whitespace-nowrap py-1 font-serif text-3xl leading-[1.1] text-white sm:text-4xl lg:text-6xl"
+                    data-cms-campo="titulo"
+                >
                     {titulo}
                 </h1>
             </div>
@@ -52,7 +65,7 @@ const { fondoSrc, eyebrow, titulo, subtitulo, quote } = Astro.props as HeroProps
             )}
             <!-- Quote (si se provee) -->
             {quote && (
-                <p class="fade-right-delay border-l-4 border-accent pl-6 font-roboto-serif text-lg italic text-white/85 sm:text-xl lg:text-2xl">
+                <p class="fade-right-delay border-l-4 border-accent pl-6 font-roboto-serif text-lg italic text-white/85 sm:text-xl lg:text-2xl" data-cms-campo="quote">
                     {quote}
                 </p>
             )}
