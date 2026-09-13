@@ -1,0 +1,174 @@
+---
+import Layout from '@layouts/Layout.astro';
+---
+
+<Layout
+  title="Buzón Ciudadano — Manfred Reyes Villa"
+  description="Enviá una sugerencia o felicitación a la Alcaldía de Cochabamba."
+>
+    <!-- ═══ Intro ═══ -->
+    <section class="relative overflow-hidden bg-primary-deepest text-white">
+        <div class="absolute inset-0 bg-gradient-to-br from-hero-from via-hero-via to-hero-to" aria-hidden="true"></div>
+        <div class="absolute inset-0 bg-primary/50 mix-blend-multiply" aria-hidden="true"></div>
+
+        <div class="relative z-10 mx-auto max-w-3xl px-6 py-20 text-center lg:py-24">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent">
+                Buzón Ciudadano
+            </p>
+            <h1 class="mt-4 text-[2rem] font-bold leading-[1.08] tracking-tight sm:text-5xl">
+                Tu voz cuenta
+            </h1>
+            <p class="mx-auto mt-5 max-w-xl text-base leading-relaxed text-purple-100 lg:text-lg">
+                ¿Tenés una sugerencia o querés felicitar a un equipo de la gestión?
+                Escribinos. Leemos cada mensaje que llega a este buzón.
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══ Formulario ═══ -->
+    <section class="bg-gray-50 py-20 lg:py-24">
+        <div class="mx-auto max-w-2xl px-6 lg:px-8">
+            <p id="buzon-aviso" data-buzon-aviso role="status" class="mb-6 hidden rounded-2xl px-5 py-4 text-sm font-medium ring-1 ring-inset" hidden></p>
+
+            <form data-buzon-form class="space-y-6 rounded-3xl bg-white p-6 shadow-xl shadow-primary/10 sm:p-10" novalidate>
+                <!-- Campo trampa anti-bots (invisible) -->
+                <input type="text" name="web" value="" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+                <div>
+                    <label for="buzon-nombre" class="mb-2 block text-sm font-semibold text-slate-700">
+                        Nombre
+                    </label>
+                    <input
+                        id="buzon-nombre"
+                        name="nombre"
+                        type="text"
+                        required
+                        minlength="2"
+                        maxlength="80"
+                        placeholder="Tu nombre"
+                        class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                </div>
+
+                <div>
+                    <label for="buzon-tipo" class="mb-2 block text-sm font-semibold text-slate-700">
+                        Tipo de mensaje
+                    </label>
+                    <select
+                        id="buzon-tipo"
+                        name="tipo"
+                        required
+                        class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                        <option value="sugerencia">Sugerencia</option>
+                        <option value="felicitacion">Felicitación</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="buzon-mensaje" class="mb-2 block text-sm font-semibold text-slate-700">
+                        Mensaje
+                    </label>
+                    <textarea
+                        id="buzon-mensaje"
+                        name="mensaje"
+                        required
+                        minlength="5"
+                        maxlength="1000"
+                        rows="6"
+                        placeholder="Contanos tu sugerencia o felicitación…"
+                        class="w-full resize-y rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    ></textarea>
+                    <p class="mt-2 text-right text-xs text-slate-400">Máximo 1000 caracteres</p>
+                </div>
+
+                <button
+                    type="submit"
+                    data-buzon-enviar
+                    class="w-full rounded-xl bg-primary px-6 py-3.5 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                >
+                    Enviar mensaje
+                </button>
+            </form>
+
+            <p class="mt-8 text-center text-xs leading-relaxed text-slate-400">
+                Tu mensaje es público para el equipo de la Alcaldía. Evitá compartir datos
+                personales sensibles y usá un lenguaje respetuoso.
+            </p>
+        </div>
+    </section>
+</Layout>
+
+<script>
+    import { detectarPalabraInapropiada } from '@lib/buzon/palabras';
+
+    const form = document.querySelector<HTMLFormElement>('[data-buzon-form]');
+    const aviso = document.querySelector<HTMLElement>('[data-buzon-aviso]');
+
+    function mostrarAviso(texto: string, ok: boolean) {
+        if (!aviso) return;
+        aviso.textContent = texto;
+        aviso.hidden = false;
+        aviso.classList.remove('hidden');
+        aviso.classList.toggle('bg-emerald-50', ok);
+        aviso.classList.toggle('text-emerald-700', ok);
+        aviso.classList.toggle('ring-emerald-200', ok);
+        aviso.classList.toggle('bg-red-50', !ok);
+        aviso.classList.toggle('text-red-700', !ok);
+        aviso.classList.toggle('ring-red-200', !ok);
+        aviso.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    form?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!form) return;
+
+        const datos = new FormData(form);
+        const nombre = String(datos.get('nombre') ?? '').trim();
+        const tipo = String(datos.get('tipo') ?? 'sugerencia');
+        const mensaje = String(datos.get('mensaje') ?? '').trim();
+        const web = String(datos.get('web') ?? '');
+
+        // Aviso temprano con el MISMO filtro que el servidor (el servidor decide).
+        const prohibida =
+            detectarPalabraInapropiada(nombre) ?? detectarPalabraInapropiada(mensaje);
+        if (prohibida) {
+            mostrarAviso(
+                'Tu mensaje contiene lenguaje que no se permite. Por favor, ajustá el texto para poder enviarlo.',
+                false,
+            );
+            return;
+        }
+
+        const boton = form.querySelector<HTMLButtonElement>('[data-buzon-enviar]');
+        if (boton) {
+            boton.disabled = true;
+            boton.textContent = 'Enviando…';
+        }
+
+        try {
+            const respuesta = await fetch('/api/buzon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, tipo, mensaje, web }),
+            });
+            const datosRespuesta = (await respuesta.json()) as { ok?: boolean; error?: string };
+            if (respuesta.ok && datosRespuesta.ok) {
+                form.reset();
+                mostrarAviso('¡Gracias! Tu mensaje fue recibido correctamente.', true);
+            } else {
+                mostrarAviso(
+                    datosRespuesta.error ?? 'No se pudo enviar el mensaje. Intentá de nuevo.',
+                    false,
+                );
+            }
+        } catch {
+            mostrarAviso('No se pudo conectar al servidor. Revisá tu conexión e intentá de nuevo.', false);
+        } finally {
+            if (boton) {
+                boton.disabled = false;
+                boton.textContent = 'Enviar mensaje';
+            }
+        }
+    });
+</script>

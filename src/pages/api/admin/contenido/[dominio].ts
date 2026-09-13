@@ -1,19 +1,26 @@
 import type { APIRoute } from 'astro';
 import { getBloques, setBloque, eliminarBloque, reordenar } from '@lib/cms/store';
+import { obtenerTokenDeRequest, usuarioValido } from '@lib/auth';
 
 /**
  * CRUD "mock" del CMS: escribe en el store en memoria (src/lib/cms/store.ts),
  * nunca en la DB real (src/lib/db.ts). Simula un guardado sin persistir a
  * disco — se pierde al reiniciar el servidor, a propósito.
  *
- * Sin autenticación real todavía: solo exige que el header X-Admin-Secret
- * coincida con la misma variable de entorno que protege la ruta /admin/[secret].
+ * Doble verificación: exige el header X-Admin-Secret (que coincide con la
+ * variable de entorno que protege la ruta /admin/[secret]) Y una sesión de
+ * administrador válida (cookie HttpOnly), para que el header por sí solo no
+ * baste si se filtra.
  */
 
 function autorizado(request: Request): boolean {
   const secreto = import.meta.env.ADMIN_SECRET_PATH;
   if (!secreto) return false;
   return request.headers.get('x-admin-secret') === secreto;
+}
+
+async function conSesion(request: Request): Promise<boolean> {
+  return (await usuarioValido(obtenerTokenDeRequest(request))) !== null;
 }
 
 function json(data: unknown, status = 200): Response {
@@ -25,12 +32,14 @@ function json(data: unknown, status = 200): Response {
 
 export const GET: APIRoute = async ({ params, request }) => {
   if (!autorizado(request)) return json({ error: 'no autorizado' }, 401);
+  if (!(await conSesion(request))) return json({ error: 'sesión inválida' }, 401);
   const dominio = params.dominio!;
   return json({ dominio, bloques: getBloques(dominio) ?? [] });
 };
 
 export const POST: APIRoute = async ({ params, request }) => {
   if (!autorizado(request)) return json({ error: 'no autorizado' }, 401);
+  if (!(await conSesion(request))) return json({ error: 'sesión inválida' }, 401);
   const dominio = params.dominio!;
   const body = await request.json().catch(() => null);
   if (!body || typeof body.clave !== 'string' || typeof body.data !== 'object') {
@@ -42,6 +51,7 @@ export const POST: APIRoute = async ({ params, request }) => {
 
 export const DELETE: APIRoute = async ({ params, request }) => {
   if (!autorizado(request)) return json({ error: 'no autorizado' }, 401);
+  if (!(await conSesion(request))) return json({ error: 'sesión inválida' }, 401);
   const dominio = params.dominio!;
   const body = await request.json().catch(() => null);
   if (!body || typeof body.clave !== 'string') {
@@ -53,6 +63,7 @@ export const DELETE: APIRoute = async ({ params, request }) => {
 
 export const PATCH: APIRoute = async ({ params, request }) => {
   if (!autorizado(request)) return json({ error: 'no autorizado' }, 401);
+  if (!(await conSesion(request))) return json({ error: 'sesión inválida' }, 401);
   const dominio = params.dominio!;
   const body = await request.json().catch(() => null);
   if (!body || typeof body.orden !== 'object') {

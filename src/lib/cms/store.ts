@@ -1,5 +1,5 @@
 /**
- * Store en memoria del CMS (beta). NO toca `src/lib/db.ts` / SQLite a propósito:
+ * Store en memoria del CMS (beta). NO toca `src/lib/db.ts` a propósito:
  * esto es una capa de "overrides" que simula un guardado real mientras se
  * prueba el editor. Vive mientras el proceso de Node esté corriendo; se
  * pierde al reiniciar el servidor.
@@ -62,9 +62,4 @@ export function reordenar(dominio: string, ordenPorClave: Record<string, number>
     const bloque = mapa.get(clave);
     if (bloque) bloque.orden = orden;
   }
-}
-
-/** Vacía todo el store (solo para debug/pruebas manuales, no se usa en runtime). */
-export function limpiarTodo(): void {
-  store.clear();
 }
