@@ -1,17 +1,8 @@
 ---
-import type { NavItem } from '@types/nav';
 import HeaderMovil from './HeaderMovil.tsx';
-
-// Menú: "Agenda" se quitó del sitio.
-const enlacesMenu: NavItem[] = [
-    { nombre: 'Inicio', ruta: '/' },
-    { nombre: 'Sobre', ruta: '/sobre' },
-    { nombre: 'Gestión', ruta: '/gestion' },
-    { nombre: 'Noticias', ruta: '/noticias' },
-    { nombre: 'Buzón Ciudadano', ruta: '/buzon' }
-];
+import { SITE_MENU } from '@constants/nav';
 ---
 
 <header>
-    <HeaderMovil enlaces={enlacesMenu} client:load />
+    <HeaderMovil enlaces={SITE_MENU} client:load />
 </header>

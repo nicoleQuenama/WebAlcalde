@@ -1,0 +1,115 @@
+---
+import AdminLayout from '@layouts/AdminLayout.astro';
+import { MEDIA } from '@lib/media';
+
+interface Props {
+    error?: string;
+    email?: string;
+}
+
+const { error, email } = Astro.props;
+
+if (Astro.request.method === 'POST') {
+    const form = await Astro.request.formData();
+    const emailEnviado = String(form.get('email') ?? '');
+    const passwordEnviado = String(form.get('password') ?? '');
+
+    if (!emailEnviado || !passwordEnviado) {
+        return Astro.redirect('/admin/login?error=vacio');
+    }
+    return Astro.redirect('/admin/login?error=noconfigurado');
+}
+
+const query = Astro.url.searchParams;
+const errorMsg: Record<string, string> = {
+    vacio: 'Completa usuario y contraseña.',
+    noconfigurado: 'La autenticación aún no está configurada.',
+};
+const mensajeError = query.get('error')
+    ? errorMsg[query.get('error')!] ?? 'Ocurrió un error inesperado.'
+    : error;
+---
+
+<AdminLayout title="Iniciar sesión — Administración">
+    <main class="relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-primary px-6 py-12">
+        <!-- Fondo de marca -->
+        <div class="absolute inset-0 bg-gradient-to-br from-hero-from via-hero-via to-hero-to" aria-hidden="true"></div>
+        <div class="absolute inset-0 bg-primary/40 mix-blend-multiply" aria-hidden="true"></div>
+
+        <div class="relative z-10 w-full max-w-md">
+            <!-- Tarjeta -->
+            <div class="rounded-3xl bg-white p-8 shadow-2xl shadow-black/30 sm:p-10">
+                <!-- Logotipo -->
+                <a href="/" class="mb-8 flex items-center justify-center gap-3" aria-label="Manfred Reyes Villa — Inicio">
+                    <img
+                        src={MEDIA.logo}
+                        alt="Manfred Reyes Villa"
+                        width={56}
+                        height={56}
+                        class="h-12 w-auto object-contain"
+                    />
+                    <span class="font-roboto-serif text-2xl font-bold tracking-wide text-slate-900">
+                        Admin
+                    </span>
+                </a>
+
+                <h1 class="text-center text-[1.6rem] font-bold leading-tight tracking-tight text-slate-900 sm:text-2xl">
+                    Iniciar sesión
+                </h1>
+                <p class="mt-2 text-center text-sm text-slate-500">
+                    Acceso restringido al panel de administración.
+                </p>
+
+                {mensajeError && (
+                    <p class="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                        {mensajeError}
+                    </p>
+                )}
+
+                <form method="post" class="mt-7 space-y-5">
+                    <div>
+                        <label for="email" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">
+                            Usuario
+                        </label>
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={email ?? ''}
+                            required
+                            autocomplete="username"
+                            placeholder="usuario@alcaldia.gob.bo"
+                            class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/30"
+                        />
+                    </div>
+
+                    <div>
+                        <label for="password" class="mb-1.5 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">
+                            Contraseña
+                        </label>
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            required
+                            autocomplete="current-password"
+                            placeholder="••••••••"
+                            class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/30"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="w-full rounded-xl bg-primary px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30"
+                    >
+                        Entrar
+                    </button>
+                </form>
+            </div>
+
+            <p class="mt-6 text-center text-xs text-white/60">
+                © {new Date().getFullYear()} Alcaldía de Cochabamba · Manfred Reyes Villa
+            </p>
+        </div>
+    </main>
+</AdminLayout>
