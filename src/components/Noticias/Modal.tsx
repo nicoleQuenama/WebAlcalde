@@ -12,11 +12,27 @@ interface NewsModalProps {
 export default function NewsModal({ noticia, isOpen, onClose, onNext, onPrev }: NewsModalProps) {
   useEffect(() => {
     if (isOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
     } else {
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
       document.body.style.overflow = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -81,8 +97,8 @@ export default function NewsModal({ noticia, isOpen, onClose, onNext, onPrev }: 
           </button>
 
           <div className="noticias-modal__meta">
-            <span className="noticias-modal__categoria">{noticia.categoria}</span>
-            <span className="noticias-modal__separador">•</span>
+            <span className="noticias-modal__categoria-texto">{noticia.categoria}</span>
+            <span className="noticias-modal__separador-texto">•</span>
             <time className="noticias-modal__fecha">
               {new Date(noticia.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
             </time>
