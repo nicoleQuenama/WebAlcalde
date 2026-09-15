@@ -41,6 +41,7 @@ export default defineConfig({
   },
 
   vite: {
+    envPrefix: ['PUBLIC_', 'DATABASE_'],
     plugins: [tailwindcss()],
     resolve: {
       alias: {

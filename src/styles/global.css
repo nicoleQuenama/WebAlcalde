@@ -20,6 +20,7 @@ body {
 
 @theme {
   --font-roboto-serif: "Roboto Serif", serif;
+  --font-roboto-condensed: "Roboto Condensed", sans-serif;
 
   --color-primary: #472d82;
   --color-primary-rgb: 71, 45, 130;

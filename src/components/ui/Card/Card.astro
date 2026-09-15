@@ -1,0 +1,23 @@
+---
+interface Props{
+    src: string;
+    titulo?:string;
+    class?:string;
+}
+
+const{src, titulo, class: className=''}= Astro.props;
+---
+<article class={`group relative cursor-pointer overflow-hidden rounded-[1.5rem] border border-white/30 bg-slate-900 shadow-xl transition-transform duration-500 hover:-translate-y-2 hover:shadow-primary/40 ${className}`}>
+    <img 
+        src={src}
+        alt={titulo ?? 'Imagen tarjeta'}
+        class= "absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        loading="lazy"
+        decoding="async"
+    />
+    {titulo &&(
+        <span class="absolute inset-x-0 bottom-0 rounded-b-[1.5rem] bg-gradient-to-t from-black/75 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white">
+        {titulo}
+        </span>
+    )}
+</article>

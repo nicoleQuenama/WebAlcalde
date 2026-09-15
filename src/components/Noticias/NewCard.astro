@@ -1,0 +1,29 @@
+---
+import Card from '../ui/Card/Card.astro';
+
+interface Noticia {
+  id: number | string;
+  src: string;
+  titulo: string;
+}
+
+interface Props {
+  noticias: Noticia[];
+}
+
+const { noticias } = Astro.props;
+
+const carrete = [...noticias, ...noticias];
+---
+
+<div class="ticker-wrapper">
+  <div class="ticker-track py-4">
+    {carrete.map((noticia) => (
+      <Card
+        src={noticia.src}
+        titulo={noticia.titulo}
+        class="h-72 w-52 shrink-0"
+      />
+    ))}
+  </div>
+</div>

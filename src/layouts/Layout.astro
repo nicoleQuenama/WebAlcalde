@@ -39,8 +39,20 @@ const {title, description = 'Manfred Reyes Villa — Cocha, la mejor ciudad de B
             media="print"
             onload="this.media='all'"
         />
+        <link
+            rel="preload"
+            as="style"
+            href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap"
+            media="print"
+            onload="this.media='all'"
+        />
         <noscript>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,opsz,wght@0,8..144,400;1,8..144,400&display=swap" />
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap" />
         </noscript>
         <!-- View Transitions SPA: navegación sin reload -->
         <ClientRouter fallback="swap" />

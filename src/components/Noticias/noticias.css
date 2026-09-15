@@ -1,0 +1,140 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Noticias — Estilos del módulo completo
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Hero: animaciones de entrada ───────────────────────────────────────── */
+
+@keyframes heroSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(12px, -18px) scale(1.05); }
+}
+
+.hero-badge {
+  animation: heroSlideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.hero-title {
+  animation: heroSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
+.hero-subtitle {
+  animation: heroSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+.hero-cta {
+  animation: heroSlideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both;
+}
+
+.hero-orb--top {
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
+.hero-orb--bottom {
+  animation: orbFloat 10s ease-in-out infinite reverse;
+}
+
+/* ── Ticker: scroll infinito  */
+
+.ticker-wrapper {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
+
+.ticker-track {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  animation: scroll-ticker 35s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scroll-ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 0.75rem)); }
+}
+
+/* ── Cards del ticker: sin interacción  */
+
+.ticker-wrapper :global(article) {
+  background: linear-gradient(160deg, #14091f 0%, #0a0412 100%);
+  border-color: rgba(90, 58, 158, 0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(139, 110, 200, 0.06);
+  cursor: default;
+  pointer-events: none;
+  transition: none;
+}
+
+.ticker-wrapper :global(article img) {
+  opacity: 0.7;
+  filter: brightness(0.8) saturate(0.85);
+  transition: none;
+}
+
+.ticker-wrapper :global(article span) {
+  color: rgba(186, 170, 220, 0.85);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+}
+
+/* ── Feed section: animaciones y estilos  */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feed-section {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Scrollbar personalizado para el feed */
+.feed-section ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.feed-section ::-webkit-scrollbar-track {
+  background: rgba(90, 58, 158, 0.05);
+  border-radius: 3px;
+}
+
+.feed-section ::-webkit-scrollbar-thumb {
+  background: rgba(90, 58, 158, 0.2);
+  border-radius: 3px;
+}
+
+.feed-section ::-webkit-scrollbar-thumb:hover {
+  background: rgba(90, 58, 158, 0.3);
+}
