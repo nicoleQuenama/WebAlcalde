@@ -63,5 +63,5 @@ export const DEFAULT_SOBRE_BIOGRAFIA = {
 };
 
 export const DEFAULT_HOME_LAYOUT = ['hero', 'biografia', 'antes_despues', 'libro'];
-export const DEFAULT_GESTION_LAYOUT = ['hero', 'capitulos', 'eras', 'proyectos_titulo', 'proyectos'];
+export const DEFAULT_GESTION_LAYOUT = ['hero', 'capitulos', 'eras', 'proyectos_titulo', 'proyectos', 'mapa'];
 export const DEFAULT_SOBRE_LAYOUT = ['hero', 'biografia', 'institutional', 'timeline'];

@@ -2,6 +2,7 @@
 import Layout from '@layouts/Layout.astro';
 import { Image, getImage } from 'astro:assets';
 import HeroCards from '@components/global/Hero/HeroCard.tsx';
+import Map from '@components/Map/Map.tsx';
 import { ajusteImagen } from '@lib/ajusteImagen';
 import {
   getCapitulos,
@@ -333,6 +334,26 @@ const colorEstado: Record<string, string> = {
 						))
 					}
 				</ul>
+			</div>
+		</section>
+
+		<!-- ═══ MAPA DEL CERCADO (Leaflet) ═══ -->
+		<section class="bg-white" style={`order:${ordenDe('mapa')}`}>
+			<div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
+				<header class="max-w-2xl">
+					<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
+						Mapa
+					</p>
+					<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight text-slate-900 sm:text-4xl lg:text-[2.75rem]">
+						Cercado — Cochabamba
+					</h2>
+					<p class="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
+						El municipio de Cochabamba (provincia Cercado), la ciudad y los distritos sobre el mapa.
+					</p>
+				</header>
+				<div class="mt-10 lg:mt-14">
+					<Map client:only="react" />
+				</div>
 			</div>
 		</section>
 	</main>
