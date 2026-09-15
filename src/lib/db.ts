@@ -849,7 +849,16 @@ class AlmacenPostgres implements Almacen {
 
   private pool(): Pool {
     if (!this._pool) {
-      this._pool = new Pool({ connectionString: this.url, max: 10 });
+      // Supabase (pooler o direct) requiere SSL. Lo activamos automáticamente
+      // cuando la URL apunta a supabase.co / pooler.supabase.com o incluye
+      // sslmode=require. Para localhost no se fuerza SSL.
+      const needsSSL =
+        /supabase\.co/.test(this.url) || /sslmode=require/.test(this.url);
+      this._pool = new Pool({
+        connectionString: this.url,
+        max: 10,
+        ...(needsSSL ? { ssl: { rejectUnauthorized: false } } : {}),
+      });
     }
     return this._pool;
   }
@@ -1115,14 +1124,29 @@ async function sembrar(): Promise<void> {
 
 // ── API pública ──────────────────────────────────────────────────────────────
 
-async function asegurarSembrada(): Promise<void> {
+export async function asegurarSembrada(): Promise<void> {
+  // Asegura todas las tablas principales antes de sembrar, así `npm run dev`
+  // deja la DB lista en Supabase sin esperar al primer request.
   await getAlmacen().asegurarTabla();
+  await getAlmacen().asegurarTablaBuzon();
+  await getAlmacen().asegurarTablaAuth();
   if (
     (await estaVacio('capitulo')) ||
     (await estaVacio('era')) ||
     (await estaVacio('hito'))
   ) {
     await sembrar();
+  }
+}
+
+// Hook para astro:server:setup — fuerza el sembrado al levantar `astro dev`
+export async function initDbOnStartup(): Promise<void> {
+  try {
+    await asegurarSembrada();
+    console.log('[db] Supabase listo (tablas verificadas/sembradas)');
+  } catch (err) {
+    console.error('[db] Error al inicializar Supabase:', (err as Error).message);
+    // No bloqueamos el dev server: el error se verá en el primer request igual
   }
 }
 

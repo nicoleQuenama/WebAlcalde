@@ -26,6 +26,22 @@ export default defineConfig({
     react({
       experimentalReactChildren: true,
     }),
+    // Sembrado automático de Supabase al levantar `astro dev` (no bloquea el arranque)
+    {
+      name: 'init-db',
+      hooks: {
+        'astro:server:setup': async ({ server }) => {
+          server?.httpServer?.once('listening', async () => {
+            try {
+              const { initDbOnStartup } = await import('./src/lib/db.ts');
+              await initDbOnStartup();
+            } catch (e) {
+              console.warn('[init-db] seeding diferido al primer request:', e.message);
+            }
+          });
+        },
+      },
+    },
   ],
 
   // Optimización de imágenes remotas del bucket de Supabase (resize + webp en build).

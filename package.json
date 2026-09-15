@@ -6,10 +6,12 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "astro dev --force",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "db:seed": "node ./scripts/seed.mjs",
+    "db:check": "node ./scripts/check-db.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.5",
