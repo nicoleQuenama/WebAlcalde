@@ -2,68 +2,63 @@
 import './noticias.css';
 import NewCard from './NewCard.astro';
 import Feed from './SectionNoticias/Feed.tsx';
+import { MEDIA } from '@lib/media';
 
 const noticiasData = [
-  { id: 1, src: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=600', titulo: 'Nueva Terminal' },
-  { id: 2, src: 'https://images.unsplash.com/photo-1449034446853-66c86144b0ad?auto=format&fit=crop&q=80&w=600', titulo: 'Laguna Alalay' },
-  { id: 3, src: 'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&q=80&w=600', titulo: 'Salud Municipal' },
-  { id: 4, src: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80&w=600', titulo: 'FEXCO 2026' },
-  { id: 5, src: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&q=80&w=600', titulo: 'Parques Urbanos' },
+  { id: 1, src: MEDIA.proyectos.playaTurquesa, titulo: 'Playa Turquesa' },
+  { id: 2, src: MEDIA.proyectos.lagunaAlalay, titulo: 'Laguna Alalay' },
+  { id: 3, src: MEDIA.proyectos.plazaBanderas, titulo: 'Plaza de las Banderas' },
+  { id: 4, src: MEDIA.proyectos.parqueVial, titulo: 'Parque Vial' },
+  { id: 5, src: MEDIA.temario.salud, titulo: 'Salud Municipal' },
 ];
 ---
 
-<section class="noticias-hero relative overflow-hidden text-white">
+<section class="noticias-hero">
 
-  <div class="absolute inset-0 bg-gradient-to-br from-[#1a0a2e] via-[#2d1654] to-[#0d0618]"></div>
+  <div class="noticias-hero__bg"></div>
 
-  <div class="hero-orb hero-orb--top pointer-events-none absolute -top-32 -left-32 h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle,rgba(100,60,180,0.18)_0%,transparent_70%)] blur-3xl"></div>
+  <div class="hero-orb hero-orb--top"></div>
 
-  <div class="hero-orb hero-orb--bottom pointer-events-none absolute -bottom-40 -right-40 h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,rgba(90,50,160,0.12)_0%,transparent_70%)] blur-3xl"></div>
+  <div class="hero-orb hero-orb--bottom"></div>
 
-  <div class="pointer-events-none absolute left-0 top-0 h-full w-px bg-gradient-to-b from-transparent via-[#5a3a9e]/15 to-transparent"></div>
+  <div class="noticias-hero__linea"></div>
 
-  <div class="relative z-10 mx-auto flex min-h-[85svh] max-w-7xl items-center px-6 py-20 lg:px-12">
+  <div class="noticias-hero__contenido">
+    <div class="noticias-hero__grid">
 
-    <div class="w-full lg:flex lg:items-center lg:gap-16">
-
-      <div class="mx-auto max-w-xl text-center lg:ml-0 lg:w-5/12 lg:text-left">
-
-        <div class="hero-badge inline-flex items-center gap-2 rounded-full border border-[#5a3a9e]/25 bg-[#5a3a9e]/8 px-4 py-1.5 backdrop-blur-sm">
-          <span class="inline-block h-1.5 w-1.5 rounded-full bg-[#8b6fc0]/70"></span>
-          <span class="font-roboto-condensed text-[11px] font-bold uppercase tracking-[0.2em] text-[#9a85c0]">Noticias</span>
+      <div class="noticias-hero__texto">
+        <div class="hero-badge noticias-hero__badge">
+          <span class="noticias-hero__badge-dot"></span>
+          <span class="noticias-hero__badge-label">Noticias</span>
         </div>
 
-        <h1 class="hero-title mt-8 font-roboto-condensed text-4xl font-bold leading-[1.1] text-white/90 md:text-5xl xl:text-6xl">
+        <h1 class="hero-title noticias-hero__titulo">
           Conoce las<br />
-          <span class="text-[#a895d0]">nuevas noticias</span>
+          <span class="noticias-hero__titulo-acento">nuevas noticias</span>
         </h1>
 
-        <p class="hero-subtitle mt-6 max-w-md font-roboto-condensed text-base leading-relaxed font-bold text-[#8a7ab5]/65">
+        <p class="hero-subtitle noticias-hero__subtitulo">
           Mantente informado sobre los últimos proyectos, obras entregadas y el avance de nuestra ciudad hacia el futuro.
         </p>
 
-        <div class="hero-cta mt-8">
-          <a
-            href="#ultimas-noticias"
-            class="group inline-flex items-center gap-3 rounded-xl border border-[#5a3a9e]/30 bg-[#3a2070]/40 px-7 py-3.5 font-roboto-condensed text-sm font-bold uppercase tracking-[0.12em] text-[#b8a8dc]/90 backdrop-blur-sm transition-all duration-300 hover:border-[#6b4cbf]/50 hover:bg-[#4a2d8a]/50 hover:text-[#d4c8f0]"
-          >
+        <div class="hero-cta noticias-hero__cta">
+          <a href="#ultimas-noticias" class="noticias-hero__btn">
             <span>Ver últimas noticias</span>
-            <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="noticias-hero__btn-icono" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </a>
         </div>
       </div>
 
-      <div class="relative mt-14 w-full lg:col-span-3 lg:mt-0 lg:w-7/12">
+      <div class="noticias-hero__cards">
         <NewCard noticias={noticiasData} />
       </div>
 
     </div>
   </div>
 </section>
-     <!-- Nueva Sección del Feed Interactivo -->
-    <div class="bg-white">
-      <!-- client:load enciende los hooks de React en el navegador -->
-      <Feed client:load />
-    </div>
+
+<div class="noticias-feed-bg">
+  <Feed client:load />
+</div>
