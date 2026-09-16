@@ -54,16 +54,34 @@ export const MEDIA = {
   /** Portada del libro digital (queda local: no está en el bucket). */
   portadaLibro: '/cocha.jpg',
 
-  // ── Hero (home y /sobre) ──────────────────────────────────────────
+  // ── Hero ─────────────────────────────────────────────────────────
   hero: {
-    /** Panorámica desenfocada de fondo. */
-    panoramica: ahora('DJI_0001-Pano.webp'),
-    carrusel: [
-      { id: 'gente-1', src: raiz('DSC_0802'), titulo: 'Manfred Reyes Villa', w: 2549, h: 3568, encuadre: 'rostro', zoomOut: true },
-      { id: 'gente-2', src: raiz('IMG_2941'), titulo: 'Cerca de la gente', w: 12480, h: 8320, ajuste: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 } },
-      { id: 'gente-3', src: raiz('DSC_0807'), titulo: 'Alcalde de Cochabamba', w: 2832, h: 3826, encuadre: 'rostro', zoomOut: true },
-      { id: 'gente-4', src: premio('01 ALCALDE FRANCIA OK.webp'), titulo: 'Reconocimiento internacional', w: 1032, h: 1207, encuadre: 'rostro', zoomOut: true },
-    ] satisfies TarjetaImagen[],
+    // ── Home (/) ──
+    home: {
+      /** Panorámica desenfocada de fondo (fallback). */
+      panoramica: ahora('DJI_0001-Pano.webp'),
+      /** Fotos a pantalla completa del carrusel de fondo del hero. */
+      fondo: [
+        { src: home('IMG_8396'), w: 5958, h: 4074 },
+        { src: raiz('IMG_2941'), w: 12480, h: 8320 },
+        { src: premio('puente'), w: 1034, h: 676 },
+      ],
+    } satisfies {
+      panoramica: string;
+      fondo: { src: string; w: number; h: number }[];
+    },
+
+    // ── Sobre (/sobre) ──
+    sobre: {
+      /** Panorámica desenfocada de fondo. */
+      panoramica: ahora('DJI_0001-Pano.webp'),
+      carrusel: [
+        { id: 'gente-1', src: raiz('DSC_0802'), titulo: 'Manfred Reyes Villa', w: 2549, h: 3568, encuadre: 'rostro', zoomOut: true },
+        { id: 'gente-2', src: raiz('IMG_2941'), titulo: 'Cerca de la gente', w: 12480, h: 8320, ajuste: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 } },
+        { id: 'gente-3', src: raiz('DSC_0807'), titulo: 'Alcalde de Cochabamba', w: 2832, h: 3826, encuadre: 'rostro', zoomOut: true },
+        { id: 'gente-4', src: premio('01 ALCALDE FRANCIA OK.webp'), titulo: 'Reconocimiento internacional', w: 1032, h: 1207, encuadre: 'rostro', zoomOut: true },
+      ] satisfies TarjetaImagen[],
+    },
   },
 
   // ── Video de biografía (home, debajo del hero) ────────────────────

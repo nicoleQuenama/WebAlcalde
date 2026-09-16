@@ -12,8 +12,6 @@ import {
   DEFAULT_HOME_LAYOUT,
 } from '../admin/defaults';
 import Hero from '@components/global/Hero/Hero.astro';
-import HeroCards from '@components/global/Hero/HeroCard.tsx';
-import type { TarjetaImagen } from '@components/global/Hero/HeroCard.tsx';
 import ComparadorAntesDespues from '@components/Home/ComparatingProjects/ProjectSlide.tsx';
 import type { ParComparador } from '@components/Home/ComparatingProjects/ProjectSlide.tsx';
 import FlipBook from '@components/FlipBook/FlipBook';
@@ -32,30 +30,11 @@ const ordenDe = (clave: string) => {
   return i === -1 ? 999 : i;
 };
 
-// ── HERO ──────────────────────────────────────────────────────────────
-// Optimización en build: el carrusel se sirve a ~900px webp; el fondo, chico
-// y borroso. El `height` se calcula con las dimensiones reales (w/h) para NO
-// deformar con `inferSize` (Astro lee mal algunos remotos y recorta la foto).
-const imgs: TarjetaImagen[] = await Promise.all(
-  MEDIA.hero.carrusel.map(async (img) => ({
-    ...img,
-    src: (
-      await getImage({
-        src: img.src,
-        width: 900,
-        ...(img.w && img.h ? { height: Math.max(1, Math.round((900 * img.h) / img.w)) } : {}),
-        fit: 'cover',
-        format: 'webp',
-      })
-    ).src,
-  })),
-);
-// Panorámica DJI_0001-Pano.webp = 5570×3481 → alto real a 900px de ancho.
 const fondo = await getImage({
-  src: MEDIA.hero.panoramica,
+  src: MEDIA.hero.home.panoramica,
   width: 900,
   height: 562,
-  quality: 30,
+  quality: 72,
   format: 'webp',
 });
 
@@ -148,13 +127,12 @@ const toc = [
     <!-- ═══ HERO (mismo diseño que /sobre, con el texto del home) ═══ -->
     <Hero
         fondoSrc={fondo.src}
+        fotosFondo={MEDIA.hero.home.fondo}
         eyebrow={heroTexto.eyebrow}
         titulo={heroTexto.titulo}
         style={`order:${ordenDe('hero')}`}
         dominio="home_hero"
-    >
-        <HeroCards client:load imagenes={imgs} autoplayMs={4500} slot="media" />
-    </Hero>
+    />
 
     <!-- ═══ BIOGRAFÍA ═══ -->
     <BiographyVideo
@@ -225,6 +203,12 @@ const toc = [
                 />
             </FlipBook>
         </div>
+    </section>
+    <section>
+      <section>
+        <script src="https://elfsightcdn.com/platform.js" async></script>
+        <div class="elfsight-app-5ca2e603-6ff5-4c5f-bf69-4689838a733c" data-elfsight-app-lazy></div>
+      </section>
     </section>
     </div>
 </Layout>

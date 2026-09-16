@@ -1,10 +1,13 @@
 ---
 import type { HeroProps } from './types';
+import CarouselFondo from '@components/Home/Carousel/index.astro';
 
-const { fondoSrc, eyebrow, titulo, subtitulo, quote, style, dominio } = Astro.props as HeroProps & {
+const { fondoSrc, fotosFondo, eyebrow, titulo, subtitulo, quote, style, dominio } = Astro.props as HeroProps & {
     style?: string;
     dominio?: string;
 };
+
+const usaCarrusel = !!fotosFondo && fotosFondo.length > 0;
 ---
 
 <section
@@ -12,25 +15,37 @@ const { fondoSrc, eyebrow, titulo, subtitulo, quote, style, dominio } = Astro.pr
     style={style}
     data-cms-dominio={dominio}
 >
-    <!-- Fondo: panorámica desenfocada + velo del color de marca -->
     <div class="absolute inset-0 z-0 overflow-hidden">
-        <div
-            class="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-xl"
-            style={`background-image: url('${fondoSrc}');`}
-        ></div>
-        <div class="absolute inset-0 bg-primary/80 mix-blend-multiply"></div>
-        <div class="absolute inset-0 bg-gradient-to-br from-hero-from via-hero-via to-hero-to opacity-90"></div>
+        {usaCarrusel ? (
+            <CarouselFondo fotos={fotosFondo} />
+        ) : (
+            <div
+                class="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-xl"
+                style={`background-image: url('${fondoSrc}');`}
+            ></div>
+        )}
+        <div class="absolute inset-0 bg-primary/25 mix-blend-multiply"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-hero-from via-hero-via to-hero-to opacity-30"></div>
     </div>
 
     <!-- Contenido -->
-    <div class="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 px-6 lg:grid-cols-2 lg:px-12">
-        <!-- Columna izquierda: slot para media (carrusel, video, etc.) -->
-        <div class="flex w-full justify-center">
-            <slot name="media" />
-        </div>
+    <div
+        class={`relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-12 ${
+            usaCarrusel ? '' : 'grid grid-cols-1 items-center gap-16 lg:grid-cols-2'
+        }`}
+    >
+        {!usaCarrusel && (
+            <div class="flex w-full justify-center">
+                <slot name="media" />
+            </div>
+        )}
 
-        <!-- Columna derecha: textos -->
-        <div class="flex flex-col items-center space-y-6 text-center lg:items-start lg:text-left">
+        <!-- Textos -->
+        <div
+            class={`flex flex-col space-y-6 text-center ${
+                usaCarrusel ? 'items-center' : 'items-center lg:items-start lg:text-left'
+            }`}
+        >
             <!-- Eyebrow (máquina de escribir 1) -->
             <div class="relative w-max max-w-full">
                 <p class="invisible whitespace-nowrap pr-2 font-roboto-serif text-[11px] uppercase tracking-[0.14em] opacity-0 sm:text-sm sm:tracking-[0.2em]">
@@ -56,20 +71,6 @@ const { fondoSrc, eyebrow, titulo, subtitulo, quote, style, dominio } = Astro.pr
                     {titulo}
                 </h1>
             </div>
-
-            <!-- Subtítulo (si se provee) -->
-            {subtitulo && (
-                <p class="fade-right-delay font-roboto-serif text-lg text-white/85 sm:text-xl lg:text-2xl">
-                    {subtitulo}
-                </p>
-            )}
-            <!-- Quote (si se provee) -->
-            {quote && (
-                <p class="fade-right-delay border-l-4 border-accent pl-6 font-roboto-serif text-lg italic text-white/85 sm:text-xl lg:text-2xl" data-cms-campo="quote">
-                    {quote}
-                </p>
-            )}
-            <!-- Slot para contenido adicional (botones, etc.) -->
             <slot />
         </div>
     </div>
