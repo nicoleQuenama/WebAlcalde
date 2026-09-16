@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { NoticiaFeed } from "./SectionNoticias/FeedCard";
 
 interface NewsModalProps {
@@ -7,84 +8,156 @@ interface NewsModalProps {
   onClose: () => void;
   onNext: () => void;
   onPrev: () => void;
+  /** Arreglo completo de noticias filtradas, para mostrar preview de la siguiente */
+  todasLasNoticias: NoticiaFeed[];
+  /** Índice actual dentro del arreglo de noticias */
+  indiceActual: number;
 }
 
-export default function NewsModal({ noticia, isOpen, onClose, onNext, onPrev }: NewsModalProps) {
+export default function NewsModal({
+  noticia,
+  isOpen,
+  onClose,
+  onNext,
+  onPrev,
+  todasLasNoticias,
+  indiceActual,
+}: NewsModalProps) {
+  // Bloquear scroll del body cuando el modal está abierto
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      const scrollY = document.body.style.top;
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || "0") * -1);
+      }
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+    };
   }, [isOpen]);
 
+  // Navegación con teclado
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowRight') onNext();
-      if (e.key === 'ArrowLeft') onPrev();
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight") onNext();
+      if (e.key === "ArrowLeft") onPrev();
     };
-    if (isOpen) window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
+    if (isOpen) window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
   }, [isOpen, onClose, onNext, onPrev]);
 
   if (!isOpen || !noticia) return null;
 
-  return (
-    <div className="noticias-modal-overlay">
-      <div className="noticias-modal-bg" onClick={onClose} />
+  // Calcular la siguiente noticia para el preview
+  const siguienteIndice =
+    indiceActual === todasLasNoticias.length - 1 ? 0 : indiceActual + 1;
+  const siguienteNoticia = todasLasNoticias[siguienteIndice];
 
-      <button 
-        onClick={(e) => { e.stopPropagation(); onPrev(); }} 
+  return createPortal(
+    <div className="noticias-modal-overlay" onClick={onClose}>
+      <div className="noticias-modal-bg" />
+
+      {/* Flecha izquierda */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onPrev();
+        }}
         className="noticias-modal__flecha noticias-modal__flecha--izquierda"
+        aria-label="Noticia anterior"
       >
-        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
 
-      <div 
-        className="noticias-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button 
-          onClick={onClose} 
-          className="noticias-modal__cerrar"
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      {/* Contenido del modal */}
+      <div className="noticias-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Botón cerrar */}
+        <button onClick={onClose} className="noticias-modal__cerrar">
+          <svg
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
+        {/* Sección de imagen */}
         <div className="noticias-modal__imagen-wrap">
-          <div 
+          <div
             className="noticias-modal__imagen-blur"
             style={{ backgroundImage: `url(${noticia.src})` }}
           />
           <div className="noticias-modal__imagen-overlay" />
           <div className="noticias-modal__imagen">
-            <img 
-              src={noticia.src} 
-              alt={noticia.titulo}
-              loading="lazy"
-              decoding="async"
-            />
+            <img src={noticia.src} alt={noticia.titulo} loading="lazy" decoding="async" />
           </div>
         </div>
 
+        {/* Sección de contenido con scroll */}
         <div className="noticias-modal__contenido">
           <button className="noticias-modal__compartir" title="Compartir">
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+              />
             </svg>
           </button>
 
           <div className="noticias-modal__meta">
-            <span className="noticias-modal__categoria">{noticia.categoria}</span>
-            <span className="noticias-modal__separador">•</span>
+            <span className="noticias-modal__categoria-texto">
+              {noticia.categoria}
+            </span>
+            <span className="noticias-modal__separador-texto">•</span>
             <time className="noticias-modal__fecha">
-              {new Date(noticia.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {new Date(noticia.fecha).toLocaleDateString("es-ES", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
             </time>
           </div>
 
@@ -95,30 +168,97 @@ export default function NewsModal({ noticia, isOpen, onClose, onNext, onPrev }: 
           <div className="noticias-modal__texto">
             <p>{noticia.resumen}</p>
             <p>
-              Aquí irá todo el cuerpo completo de la noticia detallando los pormenores del proyecto, 
-              declaraciones oficiales y los próximos pasos a seguir para beneficiar a la población de Cochabamba.
+              Aquí irá todo el cuerpo completo de la noticia detallando los
+              pormenores del proyecto, declaraciones oficiales y los próximos
+              pasos a seguir para beneficiar a la población de Cochabamba.
             </p>
             <p>
-              Este proyecto representa un avance significativo para nuestra ciudad, mejorando la calidad 
-              de vida de miles de cochabambinos y marcando un precedente importante en gestión municipal.
+              Este proyecto representa un avance significativo para nuestra
+              ciudad, mejorando la calidad de vida de miles de cochabambinos y
+              marcando un precedente importante en gestión municipal.
             </p>
             <p>
-              Las autoridades municipales han destacado la importancia de esta iniciativa, la cual 
-              forma parte del plan integral de desarrollo urbano que se viene implementando durante 
-              este período de gestión.
+              Las autoridades municipales han destacado la importancia de esta
+              iniciativa, la cual forma parte del plan integral de desarrollo
+              urbano que se viene implementando durante este período de gestión.
             </p>
           </div>
+
+          {/* Preview de la siguiente noticia */}
+          {siguienteNoticia && (
+            <div className="noticias-modal__siguiente-wrap">
+              <div className="noticias-modal__siguiente-divider"></div>
+              <button
+                className="noticias-modal__siguiente"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNext();
+                }}
+              >
+                <span className="noticias-modal__siguiente-label">
+                  Siguiente noticia
+                </span>
+                <h4 className="noticias-modal__siguiente-titulo">
+                  {siguienteNoticia.titulo}
+                </h4>
+                <div className="noticias-modal__siguiente-meta">
+                  <span>{siguienteNoticia.categoria}</span>
+                  <span className="noticias-modal__siguiente-sep">•</span>
+                  <time>
+                    {new Date(siguienteNoticia.fecha).toLocaleDateString(
+                      "es-ES",
+                      { day: "numeric", month: "short", year: "numeric" }
+                    )}
+                  </time>
+                </div>
+                <span className="noticias-modal__siguiente-cta">
+                  Leer ahora
+                  <svg
+                    width="14"
+                    height="14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      <button 
-        onClick={(e) => { e.stopPropagation(); onNext(); }} 
+      {/* Flecha derecha */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onNext();
+        }}
         className="noticias-modal__flecha noticias-modal__flecha--derecha"
+        aria-label="Siguiente noticia"
       >
-        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        <svg
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 5l7 7-7 7"
+          />
         </svg>
       </button>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,5 +1,4 @@
 import * as React from "react";
-
 export interface RevealCardProps extends React.HTMLAttributes<HTMLDivElement> {
   src: string;
   titulo: string;
@@ -7,7 +6,6 @@ export interface RevealCardProps extends React.HTMLAttributes<HTMLDivElement> {
   resumen: string;
   href?: string;
 }
-
 const RevealCard = React.forwardRef<HTMLDivElement, RevealCardProps>(
   ({ className, src, titulo, categoria, resumen, href = "#", ...props }, ref) => {
     return (
@@ -66,6 +64,5 @@ const RevealCard = React.forwardRef<HTMLDivElement, RevealCardProps>(
     );
   }
 );
-
 RevealCard.displayName = "RevealCard";
 export { RevealCard };

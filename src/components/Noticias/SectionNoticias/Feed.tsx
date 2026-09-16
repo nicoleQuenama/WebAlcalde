@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import NewsFeedCard, { type NoticiaFeed } from './FeedCard';
 import NewsFilters from './Filters';
 import NewsModal from '../Modal';
@@ -71,27 +71,156 @@ const NOTICIAS_DB: NoticiaFeed[] = [
   },
 ];
 
-const CATEGORIAS = ['Todas', 'Espacio público', 'Medio Ambiente', 'Salud', 'Educación', 'Obras Públicas', 'Ciudad Jardín'];
+function CarruselNoticias({ 
+  titulo, 
+  noticias, 
+  onAbrirModal,
+  compacto = false
+}: {
+  titulo: string;
+  noticias: NoticiaFeed[];
+  onAbrirModal: (id: number | string) => void;
+  compacto?: boolean;
+}) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollStart = useRef(0);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+
+    const checkScroll = () => {
+      setCanScrollLeft(el.scrollLeft > 10);
+      setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 10);
+    };
+
+    checkScroll();
+    el.addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('resize', checkScroll);
+
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [noticias]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    startX.current = e.pageX;
+    scrollStart.current = trackRef.current?.scrollLeft || 0;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !trackRef.current) return;
+    const x = e.pageX;
+    const walk = (startX.current - x) * 1.5;
+    trackRef.current.scrollLeft = scrollStart.current + walk;
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleItemClick = (id: number | string) => {
+    if (!isDragging.current) {
+      onAbrirModal(id);
+    }
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (!trackRef.current) return;
+    const amount = 340;
+    const newScroll = direction === 'left' 
+      ? trackRef.current.scrollLeft - amount 
+      : trackRef.current.scrollLeft + amount;
+    trackRef.current.scrollTo({ left: newScroll, behavior: 'smooth' });
+  };
+
+  if (noticias.length === 0) return null;
+
+  return (
+    <div style={{ marginBottom: compacto ? '0' : '3rem' }}>
+      <div className="noticias-subencabezado">
+        <div className="noticias-subencabezado__label">
+          <div className={`noticias-subencabezado__barra ${compacto ? 'noticias-subencabezado__barra--pequena' : ''}`}></div>
+          <h2 className={`noticias-subencabezado__titulo ${compacto ? 'noticias-subencabezado__titulo--secundario' : ''}`}>
+            {titulo}
+          </h2>
+        </div>
+        <div className="noticias-subencabezado__linea"></div>
+      </div>
+      
+      <div className="noticias-carrusel-wrap">
+        {canScrollLeft && (
+          <button 
+            onClick={() => scroll('left')}
+            className="noticias-flecha noticias-flecha--izquierda"
+            aria-label="Anterior"
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        )}
+
+        <div 
+          ref={trackRef}
+          className="noticias-carrusel__track scrollbar-hide"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          {noticias.map(noticia => (
+            <div 
+              key={noticia.id} 
+              onClick={() => handleItemClick(noticia.id)} 
+              className="noticias-carrusel__item"
+            >
+              <NewsFeedCard noticia={noticia} />
+            </div>
+          ))}
+        </div>
+
+        {canScrollRight && (
+          <button 
+            onClick={() => scroll('right')}
+            className="noticias-flecha noticias-flecha--derecha"
+            aria-label="Siguiente"
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Feed() {
   const [busqueda, setBusqueda] = useState('');
-  const [fechaSel, setFechaSel] = useState('');
-  const [categoriaSel, setCategoriaSel] = useState('Todas');
-
   const [modalAbierto, setModalAbierto] = useState(false);
   const [indiceActual, setIndiceActual] = useState(0);
 
-  const ultimasRef = useRef<HTMLDivElement>(null);
-  const masRef = useRef<HTMLDivElement>(null);
-
+  // Ordenar y filtrar noticias por búsqueda
   const noticiasFiltradas = useMemo(() => {
-    return NOTICIAS_DB.filter((noticia) => {
-      const matchBusqueda = noticia.titulo.toLowerCase().includes(busqueda.toLowerCase());
-      const matchCategoria = categoriaSel === 'Todas' || noticia.categoria === categoriaSel;
-      const matchFecha = fechaSel === '' || noticia.fecha >= fechaSel;
-      return matchBusqueda && matchCategoria && matchFecha;
-    }).sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-  }, [busqueda, fechaSel, categoriaSel]);
+    const base = [...NOTICIAS_DB].sort(
+      (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+    );
+    if (!busqueda.trim()) return base;
+    const q = busqueda.toLowerCase();
+    return base.filter(
+      (n) =>
+        n.titulo.toLowerCase().includes(q) ||
+        n.categoria.toLowerCase().includes(q) ||
+        n.resumen.toLowerCase().includes(q)
+    );
+  }, [busqueda]);
 
   const ultimasNoticias = noticiasFiltradas.slice(0, 4);
   const masNoticias = noticiasFiltradas.slice(4);
@@ -112,25 +241,11 @@ export default function Feed() {
     setIndiceActual((prev) => (prev === 0 ? noticiasFiltradas.length - 1 : prev - 1));
   };
 
-  const scroll = (ref: React.RefObject<HTMLDivElement | null>, direction: 'left' | 'right') => {
-    if (ref.current) {
-      const scrollAmount = 340;
-      const newScroll = direction === 'left' 
-        ? ref.current.scrollLeft - scrollAmount 
-        : ref.current.scrollLeft + scrollAmount;
-      ref.current.scrollTo({ left: newScroll, behavior: 'smooth' });
-    }
-  };
-
   return (
-    <section className="feed-section noticias-carrusel">
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-12">
+    <section id="feed-noticias" className="feed-section">
+      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-12">
         
         <div className="noticias-encabezado">
-          <div className="noticias-encabezado__badge">
-            <span className="noticias-encabezado__badge-dot"></span>
-            <span className="noticias-encabezado__badge-texto">Explorar Noticias</span>
-          </div>
           <h2 className="noticias-encabezado__titulo">Últimas Noticias</h2>
           <p className="noticias-encabezado__descripcion">
             Mantente informado sobre los proyectos, obras y avances más recientes de nuestra ciudad.
@@ -139,103 +254,23 @@ export default function Feed() {
 
         <NewsFilters 
           busqueda={busqueda} setBusqueda={setBusqueda}
-          fechaSel={fechaSel} setFechaSel={setFechaSel}
-          categoriaSel={categoriaSel} setCategoriaSel={setCategoriaSel}
-          categorias={CATEGORIAS}
         />
 
         {ultimasNoticias.length > 0 && (
-          <div style={{ marginBottom: '5rem' }}>
-            <div className="noticias-subencabezado">
-              <div className="noticias-subencabezado__label">
-                <div className="noticias-subencabezado__barra"></div>
-                <h2 className="noticias-subencabezado__titulo">Últimas Noticias</h2>
-              </div>
-              <div className="noticias-subencabezado__linea"></div>
-            </div>
-            
-            <div className="noticias-carrusel">
-              <button 
-                onClick={() => scroll(ultimasRef, 'left')}
-                className="noticias-flecha noticias-flecha--izquierda"
-              >
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-
-              <div 
-                ref={ultimasRef}
-                className="noticias-carrusel__track scrollbar-hide"
-              >
-                {ultimasNoticias.map(noticia => (
-                  <div 
-                    key={noticia.id} 
-                    onClick={() => abrirModal(noticia.id)} 
-                    className="noticias-carrusel__item"
-                  >
-                    <NewsFeedCard noticia={noticia} />
-                  </div>
-                ))}
-              </div>
-
-              <button 
-                onClick={() => scroll(ultimasRef, 'right')}
-                className="noticias-flecha noticias-flecha--derecha"
-              >
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <CarruselNoticias 
+            titulo="Últimas Noticias"
+            noticias={ultimasNoticias}
+            onAbrirModal={abrirModal}
+          />
         )}
 
         {masNoticias.length > 0 && (
-          <div>
-            <div className="noticias-subencabezado">
-              <div className="noticias-subencabezado__label">
-                <div className="noticias-subencabezado__barra noticias-subencabezado__barra--pequena"></div>
-                <h2 className="noticias-subencabezado__titulo noticias-subencabezado__titulo--secundario">Más Noticias</h2>
-              </div>
-              <div className="noticias-subencabezado__linea"></div>
-            </div>
-            
-            <div className="noticias-carrusel noticias-carrusel--compacto">
-              <button 
-                onClick={() => scroll(masRef, 'left')}
-                className="noticias-flecha noticias-flecha--izquierda"
-              >
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-
-              <div 
-                ref={masRef}
-                className="noticias-carrusel__track scrollbar-hide"
-              >
-                {masNoticias.map(noticia => (
-                  <div 
-                    key={noticia.id} 
-                    onClick={() => abrirModal(noticia.id)} 
-                    className="noticias-carrusel__item"
-                  >
-                    <NewsFeedCard noticia={noticia} />
-                  </div>
-                ))}
-              </div>
-
-              <button 
-                onClick={() => scroll(masRef, 'right')}
-                className="noticias-flecha noticias-flecha--derecha"
-              >
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <CarruselNoticias 
+            titulo="Más Noticias"
+            noticias={masNoticias}
+            onAbrirModal={abrirModal}
+            compacto
+          />
         )}
 
         {noticiasFiltradas.length === 0 && (
@@ -248,15 +283,15 @@ export default function Feed() {
               </svg>
             </div>
             <p className="noticias-vacio__titulo">No se encontraron noticias</p>
-            <p className="noticias-vacio__descripcion">Intenta con otros términos de búsqueda o filtros diferentes.</p>
+            <p className="noticias-vacio__descripcion">Intenta con otros términos de búsqueda.</p>
             <button 
-              onClick={() => { setBusqueda(''); setCategoriaSel('Todas'); setFechaSel(''); }} 
+              onClick={() => setBusqueda('')} 
               className="noticias-vacio__btn"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6L6 18M6 6l12 12"/>
               </svg>
-              Limpiar filtros
+              Limpiar búsqueda
             </button>
           </div>
         )}
@@ -267,6 +302,8 @@ export default function Feed() {
           onClose={cerrarModal}
           onNext={noticiaSiguiente}
           onPrev={noticiaAnterior}
+          todasLasNoticias={noticiasFiltradas}
+          indiceActual={indiceActual}
         />
 
       </div>

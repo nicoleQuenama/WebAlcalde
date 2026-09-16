@@ -1,6 +1,6 @@
 ---
 import './noticias.css';
-import NewCard from './NewCard.astro';
+import HeroNoticias from './HeroNoticias';
 import Feed from './SectionNoticias/Feed.tsx';
 import { MEDIA } from '@lib/media';
 
@@ -27,11 +27,6 @@ const noticiasData = [
     <div class="noticias-hero__grid">
 
       <div class="noticias-hero__texto">
-        <div class="hero-badge noticias-hero__badge">
-          <span class="noticias-hero__badge-dot"></span>
-          <span class="noticias-hero__badge-label">Noticias</span>
-        </div>
-
         <h1 class="hero-title noticias-hero__titulo">
           Conoce las<br />
           <span class="noticias-hero__titulo-acento">nuevas noticias</span>
@@ -42,7 +37,7 @@ const noticiasData = [
         </p>
 
         <div class="hero-cta noticias-hero__cta">
-          <a href="#ultimas-noticias" class="noticias-hero__btn">
+          <a href="#feed-noticias" class="noticias-hero__btn">
             <span>Ver últimas noticias</span>
             <svg class="noticias-hero__btn-icono" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -52,7 +47,7 @@ const noticiasData = [
       </div>
 
       <div class="noticias-hero__cards">
-        <NewCard noticias={noticiasData} />
+        <HeroNoticias client:load noticias={noticiasData} />
       </div>
 
     </div>
