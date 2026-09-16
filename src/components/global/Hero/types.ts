@@ -1,4 +1,5 @@
 import type { Encuadre, AjusteCarrusel } from '@lib/ajusteImagen';
+import type { FotoFondo } from '@components/Home/Carousel/types';
 export interface TarjetaImagen {
   id: number | string;
   src: string;
@@ -15,6 +16,8 @@ export interface TarjetaImagen {
 export interface HeroProps {
   /** URL de la imagen panorámica de fondo (ya optimizada en build). */
   fondoSrc: string;
+  /** Fotos a pantalla completa del carrusel de fondo (raw, se optimizan en build). */
+  fotosFondo?: FotoFondo[];
   /** Texto eyebrow (ej: "Cocha, la mejor ciudad de Bolivia"). */
   eyebrow: string;
   /** Título principal (h1). */

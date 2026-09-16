@@ -1,0 +1,29 @@
+---
+import { getImage } from 'astro:assets';
+import CarouselFondo from './CarouselFondo';
+import type { FotoFondo } from './types';
+
+interface Props {
+  fotos: FotoFondo[];
+  autoplayMs?: number;
+}
+
+const { fotos, autoplayMs = 5000 } = Astro.props;
+
+const fondos = await Promise.all(
+  fotos.map(async (img) =>
+    (
+      await getImage({
+        src: img.src,
+        width: 1800,
+        ...(img.w && img.h ? { height: Math.max(1, Math.round((1800 * img.h) / img.w)) } : {}),
+        fit: 'cover',
+        quality: 72,
+        format: 'webp',
+      })
+    ).src,
+  ),
+);
+---
+
+<CarouselFondo client:load fondos={fondos} autoplayMs={autoplayMs} />

@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import type { ImageSliderProps } from './types';
 import styles from './ImageSlider.module.css';
 
@@ -16,8 +16,27 @@ export default function ImageSlider({
   afterScale,
 }: ImageSliderProps) {
   const [position, setPosition] = useState(clamp(initialPosition));
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [inView, setInView] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
+
+  // Dispara la pista visual (hintSlide) cuando el slider entra al viewport.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '150px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const updateFromClientX = useCallback((clientX: number) => {
     const container = containerRef.current;
@@ -31,6 +50,7 @@ export default function ImageSlider({
   const handlePointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       draggingRef.current = true;
+      setHasInteracted(true);
       e.currentTarget.setPointerCapture(e.pointerId);
       updateFromClientX(e.clientX);
     },
@@ -102,7 +122,7 @@ export default function ImageSlider({
       <span className={styles.labelAfter}>{afterLabel}</span>
 
       <div
-        className={styles.handle}
+        className={`${styles.handle} ${inView && !hasInteracted ? styles.handleAnimated : ''}`}
         style={{ left: `${position}%` }}
         role="slider"
         aria-valuemin={0}
@@ -123,7 +143,8 @@ export default function ImageSlider({
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <polyline points="9 6 15 12 9 18" />
+            <polyline points="8 7 3 12 8 17" />
+            <polyline points="16 7 21 12 16 17" />
           </svg>
         </div>
       </div>

@@ -156,3 +156,20 @@
     height: 38px;
   }
 }
+
+/* ---------- Animación de pista visual (Hint) ---------- */
+@keyframes hintSlide {
+  0%, 100% {
+    transform: translateX(-50%);
+  }
+  20%, 60% {
+    transform: translateX(calc(-50% - 14px));
+  }
+  40%, 80% {
+    transform: translateX(calc(-50% + 14px));
+  }
+}
+
+.handleAnimated {
+  animation: hintSlide 1.8s ease-in-out 0.6s 2; /* Espera 0.6s y oscila 2 veces */
+}

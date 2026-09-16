@@ -446,6 +446,9 @@ body {
 .cms-item-acciones { display: flex; gap: 4px; flex-wrap: wrap; }
 .cms-btn--copiar { background: #f3efff; border-color: var(--cms-accent); color: var(--cms-primary); }
 .cms-obra-fila--dragging { opacity: 0.4; }
+.cms-context-menu { position: fixed; z-index: 200; min-width: 210px; background: #fff; border: 1px solid #e3dbf5; border-radius: 12px; box-shadow: 0 12px 32px rgba(42,26,73,0.22); padding: 6px; display: none; flex-direction: column; gap: 2px; }
+.cms-portapapeles-bar { animation: cmsPulse 0.3s ease; }
+@keyframes cmsPulse { 0%{ transform: translateY(-4px); opacity:0 } 100%{ transform:none; opacity:1 } }
 
 @media (max-width: 560px) {
   #cms-modal {

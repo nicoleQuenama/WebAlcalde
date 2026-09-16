@@ -1,9 +1,7 @@
 ---
 import Hero from '@components/global/Hero/Hero.astro';
-import HeroCards from '@components/global/Hero/HeroCard';
-import type { TarjetaImagen } from '@components/global/Hero/HeroCard';
+import type { FotoFondo } from './Carousel/types';
 
-// Importamos directamente las carpetas (leemos sus index.astro)
 import BiographyVideo from './BiographyVideo/index.astro';
 import ComparatingProjects from './ComparatingProjects/index.astro';
 import BookSection from './BookSection/index.astro';
@@ -14,31 +12,27 @@ import type { BookProps } from './BookSection/Book3D';
 import './home.css';
 
 interface Props {
-  imagenesHero: TarjetaImagen[];
+  fotosFondo: FotoFondo[];
   fondoSrc: string;
   videoBiografia: string;
   posterBiografia: string;
   paresComparador: ParComparador[];
   bookProps: BookProps;
-  autoplayMs?: number;
 }
 
 const {
-  imagenesHero,
+  fotosFondo,
   fondoSrc,
   videoBiografia,
   posterBiografia,
   paresComparador,
   bookProps,
-  autoplayMs = 4500,
 } = Astro.props;
 ---
 
 <main class="w-full">
-  <Hero fondoSrc={fondoSrc} eyebrow="Cocha, la mejor ciudad de Bolivia" titulo="Manfred Reyes Villa">
-    <HeroCards slot="media" imagenes={imagenesHero} autoplayMs={autoplayMs} client:load />
-  </Hero>
-
+  <Hero fotosFondo={fotosFondo} fondoSrc={fondoSrc} eyebrow="Cocha, la mejor ciudad de Bolivia" titulo="Manfred Reyes Villa" />
+  
   <BiographyVideo videoBiografia={videoBiografia} posterBiografia={posterBiografia} />
   
   <ComparatingProjects pares={paresComparador} />

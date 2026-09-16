@@ -41,6 +41,9 @@ interface Portapapeles {
   dominio: string;
   data: Record<string, unknown>;
   label: string;
+  tipo: 'item' | 'seccion';
+  seccionKey?: string;
+  seccionTitulo?: string;
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(
@@ -102,10 +105,19 @@ export function montarEditor(init: InitData) {
       portapapelesEl.hidden = true;
     } else {
       portapapelesEl.hidden = false;
+      const esSeccion = portapapeles.tipo==='seccion';
+      const icono = esSeccion ? '⬢' : '⧉';
+      const hint = el('span', { style: 'opacity:0.7' }, esSeccion ? ' — abrí Estructura (☰) y hacé click derecho para pegar la sección' : ' — click derecho donde quieras pegar (misma sección)');
+      // Borde y fondo distinto según tipo para que se note en menú izquierda (topbar)
+      portapapelesEl.style.borderLeft = esSeccion ? '4px solid #472d82' : '4px solid #c9b8e8';
+      portapapelesEl.style.background = esSeccion ? '#f3efff' : '#fff';
+      const badge = el('span', { style: 'font-size:10px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;background:#472d82;color:#fff;padding:2px 6px;border-radius:999px;' }, esSeccion ? 'SECCIÓN' : 'TARJETA');
       portapapelesEl.replaceChildren(
-        el('span', {}, 'Copiado: '),
+        badge,
+        el('span', {}, ` ${icono} `),
         el('strong', {}, portapapeles.label),
         el('span', {}, ` (${portapapeles.dominio})`),
+        hint,
         (() => {
           const b = el('button', { className: 'cms-btn cms-btn--icono', type: 'button', title: 'Limpiar' }, '✕');
           b.addEventListener('click', () => { portapapeles = null; actualizarBarraPortapapeles(); syncClipboardToPreview(); });
@@ -117,28 +129,101 @@ export function montarEditor(init: InitData) {
   }
 
   function syncClipboardToPreview(){
-    try{ iframe.contentWindow?.postMessage({ source:'cms-editor', type:'clipboard', payload: portapapeles ? { dominio: portapapeles.dominio, label: portapapeles.label } : null }, '*'); }catch{}
+    try{ iframe.contentWindow?.postMessage({ source:'cms-editor', type:'clipboard', payload: portapapeles ? { dominio: portapapeles.dominio, label: portapapeles.label, tipo: portapapeles.tipo, seccionKey: portapapeles.seccionKey } : null }, '*'); }catch{}
+    // Si el modal Estructura está abierto, repintarlo para mostrar zonas de pegado de sección
+    try{
+      if(!overlay.hidden && modal.querySelector('.cms-estructura-lista')){
+        const estado = cache.get(paginaActual);
+        if(estado && portapapeles?.tipo==='seccion') mostrarEstructura();
+      }
+    }catch{}
   }
 
   function syncPreviewOrden(dominioAfectado?: string){
     try{
       const estado = cache.get(paginaActual);
       if(!estado) return;
-      // Layout
-      iframe.contentWindow?.postMessage({ source:'cms-editor', type:'cms-sync', ordenLayout: estado.datos.ordenLayout, dominio: dominioAfectado, ordenClaves: dominioAfectado ? (dominioIndex.get(dominioAfectado)?.items?.map(i=>i.clave) ?? null) : null }, '*');
-      // Fallback directo si es same-origin y iframe cargado
+      iframe.contentWindow?.postMessage({ source:'cms-editor', type:'cms-sync', ordenLayout: estado.datos.ordenLayout, dominio: dominioAfectado, ordenClaves: dominioAfectado ? (dominioIndex.get(dominioAfectado)?.items?.map(i=>i.clave) ?? null) : null, nuevoDominio: null, nuevoKey: null }, '*');
+        // Fallback directo si es same-origin y iframe cargado
       const doc = iframe.contentDocument;
       if(doc){
-        // Aplicar ordenLayout via style.order
         const containers = Array.from(doc.querySelectorAll<HTMLElement>('div[style*="flex-direction:column"], main[style*="display:flex"]'));
         containers.forEach(container=>{
           const hijos = Array.from(container.children).filter(c=> c instanceof HTMLElement && (c as HTMLElement).hasAttribute('data-cms-dominio')) as HTMLElement[];
-          if(hijos.length<2) return;
+          if(hijos.length===0) return;
+          // 1) Crear fantasmas SOLO para secciones pegadas en esta operación: usar copia profunda una sola vez
+          // Evitar duplicados: comparar por dominio real de la sección
+          const dominiosExistentes = new Set(hijos.map(h=> h.dataset.cmsDominio || ''));
+          const faltantesKeys: string[] = [];
+          for(const k of estado.datos.ordenLayout){
+            const sec = estado.datos.secciones.find(s=> s.key===k);
+            if(!sec) continue;
+            const dom = sec.dominio || k;
+            if(!dominiosExistentes.has(dom)) faltantesKeys.push(k);
+          }
+          // Solo crear si es una operación de pegado (hay portapapeles seccion y faltante es esa seccion)
+          const esPegadoSeccion = portapapeles?.tipo==='seccion' && faltantesKeys.includes(portapapeles.seccionKey ? `${portapapeles.seccionKey}-copia` : '');
+          // Alternativa simple: si falta más de 2 keys, no crear fantasmas automáticamente (evita duplicar todo)
+          if(faltantesKeys.length>0 && faltantesKeys.length<=2){
+            faltantesKeys.forEach(fk=>{
+              const srcSec = estado.datos.secciones.find(s=> s.key===fk);
+              if(!srcSec) return;
+              if(srcSec.tipo==='placeholder') return; // no clonar placeholders
+              const plantilla = hijos[hijos.length-1] ?? hijos[0];
+              if(!plantilla) return;
+              // Evitar crear si ya existe un fantasma con mismo título copia
+              if(container.querySelector(`[data-cms-dominio="${srcSec.dominio}"]`)) return;
+              const clone = plantilla.cloneNode(true) as HTMLElement;
+              if(srcSec.dominio) clone.setAttribute('data-cms-dominio', srcSec.dominio);
+              else clone.dataset.cmsDominio = fk;
+              clone.querySelectorAll('[data-cms-clave]').forEach(n=> (n as HTMLElement).removeAttribute('data-cms-clave'));
+              if(srcSec.items?.length){
+                const srcItem = srcSec.items[0];
+                const itemTemplate = plantilla.querySelector('[data-cms-clave]') as HTMLElement | null;
+                if(itemTemplate && srcItem){
+                  const itemClone = itemTemplate.cloneNode(true) as HTMLElement;
+                  itemClone.setAttribute('data-cms-dominio', srcSec.dominio || fk);
+                  itemClone.setAttribute('data-cms-clave', srcItem.clave);
+                  try{ (srcSec.campos ?? []).forEach(c=>{ const cel = itemClone.querySelector(`[data-cms-campo="${c.name}"]`); if(cel && typeof srcItem.data[c.name]==='string') cel.textContent = String(srcItem.data[c.name]); }); }catch{}
+                  const contLista = clone.querySelector('[data-cms-clave]')?.parentElement ?? clone;
+                  contLista.replaceChildren(itemClone);
+                  if(srcSec.items.length>1){
+                    const extra = document.createElement('div');
+                    extra.className='cms-pegado-count';
+                    extra.textContent = `+ ${srcSec.items.length-1} tarjetas más`;
+                    extra.style.cssText='margin:8px auto;padding:6px 10px;background:#f3efff;color:#472d82;border-radius:999px;font-size:11px;font-weight:700;text-align:center;';
+                    contLista.appendChild(extra);
+                  }
+                }
+              } else if(srcSec.valor){
+                try{ (srcSec.campos ?? []).forEach(c=>{ const cel = clone.querySelector(`[data-cms-campo="${c.name}"]`); if(cel && typeof srcSec.valor![c.name]==='string') cel.textContent = String(srcSec.valor![c.name]); }); }catch{}
+              }
+              clone.style.outline='3px solid #c9b8e8';
+              clone.style.position='relative';
+              const badge = document.createElement('div');
+              badge.textContent = `⬢ COPIA: ${srcSec.titulo}`;
+              badge.style.cssText='position:absolute;top:6px;left:6px;background:#472d82;color:#fff;font-size:10px;font-weight:800;letter-spacing:0.05em;padding:4px 8px;border-radius:999px;z-index:5;';
+              clone.appendChild(badge);
+              const hTitle = clone.querySelector('h1,h2,h3');
+              if(hTitle && srcSec.titulo) hTitle.textContent = srcSec.titulo + ' (copia)';
+              container.appendChild(clone);
+              setTimeout(()=>{ clone.style.outline=''; badge.style.opacity='0.85'; }, 2500);
+            });
+          }
+          // 2) Aplicar orden por dominio
+          const hijosActualizados = Array.from(container.children).filter(c=> c instanceof HTMLElement && (c as HTMLElement).hasAttribute('data-cms-dominio')) as HTMLElement[];
+          const domToEl = new Map(hijosActualizados.map(h=> [h.dataset.cmsDominio||'', h]));
           estado.datos.ordenLayout.forEach((key, idx)=>{
-            const DOMINIO_A_KEY: Record<string,string> = { 'home_hero':'hero','home_biografia':'biografia','home_antes_despues':'antes_despues','flipbook_meta':'libro','gestion_hero':'hero','capitulo':'capitulos','era':'eras','seccion':'secciones','proyectos_titulo':'proyectos_titulo','proyecto':'proyectos','sobre_hero':'hero','sobre_biografia':'biografia','sobre_institutional':'institutional' };
-            const h = hijos.find(x=> (DOMINIO_A_KEY[x.dataset.cmsDominio||'']||x.dataset.cmsDominio)===key);
+            const sec = estado.datos.secciones.find(s=> s.key===key);
+            const dom = sec?.dominio || key;
+            const h = domToEl.get(dom);
             if(h) h.style.order = String(idx);
           });
+          if(faltantesKeys.length===1){
+            const sec = estado.datos.secciones.find(s=> s.key===faltantesKeys[0]);
+            const nuevoEl = sec?.dominio ? domToEl.get(sec.dominio) ?? container.lastElementChild as HTMLElement | null : null;
+            if(nuevoEl) nuevoEl.scrollIntoView({ behavior:'smooth', block:'center' });
+          }
         });
         if(dominioAfectado){
           const sec = dominioIndex.get(dominioAfectado);
@@ -205,14 +290,46 @@ export function montarEditor(init: InitData) {
   }
 
   function copiarItem(dominio: string, data: Record<string, unknown>, campos: FieldSpec[]) {
-    portapapeles = { dominio, data: clonarData(data), label: tituloDeItem(campos, data) };
+    portapapeles = { dominio, data: clonarData(data), label: tituloDeItem(campos, data), tipo: 'item' };
     actualizarBarraPortapapeles();
-    estadoEl.textContent = `Copiado: ${portapapeles.label} — elige dónde pegar`;
+    estadoEl.textContent = `Copiado: ${portapapeles.label} — click derecho donde quieras pegar`;
     estadoEl.className = 'cms-estado';
-    setTimeout(() => { if (hayCambiosSinGuardar) { estadoEl.textContent = 'Cambios sin guardar'; estadoEl.className = 'cms-estado cms-estado--sucio'; } else { estadoEl.textContent = 'Todo guardado'; } }, 1800);
+    setTimeout(() => { if (hayCambiosSinGuardar) { estadoEl.textContent = 'Cambios sin guardar'; estadoEl.className = 'cms-estado cms-estado--sucio'; } else { estadoEl.textContent = 'Todo guardado'; } }, 2200);
+  }
+
+  function copiarSeccion(sec: SeccionData){
+    const label = sec.titulo || sec.key;
+    const dominio = sec.dominio || sec.key;
+    // Para secciones lista, guardamos una copia del primer item como ejemplo si existe; si no, guardamos estructura vacía
+    const dataEjemplo = sec.tipo==='lista' ? (sec.items?.[0]?.data ?? valoresVacios(sec.campos ?? [])) : (sec.valor ?? {});
+    portapapeles = { dominio, data: clonarData(dataEjemplo as Record<string,unknown>), label, tipo: 'seccion', seccionKey: sec.key, seccionTitulo: sec.titulo };
+    actualizarBarraPortapapeles();
+    estadoEl.textContent = `Copiada sección: ${label} — abrí Estructura y pegá donde quieras`;
+    estadoEl.className = 'cms-estado';
+    setTimeout(() => { if (hayCambiosSinGuardar) { estadoEl.textContent = 'Cambios sin guardar'; estadoEl.className = 'cms-estado cms-estado--sucio'; } else { estadoEl.textContent = 'Todo guardado'; } }, 2800);
+  }
+
+  function duplicarItem(dominio: string, clave: string) {
+    const sec = dominioIndex.get(dominio);
+    if (!sec?.items || sec.bloqueado) return false;
+    const idx = sec.items.findIndex((i) => i.clave === clave);
+    if (idx === -1) return false;
+    const src = sec.items[idx];
+    const nuevaClave = `nuevo-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    // clonarData garantiza que la tarjeta duplicada sea independiente — no afecta al componente original ni a su estructura
+    sec.items.splice(idx + 1, 0, { clave: nuevaClave, data: clonarData(src.data) });
+    marcarSucio();
+    syncPreviewOrden(dominio);
+    estadoEl.textContent = `Duplicado: ${tituloDeItem(sec.campos ?? [], src.data)}`;
+    setTimeout(() => { estadoEl.textContent = 'Cambios sin guardar'; }, 1500);
+    return true;
   }
 
   function pegarEn(dominio: string, campos: FieldSpec[], indice: number) {
+    if (!portapapeles || portapapeles.tipo!=='item' && portapapeles.tipo) {
+      // si es sección, no pegar como item
+      if(portapapeles?.tipo==='seccion') return false;
+    }
     if (!portapapeles || portapapeles.dominio !== dominio) return false;
     const sec = dominioIndex.get(dominio);
     if (!sec || !sec.items) return false;
@@ -221,6 +338,58 @@ export function montarEditor(init: InitData) {
     sec.items.splice(indice, 0, { clave: nuevaClave, data: clonarData(portapapeles.data) });
     marcarSucio();
     syncPreviewOrden(dominio);
+    return true;
+  }
+
+  function duplicarSeccion(sec: SeccionData){
+    const estado = cache.get(paginaActual)!;
+    const idx = estado.datos.ordenLayout.indexOf(sec.key);
+    if(idx===-1) return false;
+    // Solo secciones lista/single con dominio pueden duplicarse como lista? Para placeholder no
+    if(sec.tipo==='placeholder') return false;
+    const nuevoKey = `${sec.key}-copia-${Date.now().toString(36).slice(2,6)}`;
+    const nuevoDominio = sec.dominio ? `${sec.dominio}_copia_${Date.now().toString(36).slice(2,4)}` : undefined;
+    const nuevo: SeccionData = {
+      ...JSON.parse(JSON.stringify(sec)),
+      key: nuevoKey,
+      titulo: `${sec.titulo} (copia)`,
+      dominio: nuevoDominio ?? sec.dominio,
+      // clonar items con nuevas claves independientes
+      items: sec.items ? sec.items.map(it=> ({ clave: `nuevo-${Date.now()}-${Math.random().toString(36).slice(2,5)}-${it.clave}`, data: clonarData(it.data)})) : undefined,
+      valor: sec.valor ? clonarData(sec.valor) : undefined,
+    };
+    estado.datos.secciones.push(nuevo);
+    if(nuevoDominio) dominioIndex.set(nuevoDominio, nuevo);
+    else dominioIndex.set(nuevoKey, nuevo);
+    estado.datos.ordenLayout.splice(idx+1, 0, nuevoKey);
+    // originales: nueva sección no tiene claves viejas
+    marcarSucio(); syncPreviewOrden();
+    estadoEl.textContent = `Sección duplicada: ${nuevo.titulo}`;
+    setTimeout(()=> estadoEl.textContent='Cambios sin guardar', 1500);
+    return true;
+  }
+
+  function pegarSeccionDespues(targetKey: string){
+    if(!portapapeles || portapapeles.tipo!=='seccion' || !portapapeles.seccionKey) return false;
+    const estado = cache.get(paginaActual)!;
+    const srcSec = estado.datos.secciones.find(s=> s.key===portapapeles!.seccionKey);
+    if(!srcSec) { console.warn('[CMS] sección origen no encontrada', portapapeles.seccionKey); return false; }
+    let targetIdx = estado.datos.ordenLayout.indexOf(targetKey);
+    if(targetIdx===-1) targetIdx = estado.datos.ordenLayout.length - 1; // si no hay target, pegar al final
+    const nuevoKey = `${srcSec.key}-copia-${Date.now().toString(36).slice(2,6)}`;
+    const nuevoDominio = srcSec.dominio ? `${srcSec.dominio}_copia_${Date.now().toString(36).slice(2,4)}` : undefined;
+    const nuevo: SeccionData = {
+      ...JSON.parse(JSON.stringify(srcSec)),
+      key: nuevoKey,
+      titulo: `${srcSec.titulo} (copia)`,
+      dominio: nuevoDominio ?? srcSec.dominio,
+      items: srcSec.items ? srcSec.items.map(it=> ({ clave: `nuevo-${Date.now()}-${Math.random().toString(36).slice(2,5)}-${it.clave}`, data: clonarData(it.data)})) : undefined,
+      valor: srcSec.valor ? clonarData(srcSec.valor) : undefined,
+    };
+    estado.datos.secciones.push(nuevo);
+    if(nuevoDominio) dominioIndex.set(nuevoDominio, nuevo);
+    estado.datos.ordenLayout.splice(targetIdx+1, 0, nuevoKey);
+    marcarSucio(); syncPreviewOrden();
     return true;
   }
 
@@ -350,21 +519,84 @@ export function montarEditor(init: InitData) {
     else if (data.type === 'seleccionar') seleccionar(data.dominio as string | undefined, data.clave as string | undefined);
     else if (data.type === 'copiar') {
       const dominio = data.dominio as string; const clave = data.clave as string | undefined;
+      const esSeccion = (data as any).esSeccion as boolean | undefined;
       const sec = dominioIndex.get(dominio); if(!sec) return;
+      // Si se pidió copiar sección explícitamente (click derecho sobre sección sin clave)
+      if(esSeccion || (!clave && sec.tipo !== 'single')){
+        // Para lista sin clave => copiar sección completa (no solo un item)
+        if(!clave){
+          copiarSeccion(sec);
+          const modalVisible = !overlay.hidden;
+          if(modalVisible) mostrarEstructura();
+          return;
+        }
+      }
       const src = clave ? sec.items?.find(i=>i.clave===clave)?.data : sec.valor;
-      if(!src) return;
+      if(!src) {
+        // fallback: si era lista sin items, copiar sección
+        if(sec.tipo==='lista' && !clave){ copiarSeccion(sec); if(!overlay.hidden) mostrarEstructura(); return; }
+        return;
+      }
       copiarItem(dominio, src as Record<string,unknown>, sec.campos ?? []);
       // Si estábamos en vista lista, refrescar para mostrar dropzones activas
       const modalVisible = !overlay.hidden;
       if(modalVisible && sec.tipo==='lista') mostrarLista(sec);
+    } else if (data.type === 'duplicar') {
+      const dominio = data.dominio as string; const clave = data.clave as string | undefined;
+      const esSeccion = (data as any).esSeccion as boolean | undefined;
+      if(esSeccion || !clave){
+        const sec = dominioIndex.get(dominio);
+        if(sec && duplicarSeccion(sec)){
+          if(!overlay.hidden) mostrarEstructura();
+        }
+      } else if(duplicarItem(dominio, clave ?? '')){
+        const sec = dominioIndex.get(dominio);
+        if(sec && !overlay.hidden && sec.tipo==='lista') mostrarLista(sec);
+      }
+    } else if (data.type === 'pegarSeccion') {
+      const dominio = data.dominio as string | undefined;
+      let targetKey: string | undefined;
+      if(dominio){
+        const sec = dominioIndex.get(dominio);
+        targetKey = sec?.key;
+      }
+      // si no hay dominio (click en fondo), pegar al final
+      if(!targetKey){
+        const estado = cache.get(paginaActual)!;
+        targetKey = estado.datos.ordenLayout[estado.datos.ordenLayout.length-1];
+      }
+      if(targetKey && pegarSeccionDespues(targetKey)){
+        if(!overlay.hidden) mostrarEstructura();
+        // forzar refresco de estructura para mostrar banner actualizado
+        try{ mostrarEstructura(); }catch{}
+        estadoEl.textContent = `Sección pegada: ${portapapeles?.label ?? ''}`;
+        setTimeout(()=>{ if(hayCambiosSinGuardar) estadoEl.textContent='Cambios sin guardar'; }, 1500);
+      }
     } else if (data.type === 'pegar') {
       const dominio = data.dominio as string; const clave = data.clave as string | undefined;
+      const posicion = data.posicion as string | undefined;
+      // Si el portapapeles es sección, redirigir a pegarSeccion
+      if(portapapeles?.tipo==='seccion'){
+        const sec = dominioIndex.get(dominio);
+        if(sec && pegarSeccionDespues(sec.key)){
+          if(!overlay.hidden) mostrarEstructura();
+          estadoEl.textContent = `Sección pegada: ${portapapeles?.label ?? ''}`;
+          setTimeout(()=>{ if(hayCambiosSinGuardar) estadoEl.textContent='Cambios sin guardar'; }, 1500);
+        }
+        return;
+      }
       const sec = dominioIndex.get(dominio); if(!sec) return;
-      const idx = clave ? (sec.items?.findIndex(i=>i.clave===clave) ?? -1) : -1;
-      const pos = idx===-1 ? (sec.items?.length ?? 0) : idx+1;
+      let pos: number;
+      if(posicion==='final' || !clave) pos = sec.items?.length ?? 0;
+      else {
+        const idx = sec.items?.findIndex(i=>i.clave===clave) ?? -1;
+        pos = idx===-1 ? (sec.items?.length ?? 0) : idx+1;
+      }
       if(pegarEn(dominio, sec.campos ?? [], pos)){
-        // feedback y actualizar modal si está abierto
         if(!overlay.hidden && sec.tipo==='lista') mostrarLista(sec);
+        // feedback visual en preview: flash del nuevo item
+        estadoEl.textContent = `Pegado: ${portapapeles?.label ?? ''}`;
+        setTimeout(()=>{ if(hayCambiosSinGuardar) estadoEl.textContent='Cambios sin guardar'; }, 1200);
       }
     } else if (data.type === 'reordenar') {
       const d = data as unknown as { dominio?: string; clave?: string; direccion?: string; orden?: string[]; ordenClaves?: string[] };
@@ -534,10 +766,48 @@ export function montarEditor(init: InitData) {
     });
   }
 
+  // ── Menú contextual del editor (click derecho en listas/estructura) ─
+  let cmsCtxMenu: HTMLElement | null = null;
+  function getCtxMenu(): HTMLElement {
+    if(cmsCtxMenu) return cmsCtxMenu;
+    cmsCtxMenu = el('div', { className: 'cms-context-menu' });
+    cmsCtxMenu.id = 'cms-editor-context-menu';
+    cmsCtxMenu.style.cssText = 'position:fixed; z-index:200; min-width:200px; background:#fff; border:1px solid #e3dbf5; border-radius:12px; box-shadow:0 12px 32px rgba(42,26,73,0.22); padding:6px; display:none; flex-direction:column; gap:2px;';
+    document.body.appendChild(cmsCtxMenu);
+    return cmsCtxMenu;
+  }
+  function cerrarCtxMenu(){ if(cmsCtxMenu) cmsCtxMenu.style.display='none'; }
+  document.addEventListener('click', cerrarCtxMenu);
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') cerrarCtxMenu(); });
+  function mostrarCtxMenu(e: MouseEvent, opts: { titulo: string; acciones: { label: string; disabled?: boolean; title?: string; onClick: ()=>void }[]; hint?: string }){
+    e.preventDefault(); e.stopPropagation();
+    const menu = getCtxMenu();
+    menu.replaceChildren();
+    const header = el('div', {}, opts.titulo);
+    (header as HTMLElement).style.cssText='font-size:10px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:#6b5f87;padding:6px 10px 4px;border-bottom:1px solid #f3efff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    menu.append(header);
+    opts.acciones.forEach(a=>{
+      const btn = el('button', { type:'button', title: a.title ?? '' }, a.label) as HTMLButtonElement;
+      btn.style.cssText='appearance:none;border:none;background:#fff;text-align:left;font-size:13px;font-weight:600;color:#241a3a;padding:8px 10px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;';
+      if(a.disabled){ btn.disabled=true; btn.style.opacity='0.38'; btn.style.cursor='default'; }
+      else { btn.addEventListener('click', ()=>{ cerrarCtxMenu(); a.onClick(); }); btn.addEventListener('mouseenter', ()=> btn.style.background='#f3efff'); btn.addEventListener('mouseleave', ()=> btn.style.background='#fff'); }
+      menu.append(btn);
+    });
+    if(opts.hint){ const h=el('div',{},opts.hint); (h as HTMLElement).style.cssText='font-size:11px;color:#6b5f87;padding:4px 10px;font-style:italic;'; menu.append(h); }
+    menu.style.display='flex';
+    menu.style.left='0'; menu.style.top='0';
+    const r = menu.getBoundingClientRect();
+    let x = e.clientX+6, y = e.clientY+6;
+    if(x+r.width > window.innerWidth-8) x = window.innerWidth-r.width-8;
+    if(y+r.height > window.innerHeight-8) y = window.innerHeight-r.height-8;
+    menu.style.left=x+'px'; menu.style.top=y+'px';
+  }
+
   // ── Modal helpers ───────────────────────────────────────────────────
   function cerrarModal() {
     overlay.hidden = true;
     modal.replaceChildren();
+    cerrarCtxMenu();
   }
   overlay.addEventListener('click', (e) => { if (e.target === overlay) cerrarModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) cerrarModal(); });
@@ -591,7 +861,43 @@ export function montarEditor(init: InitData) {
         else if (sec.tipo === 'single') mostrarSingle(sec);
         else mostrarPlaceholder(sec);
       });
-      lista.append(fila);
+      fila.addEventListener('contextmenu', (e)=>{
+        const esSeccion = true;
+        const puedePegarSeccion = !!portapapeles && portapapeles.tipo==='seccion' && !sec.bloqueado;
+        const puedePegarItem = sec.tipo==='lista' && !!portapapeles && portapapeles.tipo==='item' && portapapeles.dominio===sec.dominio && !sec.bloqueado;
+        mostrarCtxMenu(e as MouseEvent, {
+          titulo: sec.titulo,
+          acciones: [
+            { label:'✎ Editar sección', onClick: ()=> {
+              if (sec.tipo === 'lista') mostrarLista(sec);
+              else if (sec.tipo === 'single') mostrarSingle(sec);
+              else mostrarPlaceholder(sec);
+            }},
+            { label:'⧉ Copiar sección', onClick: ()=>{ copiarSeccion(sec); mostrarEstructura(); }},
+            { label:'⎘ Duplicar sección', onClick: ()=>{ duplicarSeccion(sec); mostrarEstructura(); }},
+            ...(puedePegarSeccion ? [
+              { label: `📋 Pegar sección "${portapapeles!.label.slice(0,18)}" después de aquí`, onClick: ()=>{ if(pegarSeccionDespues(sec.key)) mostrarEstructura(); } },
+            ] : []),
+            ...(puedePegarItem ? [
+              { label: `📋 Pegar tarjeta "${portapapeles!.label.slice(0,18)}" aquí`, onClick: ()=>{ if(pegarEn(sec.dominio!, sec.campos ?? [], 0)) mostrarLista(sec); } },
+            ] : []),
+            ...(!puedePegarSeccion && !puedePegarItem && portapapeles ? [
+              { label: portapapeles.tipo==='seccion' ? `📋 Pegar sección aquí` : `📋 Pegar aquí`, disabled: portapapeles.tipo==='item' && portapapeles.dominio!==sec.dominio, title: portapapeles.tipo==='item' && portapapeles.dominio!==sec.dominio ? `Portapapeles: ${portapapeles.dominio} — no compatible con ${sec.dominio}` : 'Pegar sección disponible', onClick: ()=>{ if(portapapeles.tipo==='seccion' && pegarSeccionDespues(sec.key)) mostrarEstructura(); } },
+            ] : []),
+          ],
+          hint: !portapapeles ? 'Copia una sección o tarjeta para pegarla' : (puedePegarSeccion ? 'Sección copiada — pegará después de esta' : (puedePegarItem ? 'Tarjeta copiada — pegará dentro de esta sección' : undefined)),
+        });
+      });
+      // dropzone visual entre secciones si hay sección copiada
+      if(portapapeles?.tipo==='seccion'){
+        const dz = el('div', { className: 'cms-dropzone cms-dropzone--activo cms-dropzone--has-clipboard' }, `+ Pegar sección "${portapapeles.label}" aquí`);
+        (dz as HTMLElement).style.margin='4px 0';
+        dz.addEventListener('click', ()=>{ if(pegarSeccionDespues(sec.key)) mostrarEstructura(); });
+        lista.append(fila);
+        lista.append(dz);
+      } else {
+        lista.append(fila);
+      }
     });
 
     activarDragReorder(lista, () => ordenLayout.slice(), (from, to) => {
@@ -601,9 +907,56 @@ export function montarEditor(init: InitData) {
       mostrarEstructura();
     });
 
+    // Banner visible cuando hay algo copiado — aparece en el menú de la izquierda (modal Estructura)
+    let banner: HTMLElement | null = null;
+    if(portapapeles){
+      const esSec = portapapeles.tipo==='seccion';
+      banner = el('div', { style: `margin:0 14px 8px;padding:10px 12px;border-radius:10px;border:1px solid ${esSec ? '#472d82' : '#c9b8e8'};background:${esSec ? '#f3efff' : '#faf8ff'};font-size:12px;color:#241a3a;display:flex;align-items:center;gap:8px;` },
+        el('span', { style: 'font-size:10px;font-weight:800;background:#472d82;color:#fff;padding:2px 6px;border-radius:999px;' }, esSec ? 'SECCIÓN COPIADA' : 'TARJETA COPIADA'),
+        el('strong', {}, portapapeles.label),
+        el('span', { style:'opacity:0.7' }, esSec ? ` — click derecho o + para pegar` : ` (${portapapeles.dominio})`),
+      );
+    }
     const header = crearHeaderModal('Estructura de la página', `${estado.datos.pagina.titulo} — arrastra para reordenar`, []);
-    const nota = el('p', { className: 'cms-panel-nota' }, 'Arrastra las secciones o usa ↑/↓. Los cambios se aplican al guardar.');
-    modal.replaceChildren(header, nota, lista);
+    const nota = el('p', { className: 'cms-panel-nota' }, portapapeles?.tipo==='seccion' ? `Sección copiada: "${portapapeles.label}" — usa los dropzones "+ Pegar sección" o click derecho sobre una sección para pegarla.` : 'Arrastra las secciones o usa ↑/↓. Click derecho para copiar/pegar secciones. Los cambios se aplican al guardar.');
+    const hijos: HTMLElement[] = banner ? [header, banner, nota, lista] : [header, nota, lista];
+    // también permitir pegar al principio si hay sección copiada
+    if(portapapeles?.tipo==='seccion'){
+      const dzTop = el('div', { className: 'cms-dropzone cms-dropzone--activo' }, `+ Pegar sección "${portapapeles.label}" al principio`);
+      dzTop.addEventListener('click', ()=>{
+        const estado2 = cache.get(paginaActual)!;
+        const srcSec = estado2.datos.secciones.find(s=> s.key===portapapeles!.seccionKey);
+        if(!srcSec) return;
+        const nuevoKey = `${srcSec.key}-copia-${Date.now().toString(36).slice(2,6)}`;
+        const nuevoDominio = srcSec.dominio ? `${srcSec.dominio}_copia_${Date.now().toString(36).slice(2,4)}` : undefined;
+        const nuevo: SeccionData = { ...JSON.parse(JSON.stringify(srcSec)), key:nuevoKey, titulo:`${srcSec.titulo} (copia)`, dominio: nuevoDominio ?? srcSec.dominio, items: srcSec.items ? srcSec.items.map(it=> ({clave:`nuevo-${Date.now()}-${Math.random().toString(36).slice(2,5)}-${it.clave}`, data:clonarData(it.data)})) : undefined, valor: srcSec.valor ? clonarData(srcSec.valor) : undefined };
+        estado2.datos.secciones.push(nuevo);
+        if(nuevoDominio) dominioIndex.set(nuevoDominio, nuevo);
+        estado2.datos.ordenLayout.unshift(nuevoKey);
+        marcarSucio(); syncPreviewOrden(); mostrarEstructura();
+      });
+      hijos.splice(3,0,dzTop);
+    }
+    modal.replaceChildren(...hijos);
+    // click derecho en fondo del modal estructura: pegar sección
+    modal.addEventListener('contextmenu', (e)=>{
+      const t = e.target as HTMLElement;
+      if(t.closest('.cms-estructura-item') || t.closest('.cms-dropzone') || t.closest('button')) return;
+      if(portapapeles?.tipo==='seccion'){
+        e.preventDefault();
+        mostrarCtxMenu(e as MouseEvent, { titulo: 'Estructura', acciones:[{ label:`📋 Pegar sección "${portapapeles.label}" al final`, onClick: ()=>{
+          const estado2 = cache.get(paginaActual)!;
+          const sec = estado2.datos.secciones.find(s=> s.key===portapapeles!.seccionKey); if(!sec) return;
+          const nuevoKey = `${sec.key}-copia-${Date.now().toString(36).slice(2,6)}`;
+          const nuevoDominio = sec.dominio ? `${sec.dominio}_copia_${Date.now().toString(36).slice(2,4)}` : undefined;
+          const nuevo: SeccionData = { ...JSON.parse(JSON.stringify(sec)), key:nuevoKey, titulo:`${sec.titulo} (copia)`, dominio: nuevoDominio ?? sec.dominio, items: sec.items ? sec.items.map(it=> ({clave:`nuevo-${Date.now()}-${Math.random().toString(36).slice(2,5)}-${it.clave}`, data:clonarData(it.data)})) : undefined, valor: sec.valor ? clonarData(sec.valor) : undefined };
+          estado2.datos.secciones.push(nuevo);
+          if(nuevoDominio) dominioIndex.set(nuevoDominio, nuevo);
+          estado2.datos.ordenLayout.push(nuevoKey);
+          marcarSucio(); syncPreviewOrden(); mostrarEstructura();
+        }}] });
+      }
+    }, { once:true });
     overlay.hidden = false;
   }
 
@@ -641,7 +994,7 @@ export function montarEditor(init: InitData) {
     const idxLayout = ordenLayout.indexOf(sec.key);
     const items = sec.items ?? [];
     const campos = sec.campos ?? [];
-    const puedePegar = !!portapapeles && portapapeles.dominio === sec.dominio && !sec.bloqueado;
+    const puedePegar = !!portapapeles && portapapeles.tipo==='item' && portapapeles.dominio === sec.dominio && !sec.bloqueado;
 
     const headerAcciones: HTMLElement[] = [
       el('button', { className: 'cms-btn cms-btn--icono', type: 'button', title: 'Ver estructura' }, '☰'),
@@ -655,7 +1008,7 @@ export function montarEditor(init: InitData) {
     const cont = el('div', { className: 'cms-lista-drag' });
 
     function crearDropzone(pos: number): HTMLElement {
-      const dz = el('div', { className: `cms-dropzone ${puedePegar ? 'cms-dropzone--has-clipboard' : ''}` }, puedePegar ? `+ Pegar aquí (posición ${pos + 1})` : '—');
+      const dz = el('div', { className: `cms-dropzone ${puedePegar ? 'cms-dropzone--has-clipboard' : ''}` }, puedePegar ? `+ Pegar aquí (posición ${pos + 1}) — o click derecho` : '— click derecho para pegar');
       if (puedePegar) {
         dz.classList.add('cms-dropzone--activo');
         dz.addEventListener('click', () => { if (pegarEn(sec.dominio!, campos, pos)) mostrarLista(sec); });
@@ -735,8 +1088,34 @@ export function montarEditor(init: InitData) {
         acciones.push(borrar);
       }
       row.append(handle, titulo, editar, ...acciones);
+      row.addEventListener('contextmenu', (e)=>{
+        mostrarCtxMenu(e as MouseEvent, {
+          titulo: tituloDeItem(campos, it.data),
+          acciones: [
+            { label:'✎ Editar tarjeta', onClick: ()=> mostrarItem(sec, it.clave) },
+            ...(sec.bloqueado ? [] : [
+              { label:'⧉ Copiar tarjeta', onClick: ()=>{ copiarItem(sec.dominio!, it.data, campos); mostrarLista(sec); } },
+              { label:'⎘ Duplicar (copia independiente)', onClick: ()=>{ if(duplicarItem(sec.dominio!, it.clave)) mostrarLista(sec); } },
+              { label: (portapapeles && portapapeles.dominio===sec.dominio) ? `📋 Pegar después — "${portapapeles.label.slice(0,20)}"` : '📋 Pegar después', disabled: !(portapapeles && portapapeles.dominio===sec.dominio), title: portapapeles ? (portapapeles.dominio===sec.dominio ? '' : `Portapapeles: ${portapapeles.dominio}`) : 'Nada copiado', onClick: ()=>{ if(pegarEn(sec.dominio!, campos, i+1)) mostrarLista(sec); } },
+              { label:'🗑 Eliminar', onClick: ()=>{ if(!confirm('¿Eliminar este elemento?')) return; items.splice(i,1); marcarSucio(); syncPreviewOrden(sec.dominio!); mostrarLista(sec); } },
+            ]),
+          ],
+          hint: sec.bloqueado ? 'Sección bloqueada — solo lectura' : (!portapapeles ? 'Copia primero para pegar' : undefined),
+        });
+      });
       cont.append(row);
       cont.append(crearDropzone(i + 1));
+    });
+    // click derecho en zona vacía de la lista: pegar al final
+    cont.addEventListener('contextmenu', (e)=>{
+      const target = e.target as HTMLElement;
+      if(target.closest('.cms-lista-item-row') || target.closest('.cms-dropzone') || target.closest('button')) return;
+      e.preventDefault();
+      if(!portapapeles || portapapeles.dominio!==sec.dominio || sec.bloqueado) {
+        mostrarCtxMenu(e as MouseEvent, { titulo: sec.titulo, acciones:[{ label:'📋 Pegar aquí', disabled:true, title: portapapeles ? `Portapapeles: ${portapapeles.dominio}` : 'Nada copiado', onClick: ()=>{} }], hint:'Copia una tarjeta compatible para pegarla aquí' });
+        return;
+      }
+      mostrarCtxMenu(e as MouseEvent, { titulo: sec.titulo, acciones:[{ label:`📋 Pegar "${portapapeles.label.slice(0,24)}" al final`, onClick: ()=>{ if(pegarEn(sec.dominio!, campos, items.length)) mostrarLista(sec); } }] });
     });
 
     // Botón agregar al final (cuando no hay dropzone de pegado único)

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import ImageSlider from '@components/ImageSlider/ImageSlider';
 import ArrowButton from '@components/ui/ArrowButton/ArrowButton';
 
@@ -18,6 +18,8 @@ interface Props {
 
 export default function ComparadorAntesDespues({ pares }: Props) {
   const [i, setI] = useState(0);
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   const total = pares.length;
 
   const ir = useCallback(
@@ -25,11 +27,34 @@ export default function ComparadorAntesDespues({ pares }: Props) {
     [total],
   );
 
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisible(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   if (total === 0) return null;
   const par = pares[i];
 
   return (
-    <div className="relative">
+    <div
+      ref={ref}
+      className="relative transition-all duration-700 ease-out"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(28px)',
+      }}
+    >
       {/* Comparador grande */}
       <div className="overflow-hidden rounded-2xl border border-slate-200">
         <ImageSlider
