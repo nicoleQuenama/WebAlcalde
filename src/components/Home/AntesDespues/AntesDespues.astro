@@ -1,0 +1,28 @@
+---
+import Section from '@components/global/Section/Section.component.astro';
+import ComparadorAntesDespues from '@components/Home/ComparingProjects/ProjectSlide.tsx';
+// Ruta relativa: el alias `@types` choca hoy con ts6137 en todo el repo (bug preexistente).
+import type { ParComparador } from '../../../types/comparador';
+
+interface Props {
+    kicker: string;
+    titulo: string;
+    parrafo: string;
+    pares: ParComparador[];
+    style?: string;
+    dominio?: string;
+}
+
+const { kicker, titulo, parrafo, pares, style, dominio } = Astro.props;
+---
+
+<Section
+    subtitle={kicker}
+    title={titulo}
+    description={parrafo}
+    paddingClass="py-20 lg:py-28"
+    style={style}
+    dominio={dominio}
+>
+    <ComparadorAntesDespues client:visible pares={pares} />
+</Section>

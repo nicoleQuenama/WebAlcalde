@@ -71,6 +71,7 @@ export default defineConfig({
         '@assets': path.resolve('./src/assets'),
         '@pages': path.resolve('./src/pages'),
         '@layouts': path.resolve('./src/layouts'),
+        '@admin': path.resolve('./src/admin'),
       },
     },
     build: {

@@ -1,7 +1,7 @@
 import { getCapitulos, getEras, getGestionHero, getProyectos, getProyectosTitulo } from '@lib/db';
 import { INSTITUTIONAL_CARDS } from '@constants/institutionalProfile/content';
 import { efectivo, efectivoLista, efectivoOrden } from '@lib/cms/resolve';
-import { paginaPorId, PAGINAS, type PaginaConfig, type SeccionConfig } from '../../admin/campos';
+import { paginaPorId, PAGINAS, type PaginaConfig, type SeccionConfig } from '@lib/cms/campos';
 import {
   DEFAULT_HOME_HERO,
   DEFAULT_HOME_ANTES_DESPUES,
@@ -12,7 +12,7 @@ import {
   DEFAULT_HOME_LAYOUT,
   DEFAULT_GESTION_LAYOUT,
   DEFAULT_SOBRE_LAYOUT,
-} from '../../admin/defaults';
+} from '@lib/cms/defaults';
 
 /**
  * Cómputo del contenido editable de una página (valores reales + overrides

@@ -1,5 +1,5 @@
 ---
-import { getImage } from 'astro:assets';
+import { getOptimizedImageSrc } from '@lib/imageOptimize';
 import { getFiltrosHito, getHistoriaIntro, getHitos } from '@lib/db';
 import type { Hito } from '@lib/db';
 import { ajusteImagen } from '@lib/ajusteImagen';
@@ -15,15 +15,9 @@ const { style } = Astro.props as { style?: string };
 const ANCHO = 640;
 
 async function placaDe(hito: Hito & { imagen: string }, id: string): Promise<PlacaDolly> {
-  const optim =
+  const optimSrc =
     hito.imagenW && hito.imagenH
-      ? await getImage({
-          src: hito.imagen,
-          width: ANCHO,
-          height: Math.max(1, Math.round((ANCHO * hito.imagenH) / hito.imagenW)),
-          fit: 'cover',
-          format: 'webp',
-        })
+      ? await getOptimizedImageSrc(hito.imagen, ANCHO, hito.imagenW, hito.imagenH)
       : null;
   return {
     id,
@@ -31,7 +25,7 @@ async function placaDe(hito: Hito & { imagen: string }, id: string): Promise<Pla
     etapa: hito.etapa,
     titulo: hito.titulo,
     descripcion: hito.descripcion,
-    imagen: optim?.src ?? hito.imagen,
+    imagen: optimSrc ?? hito.imagen,
     alt: hito.imagenAlt ?? hito.titulo,
     objectPosition: ajusteImagen(hito).objectPosition,
   };

@@ -6,6 +6,14 @@ interface Props{
     //tema de color del tipo banner
     theme?: 'white' | 'purple' | 'transparent';
     class?:string;
+    /** CSS inline (ej. `order:N` para el layout arrastrable del CMS beta). */
+    style?:string;
+    /** Si se define, marca la sección como editable: `data-cms-dominio` + `data-cms-campo` en kicker/título/párrafo. */
+    dominio?:string;
+    /** Override del padding vertical del `<section>` (default: el de siempre). */
+    paddingClass?:string;
+    /** Override del espacio entre la cabecera y el contenido del slot (default: el de siempre). */
+    headerGapClass?:string;
 }
 
 const{
@@ -13,7 +21,11 @@ const{
     subtitle,
     description,
     theme = 'white',
-    class: className = ''
+    class: className = '',
+    style,
+    dominio,
+    paddingClass = 'py-16 lg:py-24',
+    headerGapClass = 'mb-12',
 } = Astro.props;
 
 
@@ -27,9 +39,9 @@ const themeStyles = {
     },
     purple:{
         bg: 'bg-primary',
-        title: 'text-slate-900',
+        title: 'text-white',
         subtitle:'text-accent',
-        desc:'text-slate-600',
+        desc:'text-white/75',
     },
     transparent:{
         bg: 'bg-transparent',
@@ -48,30 +60,30 @@ const currentTheme = themeStyles[theme];
 ---
 
 <!-- aplicacion al contendor-->
-<section class={`w-full py-16 lg:py-24 ${currentTheme.bg} ${className}`}>
+<section class={`w-full ${paddingClass} ${currentTheme.bg} ${className}`} style={style} data-cms-dominio={dominio}>
   <div class="mx-auto max-w-5xl px-6 lg:px-8">
-    
+
     <!-- Cabecera de la sección -->
     {(title || subtitle || description) && (
-      <header class="max-w-2xl mb-12">
+      <header class={`max-w-2xl ${headerGapClass}`}>
         {subtitle && (
-          <p class={`text-[11px] font-semibold uppercase tracking-[0.34em] ${currentTheme.subtitle}`}>
+          <p class={`text-[11px] font-semibold uppercase tracking-[0.34em] ${currentTheme.subtitle}`} data-cms-campo="kicker">
             {subtitle}
           </p>
         )}
         {title && (
-          <h2 class={`mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl ${currentTheme.title}`}>
+          <h2 class={`mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl ${currentTheme.title}`} data-cms-campo="titulo">
             {title}
           </h2>
         )}
         {description && (
-          <p class={`mt-4 max-w-xl text-base leading-relaxed ${currentTheme.desc}`}>
+          <p class={`mt-4 max-w-xl text-base leading-relaxed ${currentTheme.desc}`} data-cms-campo="parrafo" data-cms-multilinea>
             {description}
           </p>
         )}
       </header>
     )}
-    
+
     <div class="w-full">
       <slot />
     </div>

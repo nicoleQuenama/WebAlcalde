@@ -1,13 +1,8 @@
 import { useState } from "react";
-import type { NavItem } from "../../types/nav";
-import { MEDIA } from "../../lib/media";
-import  "../../styles/global.css";
+import type { HeaderMovilProps } from "@types/header";
+import { MEDIA } from "@lib/media";
 
-interface Props {
-  enlaces: NavItem[];
-}
-
-export default function HeaderMovil({ enlaces }: Props) {
+export default function HeaderMovil({ enlaces }: HeaderMovilProps) {
   const [abierto, setAbierto] = useState(false);
 
   return (

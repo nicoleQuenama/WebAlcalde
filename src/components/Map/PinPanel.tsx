@@ -1,19 +1,8 @@
 import { useEffect, useState } from 'react';
 import styles from './Map.module.css';
+import type { PinDatos, PinPanelProps } from '@types/pin';
 
-export interface PinDatos {
-  nombre: string;
-  coords: [number, number];
-  descripcion?: string;
-  imagenes: string[];
-}
-
-interface Props {
-  pin: PinDatos;
-  onCerrar: () => void;
-}
-
-export default function PinPanel({ pin, onCerrar }: Props) {
+export default function PinPanel({ pin, onCerrar }: PinPanelProps) {
   const total = pin.imagenes.length;
   const [indice, setIndice] = useState(0);
 

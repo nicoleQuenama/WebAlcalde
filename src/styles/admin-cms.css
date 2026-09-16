@@ -1,13 +1,13 @@
 /* Tema del editor CMS (beta) — reusa los tokens de marca del sitio. */
 
 :root {
-  --cms-primary: #472d82;
-  --cms-primary-deep: #38235f;
-  --cms-primary-deepest: #2a1a49;
-  --cms-accent: #c9b8e8;
+  --cms-primary: var(--color-primary);
+  --cms-primary-deep: var(--color-primary-deep);
+  --cms-primary-deepest: var(--color-primary-deepest);
+  --cms-accent: var(--color-accent);
   --cms-bg: #f6f4fb;
-  --cms-panel: #2a1a49;
-  --cms-panel-soft: #38235f;
+  --cms-panel: var(--color-primary-deepest);
+  --cms-panel-soft: var(--color-primary-deep);
   --cms-borde: rgba(255, 255, 255, 0.12);
   --cms-borde-claro: #e3dbf5;
   --cms-texto: #241a3a;

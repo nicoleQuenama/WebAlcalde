@@ -1,4 +1,5 @@
 import { getBloque, getBloques } from './store';
+import { getCapitulos, getEras, type Capitulo, type EraTemario, type SeccionTemario } from '@lib/db';
 
 /**
  * Valor efectivo de un dominio de una sola fila (ej. `home_hero`/`principal`):
@@ -44,4 +45,25 @@ export function efectivoOrden(dominio: string, porDefecto: string[]): string[] {
     .map((b) => b.clave);
   const faltantes = porDefecto.filter((k) => !ordenadas.includes(k));
   return [...ordenadas, ...faltantes];
+}
+
+/**
+ * Capítulos de apertura + eras/secciones de obras, ya fusionados con lo
+ * editado desde el CMS beta (dominios `capitulo`, `era`, `seccion`). Usado
+ * por `/` y `/gestion` — mismo dominio, misma fusión.
+ */
+export async function getTemarioEfectivo(): Promise<{ capitulos: Capitulo[]; eras: EraTemario[] }> {
+  const capitulos = efectivoLista('capitulo', await getCapitulos());
+  const erasCompletas = await getEras();
+  const erasBase = erasCompletas.map(({ secciones: _s, ...resto }) => resto);
+  const seccionesBase: (SeccionTemario & { eraId: string })[] = erasCompletas.flatMap((era) =>
+    era.secciones.map((s) => ({ ...s, eraId: era.id })),
+  );
+  const erasEfectivas = efectivoLista('era', erasBase);
+  const seccionesEfectivas = efectivoLista('seccion', seccionesBase);
+  const eras: EraTemario[] = erasEfectivas.map((era) => ({
+    ...era,
+    secciones: seccionesEfectivas.filter((s) => s.eraId === era.id),
+  })) as EraTemario[];
+  return { capitulos, eras };
 }

@@ -1,13 +1,5 @@
 import { memo } from 'react';
-
-export interface NoticiaFeed {
-  id: number | string;
-  src: string;
-  titulo: string;
-  categoria: string;
-  fecha: string;
-  resumen: string;
-}
+import type { NoticiaFeed } from '@types/noticiaFeed';
 
 const NewsFeedCard = memo(function NewsFeedCard({ noticia }: { noticia: NoticiaFeed }) {
   return (

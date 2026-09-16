@@ -52,5 +52,7 @@ psd
 thumb
 sketch
 
+# models
 AGENTS.md
 CLAUDE.md
+.agents/*

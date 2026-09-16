@@ -1,4 +1,5 @@
-import type { FieldSpec, PaginaConfig, SeccionConfig } from './campos';
+import type { FieldSpec } from '@lib/cms/campos';
+import type { SeccionData, DatosPagina, InitData, Obra, EstadoPagina, Portapapeles } from '../types/cms';
 
 /**
  * Editor CMS (beta) — sin librería de page-builder. La vista previa es la
@@ -12,39 +13,6 @@ import type { FieldSpec, PaginaConfig, SeccionConfig } from './campos';
  *     + Drag & drop para reordenar (layout y listas)
  *     + Vista "Estructura" para mover secciones arriba/abajo arrastrando
  */
-
-export interface SeccionData extends SeccionConfig {
-  valor?: Record<string, unknown>;
-  items?: { clave: string; data: Record<string, unknown> }[];
-}
-
-export interface DatosPagina {
-  pagina: PaginaConfig;
-  ordenLayout: string[];
-  secciones: SeccionData[];
-}
-
-export interface InitData extends DatosPagina {
-  secreto: string;
-  paginas: { pagina: string; titulo: string; ruta: string }[];
-}
-
-type Obra = { nombre?: string; anio?: string; detalle?: string; video?: boolean };
-
-interface EstadoPagina {
-  datos: DatosPagina;
-  /** Claves que YA existían en el servidor al cargar esta página, por dominio de lista — para poder mandar DELETE de las que se hayan sacado. */
-  originales: Map<string, Set<string>>;
-}
-
-interface Portapapeles {
-  dominio: string;
-  data: Record<string, unknown>;
-  label: string;
-  tipo: 'item' | 'seccion';
-  seccionKey?: string;
-  seccionTitulo?: string;
-}
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,

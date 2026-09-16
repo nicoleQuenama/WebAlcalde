@@ -1,18 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './ThreeBook.module.css';
-
-export interface ThreeBookProps {
-  coverLabel?: string;
-  accent?: string;
-  coverImage?: string;
-  onOpen?: () => void;
-}
-
-const FOV = 42;
-const CAM_DIST = 3.25;
-const BOOK_SCALE = 0.96;
-const ROT_REST_Y = -0.55;
-const ROT_HOVER_Y = -0.14;
+import type { ThreeBookProps } from '../../../types/threeBook';
+import { FOV, CAM_DIST, BOOK_SCALE, ROT_REST_Y, ROT_HOVER_Y } from '../../../constants/threeBook';
 
 function roundRectPath(
   ctx: CanvasRenderingContext2D,

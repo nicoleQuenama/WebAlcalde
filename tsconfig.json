@@ -7,16 +7,17 @@
     "jsxImportSource": "react",
     "paths": {
       "@lib/*": ["./src/lib/*"],
+      "@lib": ["./src/lib"],
       "@components/*": ["./src/components/*"],
-      "@hooks/*": ["./src/hooks/*"],
       "@constants/*": ["./src/constants/*"],
-      "@utils/*": ["./src/utils/*"],
       "@types/*": ["./src/types/*"],
       "@styles/*": ["./src/styles/*"],
       "@assets/*": ["./src/assets/*"],
       "@pages/*": ["./src/pages/*"],
       "@layouts/*": ["./src/layouts/*"],
-      "@types/*": ["./src/types/*"],
+      "@admin/*": ["./src/admin/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@hooks/*": ["./src/hooks/*"],
     }
   }
 }

@@ -1,19 +1,11 @@
 ---
-import Card from '../ui/Card/Card.astro';
+import Card from '@components/ui/Card/Card.astro';
+import type { NewCardProps } from '@types/newCard';
+import { duplicateForCarousel } from '@lib/array';
 
-interface Noticia {
-  id: number | string;
-  src: string;
-  titulo: string;
-}
+const { noticias } = Astro.props as NewCardProps;
 
-interface Props {
-  noticias: Noticia[];
-}
-
-const { noticias } = Astro.props;
-
-const carrete = [...noticias, ...noticias];
+const carrete = duplicateForCarousel(noticias);
 ---
 
 <div class="ticker-wrapper">

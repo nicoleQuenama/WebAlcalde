@@ -1,6 +1,7 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import { getImage } from 'astro:assets';
+import { getOptimizedImageSrc } from '@lib/imageOptimize';
 import { getCapitulos } from '@lib/db';
 import { MEDIA } from '@lib/media';
 import Hero from '@components/global/Hero/Hero.astro';
@@ -8,22 +9,14 @@ import HeroCards from '@components/global/Hero/HeroCard.tsx';
 import type { TarjetaImagen } from '@components/global/Hero/HeroCard.tsx';
 import Timeline from '@components/About/LifeJourney/Timeline/Timeline.component.astro';
 import { efectivo, efectivoOrden } from '@lib/cms/resolve';
-import { DEFAULT_SOBRE_HERO, DEFAULT_SOBRE_BIOGRAFIA, DEFAULT_SOBRE_LAYOUT } from '../admin/defaults';
+import { DEFAULT_SOBRE_HERO, DEFAULT_SOBRE_BIOGRAFIA, DEFAULT_SOBRE_LAYOUT } from '@lib/cms/defaults';
 import '@styles/sobre.css';
 
-// ── HERO ──────────────────────────────────────────────────────────────
+// ── HERO (optimizado vía @lib/imageOptimize) ──────────────────────────
 const imgs: TarjetaImagen[] = await Promise.all(
   MEDIA.hero.sobre.carrusel.map(async (img) => ({
     ...img,
-    src: (
-      await getImage({
-        src: img.src,
-        width: 900,
-        ...(img.w && img.h ? { height: Math.max(1, Math.round((900 * img.h) / img.w)) } : {}),
-        fit: 'cover',
-        format: 'webp',
-      })
-    ).src,
+    src: await getOptimizedImageSrc(img.src, 900, img.w, img.h),
   })),
 );
 const fondo = await getImage({
