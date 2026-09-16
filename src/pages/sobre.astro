@@ -6,7 +6,6 @@ import { MEDIA } from '@lib/media';
 import Hero from '@components/global/Hero/Hero.astro';
 import HeroCards from '@components/global/Hero/HeroCard.tsx';
 import type { TarjetaImagen } from '@components/global/Hero/HeroCard.tsx';
-import InstitutionalProfile from '@components/About/InstitutionalProfile/Institutional.component.astro';
 import Timeline from '@components/About/LifeJourney/Timeline/Timeline.component.astro';
 import { efectivo, efectivoOrden } from '@lib/cms/resolve';
 import { DEFAULT_SOBRE_HERO, DEFAULT_SOBRE_BIOGRAFIA, DEFAULT_SOBRE_LAYOUT } from '../admin/defaults';
@@ -89,19 +88,6 @@ const ordenDe = (clave: string) => {
                     <span data-cms-campo="ctaLabel">{biografiaTexto.ctaLabel}</span>
                     <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
                 </a>
-            </div>
-        </section>
-
-        <!-- ═══ TARJETAS: misión y visión ═══ -->
-        <section class="bg-primary text-white" style={`order:${ordenDe('institutional')}`} data-cms-dominio="sobre_institutional">
-            <div class="mx-auto max-w-6xl px-6 py-20 lg:px-8 lg:py-24">
-                <header class="max-w-2xl">
-                    <h2 class="text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl">
-                        Misión y visión
-                    </h2>
-                </header>
-
-                <InstitutionalProfile />
             </div>
         </section>
 
