@@ -50,10 +50,10 @@ export default function HeroNoticias({ noticias }: Props) {
 
   return (
     <>
-      <div className="ticker-wrapper">
+      <div className="flex overflow-hidden w-full [mask-image:linear-gradient(to_right,transparent_0%,black_8%,black_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_8%,black_92%,transparent_100%)]">
         <div 
           ref={trackRef}
-          className="ticker-track py-4"
+          className="flex gap-6 w-max py-4 animate-[scroll-ticker_35s_linear_infinite] will-change-transform hover:[animation-play-state:paused]"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
