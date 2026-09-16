@@ -159,7 +159,8 @@
   flex-direction: column;
   justify-content: flex-end;
   height: 100%;
-  padding: 1.25rem;
+  padding: 1.75rem;
+  padding-bottom: 2rem;
   color: white;
 }
 

@@ -4,7 +4,6 @@ interface Props{
     titulo?:string;
     class?:string;
 }
-
 const{src, titulo, class: className=''}= Astro.props;
 ---
 <article class={`group relative cursor-pointer overflow-hidden rounded-[1.5rem] border border-white/30 bg-slate-900 shadow-xl transition-transform duration-500 hover:-translate-y-2 hover:shadow-primary/40 ${className}`}>
