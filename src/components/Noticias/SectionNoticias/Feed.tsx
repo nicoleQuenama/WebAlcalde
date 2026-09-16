@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import NewsFeedCard, { type NoticiaFeed } from './FeedCard';
 import NewsFilters from './Filters';
 import NewsModal from '../Modal';
+import ArrowButton from '@components/ui/ArrowButton/ArrowButton';
 import { MEDIA } from '@lib/media';
 
 const NOTICIAS_DB: NoticiaFeed[] = [
@@ -144,32 +145,30 @@ function CarruselNoticias({
 
   return (
     <div style={{ marginBottom: compacto ? '0' : '3rem' }}>
-      <div className="noticias-subencabezado">
-        <div className="noticias-subencabezado__label">
-          <div className={`noticias-subencabezado__barra ${compacto ? 'noticias-subencabezado__barra--pequena' : ''}`}></div>
-          <h2 className={`noticias-subencabezado__titulo ${compacto ? 'noticias-subencabezado__titulo--secundario' : ''}`}>
+      <div className="mb-6 flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <div className={`h-8 w-1 rounded-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary-light)] ${compacto ? 'h-6 bg-gradient-to-b from-[var(--color-primary)]/50 to-[var(--color-primary-light)]/50' : ''}`}></div>
+          <h2 className={`text-xl font-bold text-[var(--color-text-primary)] ${compacto ? 'text-lg font-semibold text-[var(--color-text-secondary)]' : ''}`}>
             {titulo}
           </h2>
         </div>
-        <div className="noticias-subencabezado__linea"></div>
+        <div className="h-px flex-1 bg-gradient-to-r from-[var(--color-border)] to-transparent"></div>
       </div>
       
-      <div className="noticias-carrusel-wrap">
+      <div className="relative">
         {canScrollLeft && (
-          <button 
+          <ArrowButton
+            direction="left"
+            variant="carousel"
             onClick={() => scroll('left')}
-            className="noticias-flecha noticias-flecha--izquierda"
             aria-label="Anterior"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
+            className="!-left-2.5 md:!-left-5"
+          />
         )}
 
         <div 
           ref={trackRef}
-          className="noticias-carrusel__track scrollbar-hide"
+          className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory py-4 pr-4 cursor-grab [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden active:cursor-grabbing active:snap-proximity"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -179,7 +178,7 @@ function CarruselNoticias({
             <div 
               key={noticia.id} 
               onClick={() => handleItemClick(noticia.id)} 
-              className="noticias-carrusel__item"
+              className="flex-none w-[300px] sm:w-[320px] snap-start"
             >
               <NewsFeedCard noticia={noticia} />
             </div>
@@ -187,15 +186,13 @@ function CarruselNoticias({
         </div>
 
         {canScrollRight && (
-          <button 
+          <ArrowButton
+            direction="right"
+            variant="carousel"
             onClick={() => scroll('right')}
-            className="noticias-flecha noticias-flecha--derecha"
             aria-label="Siguiente"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+            className="!-right-2.5 md:!-right-5"
+          />
         )}
       </div>
     </div>
@@ -242,12 +239,12 @@ export default function Feed() {
   };
 
   return (
-    <section id="feed-noticias" className="feed-section">
+    <section id="feed-noticias" className="animate-[fadeInUp_0.6s_ease-out_forwards]">
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-12">
         
-        <div className="noticias-encabezado">
-          <h2 className="noticias-encabezado__titulo">Últimas Noticias</h2>
-          <p className="noticias-encabezado__descripcion">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <h2 className="text-[1.875rem] font-bold text-[var(--color-text-primary)] md:text-[2.25rem]">Últimas Noticias</h2>
+          <p className="mt-4 max-w-2xl text-base text-[var(--color-text-secondary)]">
             Mantente informado sobre los proyectos, obras y avances más recientes de nuestra ciudad.
           </p>
         </div>
@@ -274,19 +271,19 @@ export default function Feed() {
         )}
 
         {noticiasFiltradas.length === 0 && (
-          <div className="noticias-vacio">
-            <div className="noticias-vacio__icono">
+          <div className="py-24 text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-[var(--radius-xl)] bg-[var(--color-surface-hover)]">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="11" cy="11" r="8"/>
                 <path d="m21 21-4.3-4.3"/>
                 <path d="M8 11h6"/>
               </svg>
             </div>
-            <p className="noticias-vacio__titulo">No se encontraron noticias</p>
-            <p className="noticias-vacio__descripcion">Intenta con otros términos de búsqueda.</p>
+            <p className="text-lg font-medium text-[var(--color-text-secondary)]">No se encontraron noticias</p>
+            <p className="mt-2 text-sm text-[var(--color-text-muted)]">Intenta con otros términos de búsqueda.</p>
             <button 
               onClick={() => setBusqueda('')} 
-              className="noticias-vacio__btn"
+              className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-[var(--radius-lg)] border-none bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition-all hover:bg-[var(--color-primary-deep)] hover:shadow-[0_10px_15px_-3px_rgba(71,45,130,0.2)]"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6L6 18M6 6l12 12"/>

@@ -13,40 +13,40 @@ const noticiasData = [
 ];
 ---
 
-<section class="noticias-hero">
+<section class="relative overflow-hidden text-white">
 
-  <div class="noticias-hero__bg"></div>
+  <div class="absolute inset-0 bg-gradient-to-br from-[#2a1252] via-[#3d1f6d] to-[#1e0e3a]"></div>
 
-  <div class="hero-orb hero-orb--top"></div>
+  <div class="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(120,70,200,0.2)_0%,transparent_70%)] blur-12 hero-orb--top"></div>
 
-  <div class="hero-orb hero-orb--bottom"></div>
+  <div class="absolute -bottom-40 -right-40 h-[600px] w-[600px] rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(110,60,180,0.15)_0%,transparent_70%)] blur-12 hero-orb--bottom"></div>
 
-  <div class="noticias-hero__linea"></div>
+  <div class="absolute left-0 top-0 h-full w-px pointer-events-none bg-gradient-to-b from-transparent via-[rgba(120,70,200,0.2)] to-transparent"></div>
 
-  <div class="noticias-hero__contenido">
-    <div class="noticias-hero__grid">
+  <div class="relative z-10 flex min-h-[85svh] max-w-[80rem] mx-auto items-center py-20 px-6 lg:px-12">
+    <div class="w-full lg:flex lg:items-center lg:gap-16">
 
-      <div class="noticias-hero__texto">
-        <h1 class="hero-title noticias-hero__titulo">
+      <div class="max-w-2xl mx-auto text-center lg:ml-0 lg:w-[42%] lg:text-left">
+        <h1 class="animate-[heroSlideUp_0.7s_cubic-bezier(0.22,1,0.36,1)_0.25s_both] mt-8 font-[var(--font-roboto-condensed)] text-[2.25rem] font-bold leading-none text-white/90 md:text-5xl xl:text-6xl">
           Conoce las<br />
-          <span class="noticias-hero__titulo-acento">nuevas noticias</span>
+          <span class="text-[#a895d0]">nuevas noticias</span>
         </h1>
 
-        <p class="hero-subtitle noticias-hero__subtitulo">
+        <p class="animate-[heroSlideUp_0.7s_cubic-bezier(0.22,1,0.36,1)_0.4s_both] mt-6 max-w-[28rem] font-[var(--font-roboto-condensed)] text-base leading-relaxed font-bold text-[rgba(138,122,181,0.65)]">
           Mantente informado sobre los últimos proyectos, obras entregadas y el avance de nuestra ciudad hacia el futuro.
         </p>
 
-        <div class="hero-cta noticias-hero__cta">
-          <a href="#feed-noticias" class="noticias-hero__btn">
+        <div class="animate-[heroSlideUp_0.7s_cubic-bezier(0.22,1,0.36,1)_0.55s_both] mt-8">
+          <a href="#feed-noticias" class="inline-flex items-center gap-3 rounded-xl border border-[rgba(90,58,158,0.3)] bg-[rgba(58,32,112,0.4)] px-7 py-3.5 font-[var(--font-roboto-condensed)] text-sm font-bold uppercase tracking-[0.12em] text-[rgba(184,168,220,0.9)] backdrop-blur-sm no-underline transition-all hover:border-[rgba(107,76,191,0.5)] hover:bg-[rgba(74,45,138,0.5)] hover:text-[#d4c8f0]">
             <span>Ver últimas noticias</span>
-            <svg class="noticias-hero__btn-icono" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="h-4 w-4 transition-transform hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </a>
         </div>
       </div>
 
-      <div class="noticias-hero__cards">
+      <div class="relative mt-14 w-full lg:mt-0 lg:w-[58%]">
         <HeroNoticias client:load noticias={noticiasData} />
       </div>
 
@@ -54,6 +54,6 @@ const noticiasData = [
   </div>
 </section>
 
-<div class="noticias-feed-bg">
+<div class="bg-white">
   <Feed client:load />
 </div>

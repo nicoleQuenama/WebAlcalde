@@ -24,9 +24,31 @@ body {
 
   --color-primary: #472d82;
   --color-primary-rgb: 71, 45, 130;
-  --color-accent: #c9b8e8;
+  --color-primary-light: #6b4cbf;
   --color-primary-deep: #38235f;
   --color-primary-deepest: #2a1a49;
+  --color-accent: #c9b8e8;
+
+  --color-surface: #ffffff;
+  --color-surface-hover: #f8f9fa;
+  --color-text-primary: #1a1a2e;
+  --color-text-secondary: #64748b;
+  --color-text-muted: #94a3b8;
+  --color-border: #e2e8f0;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
 
   --color-hero-from: #3b1f6b;
   --color-hero-via: #1e1040;
@@ -34,6 +56,7 @@ body {
 
   --animate-zoomIn: zoomIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   --animate-fadeIn: fadeIn 0.3s ease-out forwards;
+  --animate-fadeInUp: fadeInUp 0.6s ease-out forwards;
 
   @keyframes zoomIn {
     0% {
@@ -55,6 +78,11 @@ body {
     100% {
       opacity: 1;
     }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
