@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 export interface NoticiaFeed {
   id: number | string;
   src: string;
@@ -7,7 +9,7 @@ export interface NoticiaFeed {
   resumen: string;
 }
 
-export default function NewsFeedCard({ noticia }: { noticia: NoticiaFeed }) {
+const NewsFeedCard = memo(function NewsFeedCard({ noticia }: { noticia: NoticiaFeed }) {
   return (
     <article className="noticia-card">
       <div 
@@ -39,4 +41,6 @@ export default function NewsFeedCard({ noticia }: { noticia: NoticiaFeed }) {
       </div>
     </article>
   );
-}
+});
+
+export default NewsFeedCard;

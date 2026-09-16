@@ -71,8 +71,6 @@ const NOTICIAS_DB: NoticiaFeed[] = [
   },
 ];
 
-const CATEGORIAS = ['Todas', 'Espacio público', 'Medio Ambiente', 'Salud', 'Educación', 'Obras Públicas', 'Ciudad Jardín'];
-
 function CarruselNoticias({ 
   titulo, 
   noticias, 
@@ -145,7 +143,7 @@ function CarruselNoticias({
   if (noticias.length === 0) return null;
 
   return (
-    <div style={{ marginBottom: compacto ? '0' : '5rem' }}>
+    <div style={{ marginBottom: compacto ? '0' : '3rem' }}>
       <div className="noticias-subencabezado">
         <div className="noticias-subencabezado__label">
           <div className={`noticias-subencabezado__barra ${compacto ? 'noticias-subencabezado__barra--pequena' : ''}`}></div>
@@ -206,20 +204,23 @@ function CarruselNoticias({
 
 export default function Feed() {
   const [busqueda, setBusqueda] = useState('');
-  const [fechaSel, setFechaSel] = useState('');
-  const [categoriaSel, setCategoriaSel] = useState('Todas');
-
   const [modalAbierto, setModalAbierto] = useState(false);
   const [indiceActual, setIndiceActual] = useState(0);
 
+  // Ordenar y filtrar noticias por búsqueda
   const noticiasFiltradas = useMemo(() => {
-    return NOTICIAS_DB.filter((noticia) => {
-      const matchBusqueda = noticia.titulo.toLowerCase().includes(busqueda.toLowerCase());
-      const matchCategoria = categoriaSel === 'Todas' || noticia.categoria === categoriaSel;
-      const matchFecha = fechaSel === '' || noticia.fecha >= fechaSel;
-      return matchBusqueda && matchCategoria && matchFecha;
-    }).sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-  }, [busqueda, fechaSel, categoriaSel]);
+    const base = [...NOTICIAS_DB].sort(
+      (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+    );
+    if (!busqueda.trim()) return base;
+    const q = busqueda.toLowerCase();
+    return base.filter(
+      (n) =>
+        n.titulo.toLowerCase().includes(q) ||
+        n.categoria.toLowerCase().includes(q) ||
+        n.resumen.toLowerCase().includes(q)
+    );
+  }, [busqueda]);
 
   const ultimasNoticias = noticiasFiltradas.slice(0, 4);
   const masNoticias = noticiasFiltradas.slice(4);
@@ -242,7 +243,7 @@ export default function Feed() {
 
   return (
     <section id="feed-noticias" className="feed-section">
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-12">
+      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-12">
         
         <div className="noticias-encabezado">
           <h2 className="noticias-encabezado__titulo">Últimas Noticias</h2>
@@ -253,9 +254,6 @@ export default function Feed() {
 
         <NewsFilters 
           busqueda={busqueda} setBusqueda={setBusqueda}
-          fechaSel={fechaSel} setFechaSel={setFechaSel}
-          categoriaSel={categoriaSel} setCategoriaSel={setCategoriaSel}
-          categorias={CATEGORIAS}
         />
 
         {ultimasNoticias.length > 0 && (
@@ -285,15 +283,15 @@ export default function Feed() {
               </svg>
             </div>
             <p className="noticias-vacio__titulo">No se encontraron noticias</p>
-            <p className="noticias-vacio__descripcion">Intenta con otros términos de búsqueda o filtros diferentes.</p>
+            <p className="noticias-vacio__descripcion">Intenta con otros términos de búsqueda.</p>
             <button 
-              onClick={() => { setBusqueda(''); setCategoriaSel('Todas'); setFechaSel(''); }} 
+              onClick={() => setBusqueda('')} 
               className="noticias-vacio__btn"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6L6 18M6 6l12 12"/>
               </svg>
-              Limpiar filtros
+              Limpiar búsqueda
             </button>
           </div>
         )}
@@ -304,6 +302,8 @@ export default function Feed() {
           onClose={cerrarModal}
           onNext={noticiaSiguiente}
           onPrev={noticiaAnterior}
+          todasLasNoticias={noticiasFiltradas}
+          indiceActual={indiceActual}
         />
 
       </div>
