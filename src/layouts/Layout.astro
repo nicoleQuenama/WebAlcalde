@@ -150,6 +150,15 @@ const {title, description = 'Manfred Reyes Villa — Cocha, la mejor ciudad de B
                     .cms-preview-toolbar button.cms-handle:active { cursor: grabbing; }
                     .cms-pegado-flash { animation: cmsFlash 0.6s ease; }
                     @keyframes cmsFlash { 0%{ outline: 3px solid #c9b8e8; } 100%{ outline: 2px dashed #472d82; } }
+                    .cms-context-menu { position: fixed; z-index: 10001; min-width: 210px; max-width: 260px; background: #fff; border: 1px solid #e3dbf5; border-radius: 12px; box-shadow: 0 12px 32px rgba(42,26,73,0.22); padding: 6px; display: none; flex-direction: column; gap: 2px; font-family: system-ui, -apple-system, sans-serif; }
+                    .cms-context-menu.cms-context-menu--open { display: flex; }
+                    .cms-context-menu__header { font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #6b5f87; padding: 6px 10px 4px; border-bottom: 1px solid #f3efff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                    .cms-context-menu__item { appearance: none; border: none; background: #fff; text-align: left; font-size: 13px; font-weight: 600; color: #241a3a; padding: 8px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+                    .cms-context-menu__item:hover { background: #f3efff; color: #472d82; }
+                    .cms-context-menu__item:disabled { opacity: 0.38; cursor: default; background: #fff; }
+                    .cms-context-menu__item small { margin-left: auto; font-size: 11px; color: #6b5f87; font-weight: 500; }
+                    .cms-context-menu__sep { height: 1px; background: #f3efff; margin: 2px 0; }
+                    .cms-context-menu__hint { font-size: 11px; color: #6b5f87; padding: 4px 10px; font-style: italic; }
                 `;
                 document.head.appendChild(estilo);
 
@@ -169,21 +178,33 @@ const {title, description = 'Manfred Reyes Villa — Cocha, la mejor ciudad de B
                 };
 
                 // Clipboard recibido del editor para mostrar botón Pegar en preview
-                let clipboardPreview: { dominio:string; label:string } | null = null;
+                let clipboardPreview: { dominio:string; label:string; tipo?: string; seccionKey?: string } | null = null;
                 window.addEventListener('message', (e)=>{
                     const d = e.data as any;
                     if(d?.source==='cms-editor' && d.type==='clipboard'){ clipboardPreview = d.payload; refrescarToolbars(); }
                     if(d?.source==='cms-editor' && d.type==='cms-sync'){
-                        // Sincronización viva desde editor: reordenar DOM sin reload
                         try{
                             if(d.ordenLayout && Array.isArray(d.ordenLayout)){
                                 const flexContainers = Array.from(document.querySelectorAll<HTMLElement>('div[style*="flex-direction:column"], main[style*="display:flex"]'));
                                 flexContainers.forEach(container=>{
                                     const hijos = Array.from(container.children).filter(el=> el instanceof HTMLElement && (el as HTMLElement).hasAttribute('data-cms-dominio')) as HTMLElement[];
-                                    if(hijos.length<2) return;
-                                    const porDominio = new Map(hijos.map(h=> [DOMINIO_A_KEY[h.dataset.cmsDominio||''] || h.dataset.cmsDominio, h] as const));
+                                    if(hijos.length===0) return;
+                                    const porDominio = new Map(hijos.map(h=> [h.dataset.cmsDominio||'', h] as const));
+                                    // Solo crear fantasma si el mensaje viene de sección pegada (detectar por dominio nuevo no mapeado)
+                                    // Para evitar duplicar, solo si hay 1 faltante y es copia
+                                    const faltantes: string[] = [];
+                                    for(const k of d.ordenLayout){
+                                        // inferir dominio posible: buscar si algún hijo ya tiene ese dominio
+                                        // si no, intentar DOMINIO_A_KEY inverso
+                                        let found = false;
+                                        for(const h of hijos){ if((DOMINIO_A_KEY[h.dataset.cmsDominio||'']||h.dataset.cmsDominio)===k) { found=true; break; } }
+                                        if(!found) faltantes.push(k);
+                                    }
+                                    // No crear fantasmas automáticos aquí — el editor ya lo hace en same-origin; evitar duplicados
+                                    const hijos2 = Array.from(container.children).filter(el=> el instanceof HTMLElement && (el as HTMLElement).hasAttribute('data-cms-dominio')) as HTMLElement[];
+                                    const porKey2 = new Map(hijos2.map(h=> [DOMINIO_A_KEY[h.dataset.cmsDominio||''] || h.dataset.cmsDominio, h] as const));
                                     d.ordenLayout.forEach((key:string, idx:number)=>{
-                                        const el = porDominio.get(key);
+                                        const el = porKey2.get(key);
                                         if(el){ (el as HTMLElement).style.order = String(idx); }
                                     });
                                 });
@@ -354,6 +375,124 @@ const {title, description = 'Manfred Reyes Villa — Cocha, la mejor ciudad de B
                 setTimeout(habilitarDragPreview, 600);
                 const obsPreview = new MutationObserver(()=> habilitarDragPreview());
                 obsPreview.observe(document.body, { childList:true, subtree:true });
+
+                // ── Menú contextual click derecho: Copiar / Pegar / Duplicar ──
+                let contextMenuEl: HTMLElement | null = null;
+                let contextMenuTarget: { dominio:string; clave?:string; esSeccion:boolean; label:string; bloqueado?:boolean } | null = null;
+                function getContextMenu(): HTMLElement {
+                    if(contextMenuEl) return contextMenuEl;
+                    contextMenuEl = document.createElement('div');
+                    contextMenuEl.id = 'cms-context-menu';
+                    contextMenuEl.className = 'cms-context-menu';
+                    contextMenuEl.addEventListener('click', (e)=> e.stopPropagation());
+                    document.body.appendChild(contextMenuEl);
+                    return contextMenuEl;
+                }
+                function cerrarContextMenu(){ if(contextMenuEl) contextMenuEl.classList.remove('cms-context-menu--open'); contextMenuTarget=null; }
+                document.addEventListener('click', ()=> cerrarContextMenu());
+                document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') cerrarContextMenu(); });
+                window.addEventListener('blur', ()=> cerrarContextMenu());
+                function abrirContextMenu(e: MouseEvent, dominio: string, clave: string | undefined, esSeccion: boolean, label: string, bloqueado: boolean){
+                    e.preventDefault(); e.stopPropagation();
+                    const menu = getContextMenu();
+                    contextMenuTarget = { dominio, clave, esSeccion, label, bloqueado };
+                    const esItem = !!clave;
+                    // Determinar si se puede pegar: item-> mismo dominio, seccion-> cualquier sección (no bloqueado por placeholder) si clipboard es seccion
+                    const esClipboardSeccion = clipboardPreview?.tipo==='seccion';
+                    const esClipboardItem = !esClipboardSeccion;
+                    const puedePegarItem = !!(clipboardPreview && esClipboardItem && clipboardPreview.dominio===dominio && !bloqueado);
+                    const puedePegarSeccion = !!(clipboardPreview && esClipboardSeccion); // secciones se pueden pegar después de cualquier sección
+                    const puedePegar = esItem ? puedePegarItem : (puedePegarItem || puedePegarSeccion);
+                    menu.replaceChildren();
+                    const header = document.createElement('div'); header.className='cms-context-menu__header';
+                    header.textContent = esItem ? `Tarjeta: ${label.slice(0,32)}` : `Sección: ${label || dominio}`;
+                    menu.append(header);
+                    const btnCopiar = document.createElement('button'); btnCopiar.className='cms-context-menu__item';
+                    btnCopiar.innerHTML = `⧉ Copiar ${esItem ? 'tarjeta' : 'sección'}`;
+                    btnCopiar.title = esItem ? 'Copia tarjeta independiente' : 'Copia la sección para pegarla en Estructura';
+                    btnCopiar.addEventListener('click', ()=>{ cerrarContextMenu(); window.parent.postMessage({ source:'cms-preview', type:'copiar', dominio, clave, esSeccion }, '*'); });
+                    menu.append(btnCopiar);
+                    if(!bloqueado){
+                        const btnDup = document.createElement('button'); btnDup.className='cms-context-menu__item';
+                        btnDup.innerHTML = `⎘ Duplicar ${esItem ? 'tarjeta' : 'sección'}`;
+                        btnDup.title = 'Duplica sin afectar el original';
+                        btnDup.addEventListener('click', ()=>{ cerrarContextMenu(); window.parent.postMessage({ source:'cms-preview', type:'duplicar', dominio, clave, esSeccion }, '*'); });
+                        menu.append(btnDup);
+                    }
+                    const sep1 = document.createElement('div'); sep1.className='cms-context-menu__sep'; menu.append(sep1);
+                    // Botón pegar contextual según tipo
+                    if(esClipboardSeccion && esSeccion){
+                        const btnPegarSec = document.createElement('button'); btnPegarSec.className='cms-context-menu__item';
+                        btnPegarSec.textContent = puedePegarSeccion ? `📋 Pegar sección "${clipboardPreview!.label.slice(0,22)}" después` : '📋 Pegar sección aquí';
+                        if(puedePegarSeccion){ btnPegarSec.addEventListener('click', ()=>{ cerrarContextMenu(); window.parent.postMessage({ source:'cms-preview', type:'pegarSeccion', dominio, clave, posicion:'despues', seccionKey: clipboardPreview!.seccionKey }, '*'); }); }
+                        else { (btnPegarSec as HTMLButtonElement).disabled = true; btnPegarSec.title = clipboardPreview ? `Portapapeles: ${clipboardPreview.label} (${clipboardPreview.tipo})` : 'Nada copiado'; }
+                        menu.append(btnPegarSec);
+                    } else {
+                        const btnPegar = document.createElement('button'); btnPegar.className='cms-context-menu__item';
+                        const pegarLabel = puedePegarItem ? `📋 Pegar aquí — "${clipboardPreview!.label.slice(0,22)}"` : '📋 Pegar aquí';
+                        btnPegar.textContent = esItem ? pegarLabel + ' (después)' : pegarLabel;
+                        if(puedePegarItem){ btnPegar.addEventListener('click', ()=>{ cerrarContextMenu(); window.parent.postMessage({ source:'cms-preview', type:'pegar', dominio, clave, posicion:'despues' }, '*'); }); }
+                        else { (btnPegar as HTMLButtonElement).disabled = true; btnPegar.title = clipboardPreview ? (clipboardPreview.tipo==='seccion' ? `Portapapeles es una SECCIÓN — usá Estructura (☰) para pegarla` : `Portapapeles: ${clipboardPreview.dominio} — no compatible con ${dominio}`) : 'Nada copiado aún — copia una tarjeta primero'; }
+                        menu.append(btnPegar);
+                        if(esSeccion && puedePegarItem){
+                            const btnPegarFinal = document.createElement('button'); btnPegarFinal.className='cms-context-menu__item';
+                            btnPegarFinal.textContent='📋 Pegar al final de la sección';
+                            btnPegarFinal.addEventListener('click', ()=>{ cerrarContextMenu(); window.parent.postMessage({ source:'cms-preview', type:'pegar', dominio, clave: undefined, posicion:'final' }, '*'); });
+                            menu.append(btnPegarFinal);
+                        }
+                    }
+                    const sep2 = document.createElement('div'); sep2.className='cms-context-menu__sep'; menu.append(sep2);
+                    const btnEditar = document.createElement('button'); btnEditar.className='cms-context-menu__item';
+                    btnEditar.textContent='✎ Editar'; btnEditar.addEventListener('click', ()=>{ cerrarContextMenu(); window.parent.postMessage({ source:'cms-preview', type:'seleccionar', dominio, clave }, '*'); });
+                    menu.append(btnEditar);
+                    if(!puedePegar && !clipboardPreview){
+                        const hint = document.createElement('div'); hint.className='cms-context-menu__hint'; hint.textContent='Tip: copia una tarjeta con ⧉ y luego click derecho donde quieras pegar.';
+                        menu.append(hint);
+                    } else if(esClipboardSeccion && !esSeccion){
+                        const hint = document.createElement('div'); hint.className='cms-context-menu__hint'; hint.textContent='Sección copiada — abrí ☰ Estructura y hacé click derecho para pegarla.';
+                        menu.append(hint);
+                    }
+                    // posicionar evitando overflow
+                    menu.classList.add('cms-context-menu--open');
+                    menu.style.left='0'; menu.style.top='0';
+                    const rect = menu.getBoundingClientRect();
+                    let x = e.clientX + 6, y = e.clientY + 6;
+                    if(x + rect.width > window.innerWidth - 8) x = window.innerWidth - rect.width - 8;
+                    if(y + rect.height > window.innerHeight - 8) y = window.innerHeight - rect.height - 8;
+                    menu.style.left = x+'px'; menu.style.top = y+'px';
+                }
+                document.addEventListener('contextmenu', (e)=>{
+                    const target = e.target as HTMLElement;
+                    if(target.closest('.cms-preview-toolbar') || target.closest('#cms-img-picker') || target.closest('#cms-context-menu')) return;
+                    const conClave = target.closest('[data-cms-clave]') as HTMLElement | null;
+                    const conDominio = (conClave ?? target.closest('[data-cms-dominio]')) as HTMLElement | null;
+                    if(!conDominio) {
+                        // Si no hay sección bajo el cursor pero hay una sección copiada, ofrecer pegar al final global
+                        if(clipboardPreview?.tipo==='seccion'){
+                            e.preventDefault();
+                            // Buscar primer dominio para usar como referencia de página
+                            const anySec = document.querySelector<HTMLElement>('[data-cms-dominio]');
+                            const dominioFallback = anySec?.dataset.cmsDominio || 'home_hero';
+                            abrirContextMenu(e as MouseEvent, dominioFallback, undefined, true, 'Página', false);
+                        } else {
+                            cerrarContextMenu();
+                        }
+                        return;
+                    }
+                    const dominio = conDominio.dataset.cmsDominio || conClave?.getAttribute('data-cms-dominio') || '';
+                    if(!dominio) return;
+                    const clave = conClave?.dataset.cmsClave;
+                    const esSeccion = !clave;
+                    // label: buscar campo titulo/nombre si es item
+                    let label = dominio;
+                    if(conClave){ label = conClave.querySelector('[data-cms-campo="titulo"], [data-cms-campo="nombre"], [data-cms-campo="title"]')?.textContent?.trim() || conClave.dataset.cmsClave || dominio; }
+                    else { label = conDominio.querySelector('h1,h2,h3')?.textContent?.trim()?.slice(0,30) || dominio; }
+                    const bloqueado = conDominio.hasAttribute('data-cms-bloqueado') || conClave?.hasAttribute('data-cms-bloqueado') || false;
+                    // heurística bloqueado solo para items
+                    const dominiosBloqueados = ['capitulo','sobre_institutional'];
+                    const esBloqueado = esSeccion ? false : (bloqueado || dominiosBloqueados.includes(dominio));
+                    abrirContextMenu(e as MouseEvent, dominio, clave, esSeccion, label, esBloqueado);
+                });
 
                 // ── Picker de imagen/video al presionar foto ─────────────────────
                 function crearPickerOverlay(){
