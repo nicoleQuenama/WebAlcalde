@@ -3,6 +3,7 @@
 import { ClientRouter } from 'astro:transitions';
 import Header from '@components/Header/Header.astro';
 import Footer from '@components/global/Footer/Footer.astro';
+import TikTokWidget from '@components/global/TikTokWidget/TikTokWidget.astro';
 import Preloader from '@components/Preloader/Preloader.astro';
 
 import '@styles/global.css';
@@ -84,6 +85,8 @@ const {title, description = 'Manfred Reyes Villa — Cocha, la mejor ciudad de B
         <main transition:animate="fade">
             <slot/>
         </main>
+
+        <TikTokWidget />
 
         <Footer />
         <script>
