@@ -31,7 +31,7 @@ export interface SeccionConfig {
 }
 
 export interface PaginaConfig {
-  pagina: 'inicio' | 'gestion' | 'sobre';
+  pagina: 'inicio' | 'gestion' | 'sobre' | 'noticias';
   titulo: string;
   ruta: string;
   layoutDominio: string;
@@ -75,6 +75,15 @@ const CAMPOS_INSTITUTIONAL: FieldSpec[] = [
   { name: 'eyebrow', label: 'Etiqueta (eyebrow)', type: 'text' },
   { name: 'title', label: 'Título', type: 'text' },
   { name: 'body', label: 'Texto', type: 'textarea' },
+];
+
+const CAMPOS_NOTICIA: FieldSpec[] = [
+  { name: 'label', label: 'Etiqueta corta (cards del hero)', type: 'text' },
+  { name: 'titulo', label: 'Título', type: 'text' },
+  { name: 'categoria', label: 'Categoría', type: 'text' },
+  { name: 'fecha', label: 'Fecha (YYYY-MM-DD)', type: 'text' },
+  { name: 'resumen', label: 'Resumen', type: 'textarea' },
+  { name: 'src', label: 'Imagen', type: 'imagen' },
 ];
 
 export const PAGINAS: PaginaConfig[] = [
@@ -246,6 +255,32 @@ export const PAGINAS: PaginaConfig[] = [
         titulo: 'Línea de tiempo',
         tipo: 'placeholder',
         notaPlaceholder: 'Interactiva (scroll 3D) — no editable en esta beta.',
+      },
+    ],
+  },
+  {
+    pagina: 'noticias',
+    titulo: 'Noticias',
+    ruta: '/noticias',
+    layoutDominio: 'noticias_layout',
+    secciones: [
+      {
+        key: 'hero',
+        titulo: 'Hero de noticias',
+        tipo: 'single',
+        dominio: 'noticias_hero',
+        campos: [
+          { name: 'kicker', label: 'Etiqueta', type: 'text' },
+          { name: 'titulo', label: 'Título', type: 'text' },
+          { name: 'bajada', label: 'Bajada', type: 'textarea' },
+        ],
+      },
+      {
+        key: 'lista_noticias',
+        titulo: 'Lista de noticias',
+        tipo: 'lista',
+        dominio: 'noticias',
+        campos: CAMPOS_NOTICIA,
       },
     ],
   },

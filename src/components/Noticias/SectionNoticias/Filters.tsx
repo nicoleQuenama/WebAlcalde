@@ -1,10 +1,14 @@
+import { CATEGORIAS_NOTICIAS } from '@constants/noticias';
+
 interface FiltrosProps {
   busqueda: string;
   setBusqueda: (val: string) => void;
+  categoria: string;
+  setCategoria: (val: string) => void;
 }
 
 export default function NewsFilters({
-  busqueda, setBusqueda
+  busqueda, setBusqueda, categoria, setCategoria
 }: FiltrosProps) {
   return (
     <div className="mb-8">
@@ -33,6 +37,26 @@ export default function NewsFilters({
               </button>
             )}
           </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {CATEGORIAS_NOTICIAS.map((cat) => {
+            const activo = cat === categoria;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategoria(cat)}
+                className={`cursor-pointer rounded-full border px-4 py-1.5 text-xs font-semibold tracking-wide transition-all ${
+                  activo
+                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-white shadow-[0_4px_10px_-2px_rgba(71,45,130,0.35)]'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]/50 hover:text-[var(--color-primary)]'
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { getCapitulos, getEras, getGestionHero, getProyectos, getProyectosTitulo } from '@lib/db';
+import { getCapitulos, getEras, getGestionHero, getNoticias, getNoticiasHero, getProyectos, getProyectosTitulo } from '@lib/db';
 import { INSTITUTIONAL_CARDS } from '@constants/institutionalProfile/content';
 import { efectivo, efectivoLista, efectivoOrden } from '@lib/cms/resolve';
 import { paginaPorId, PAGINAS, type PaginaConfig, type SeccionConfig } from '@lib/cms/campos';
@@ -12,6 +12,8 @@ import {
   DEFAULT_HOME_LAYOUT,
   DEFAULT_GESTION_LAYOUT,
   DEFAULT_SOBRE_LAYOUT,
+  DEFAULT_NOTICIAS_HERO,
+  DEFAULT_NOTICIAS_LAYOUT,
 } from '@lib/cms/defaults';
 
 /**
@@ -79,6 +81,20 @@ export async function calcularDatosPagina(paginaId: string): Promise<DatosPagina
           'proyecto',
           (await getProyectos()).map((p, i) => ({ ...p, id: String(i) })),
         ).map((p) => ({ clave: p.id as string, data: p })),
+      },
+    );
+  } else if (paginaConfig.pagina === 'noticias') {
+    ordenLayoutDefault = DEFAULT_NOTICIAS_LAYOUT;
+    const heroDefault = (await getNoticiasHero()) ?? DEFAULT_NOTICIAS_HERO;
+    const noticiasDefault = (await getNoticias()).map((n) => ({ ...n, id: String(n.id) }));
+    secciones.push(
+      { ...paginaConfig.secciones[0], valor: efectivo('noticias_hero', 'principal', heroDefault) },
+      {
+        ...paginaConfig.secciones[1],
+        items: efectivoLista('noticias', noticiasDefault).map((n) => ({
+          clave: String(n.id),
+          data: n,
+        })),
       },
     );
   } else {

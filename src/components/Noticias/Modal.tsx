@@ -1,19 +1,16 @@
 import { useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import type { NoticiaFeed } from "./SectionNoticias/FeedCard";
+import type { NoticiaFeed } from "@lib/db";
 import ArrowButton from "@components/ui/ArrowButton/ArrowButton";
 
-/**
- * Propiedades que recibe el componente NewsModal
- */
 interface NewsModalProps {
-  noticia: NoticiaFeed | null; // Datos de la noticia seleccionada
-  isOpen: boolean;             // Variable booleana que indica si el modal debe mostrarse
-  onClose: () => void;         // Función que se ejecuta para cerrar el modal
-  onNext: () => void;          // Función para avanzar a la siguiente noticia
-  onPrev: () => void;          // Función para retroceder a la noticia anterior
-  todasLasNoticias: NoticiaFeed[]; // Array con todas las noticias para la preview inferior
-  indiceActual: number;        // Posición de la noticia actual en el array
+  noticia: NoticiaFeed | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onNext: () => void;
+  onPrev: () => void;
+  todasLasNoticias: NoticiaFeed[];
+  indiceActual: number;
 }
 
 export default function NewsModal({
@@ -25,8 +22,8 @@ export default function NewsModal({
   todasLasNoticias,
   indiceActual,
 }: NewsModalProps) {
-  
-  /*CONTROL DEL SCROLL DEL FONDO */
+
+  // Bloquea el scroll del fondo y lo restaura al cerrar
   useEffect(() => {
     if (isOpen) {
       const scrollY = window.scrollY;
@@ -40,10 +37,8 @@ export default function NewsModal({
       document.body.style.top = "";
       document.body.style.width = "";
       document.body.style.overflow = "";
-      // Restaura la posición exacta donde estaba el usuario
       if (scrollY) window.scrollTo(0, parseInt(scrollY || "0") * -1);
     }
-    // Limpieza de seguridad al desmontar el componente
     return () => {
       document.body.style.position = "";
       document.body.style.top = "";
@@ -52,7 +47,6 @@ export default function NewsModal({
     };
   }, [isOpen]);
 
-  /* NAVEGACIÓN POR TECLADO */
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -63,7 +57,6 @@ export default function NewsModal({
     return () => window.removeEventListener("keydown", handleEsc);
   }, [isOpen, onClose, onNext, onPrev]);
 
-  /*COMPARTIR NOTICIA */
   const handleShare = useCallback(async () => {
     if (!noticia) return;
     const url = window.location.href;
@@ -80,32 +73,22 @@ export default function NewsModal({
     }
   }, [noticia]);
 
-  // Si el modal está cerrado o no cargó la noticia, no renderizamos nada
   if (!isOpen || !noticia) return null;
 
-  // Calcula qué noticia sigue para mostrarla en la tarjetita final
   const siguienteIndice = indiceActual === todasLasNoticias.length - 1 ? 0 : indiceActual + 1;
   const siguienteNoticia = todasLasNoticias[siguienteIndice];
 
-  /* 
-    createPortal permite "teletransportar" este HTML directamente al <body> 
-    de la web, evitando que otras cajas de tu diseño interfieran con él.
-  */
   return createPortal(
-    // Overlay oscuro general
     <div className="noticias-modal-overlay" onClick={onClose}>
-      
-      {/* Filtro borroso de fondo */}
+
       <div className="noticias-modal-bg" />
 
-      {/* ── BOTÓN CERRAR── */}
       <button onClick={onClose} className="noticias-modal__cerrar" aria-label="Cerrar modal">
         <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
 
-      {/*FLECHA IZQUIERDA */}
       <ArrowButton
         direction="left"
         variant="modal"
@@ -114,12 +97,9 @@ export default function NewsModal({
         className="!absolute !left-2 !z-[70] md:!left-6"
       />
 
-      {/* ── CONTENEDOR PRINCIPAL DEL MODAL ──
-          stopPropagation evita que hacer clic dentro del recuadro cierre el modal 
-      */}
+      {/* stopPropagation evita que el clic dentro del recuadro cierre el modal */}
       <div className="noticias-modal" onClick={(e) => e.stopPropagation()}>
-        
-        {/* LADO IZQUIERDO: SECCIÓN DE LA IMAGEN */}
+
         <div className="noticias-modal__imagen-wrap">
           <div className="noticias-modal__imagen-blur" style={{ backgroundImage: `url(${noticia.src})` }} />
           <div className="noticias-modal__imagen-overlay" />
@@ -128,13 +108,10 @@ export default function NewsModal({
           </div>
         </div>
 
-        {/* LADO DERECHO: SECCIÓN DEL TEXTO Y COMENTARIOS */}
         <div className="noticias-modal__contenido !p-0 relative flex flex-col h-full overscroll-none">
-          
-          {/* CONTENEDOR INTERNO DEL TEXTO*/}
+
           <div className="p-5 md:p-6 pb-8">
-            
-            {/* Botón de Compartir */}
+
             <div className="mb-3 flex justify-end">
               <button onClick={(e) => { e.stopPropagation(); handleShare(); }} className="flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(160,120,220,0.2)] bg-[rgba(90,58,158,0.3)] text-white/80 transition-all hover:bg-[rgba(90,58,158,0.8)] hover:text-white hover:scale-110" title="Compartir">
                 <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -150,13 +127,10 @@ export default function NewsModal({
               </time>
             </div>
 
-            {/* Título de la Noticia */}
             <h2 className="mb-2 text-lg sm:text-xl md:text-2xl font-bold leading-snug text-white">{noticia.titulo}</h2>
 
-            {/* Línea Divisoria */}
             <div className="h-px mb-4 bg-gradient-to-r from-[rgba(90,58,158,0.4)] to-transparent"></div>
 
-            {/* Cuerpo completo de la Noticia */}
             <div className="flex flex-col gap-3 text-[0.875rem] sm:text-[0.9375rem] leading-relaxed text-white/75 min-w-0">
               <p className="break-words font-medium text-white/90">{noticia.resumen}</p>
               <p className="break-words">Aquí irá todo el cuerpo completo de la noticia detallando los pormenores del proyecto, declaraciones oficiales y los próximos pasos a seguir para beneficiar a la población de Cochabamba.</p>
@@ -166,17 +140,12 @@ export default function NewsModal({
             </div>
           </div>
 
-          {/* ── BARRA INFERIOR ESTILO INSTAGRAM 
-              - "sticky bottom-0": Lo ancla siempre al fondo de su columna.
-              - "bg-[#2a1252]": Le da color sólido, tapando el texto que scrollea.
-              - "mt-auto": Lo empuja siempre al final aunque la noticia sea corta.
-          */}
+          {/* Barra "siguiente noticia": sticky al fondo de la columna (bg cubre el scroll) */}
           <div className="sticky bottom-0 z-20 w-full bg-[#2a1252] px-4 py-3 md:px-5 border-t border-[rgba(160,120,220,0.15)] shadow-[0_-10px_20px_rgba(26,15,48,0.7)] mt-auto">
-            <button 
-              className="flex flex-col justify-center px-3 py-2 rounded-[var(--radius-md)] border border-[rgba(160,120,220,0.15)] bg-[rgba(90,58,158,0.08)] text-left cursor-pointer transition-all w-full hover:bg-[rgba(90,58,158,0.25)] hover:border-[rgba(160,120,220,0.4)]" 
+            <button
+              className="flex flex-col justify-center px-3 py-2 rounded-[var(--radius-md)] border border-[rgba(160,120,220,0.15)] bg-[rgba(90,58,158,0.08)] text-left cursor-pointer transition-all w-full hover:bg-[rgba(90,58,158,0.25)] hover:border-[rgba(160,120,220,0.4)]"
               onClick={(e) => { e.stopPropagation(); onNext(); }}
             >
-              {/* Cabecera del botón*/}
               <div className="flex items-center justify-between w-full">
                 <span className="text-[0.5rem] font-bold uppercase tracking-[0.1em] text-[var(--color-accent)]">
                   Siguiente noticia
@@ -185,8 +154,7 @@ export default function NewsModal({
                   <span className="truncate max-w-[80px]">{siguienteNoticia.categoria}</span>
                 </div>
               </div>
-              
-              {/* Título de la próxima noticia */}
+
               <h4 className="text-[0.75rem] sm:text-[0.8125rem] font-semibold leading-tight text-white/90 line-clamp-1 mt-0.5">
                 {siguienteNoticia.titulo}
               </h4>
@@ -196,7 +164,6 @@ export default function NewsModal({
         </div>
       </div>
 
-      {/* ── FLECHA DERECHA*/}
       <ArrowButton
         direction="right"
         variant="modal"
