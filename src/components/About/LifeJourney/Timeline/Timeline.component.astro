@@ -1,9 +1,14 @@
 ---
-import { getOptimizedImageSrc } from '@lib/imageOptimize';
-import { getFiltrosHito, getHistoriaIntro, getHitos } from '@lib/db';
-import type { Hito } from '@lib/db';
-import { ajusteImagen } from '@lib/ajusteImagen';
-import TimelineDolly from '@components/About/LifeJourney/Timeline/TimelineDolly';
+import {
+  getHitos,
+  getHistoriaIntro,
+  getFiltrosHito,
+  getOptimizedImageSrc,
+  ajusteImagen,
+  type Hito,
+} from '@lib';
+import Section from '@components/global/Section/Section.component.astro';
+import { TimelineDolly } from '@components/About/LifeJourney/Timeline';
 import type { PlacaDolly, TabDolly } from './types';
 
 const HISTORIA = await getHitos();
@@ -54,22 +59,13 @@ const tabs: TabDolly[] = await Promise.all(
 );
 ---
 
-<section class="relative bg-white text-slate-900" id="trayectoria" style={style}>
-    <div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
-        <header class="max-w-2xl">
-            {INTRO.kicker && (
-                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
-                    {INTRO.kicker}
-                </p>
-            )}
-            <h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]">
-                {INTRO.titulo}
-            </h2>
-            <p class="mt-5 text-base leading-relaxed text-slate-600 lg:text-lg">
-                {INTRO.bajada}
-            </p>
-        </header>
-
-        <TimelineDolly client:visible tabs={tabs} />
-    </div>
-</section>
+<Section
+    subtitle={INTRO.kicker}
+    title={INTRO.titulo}
+    description={INTRO.bajada}
+    class="relative"
+    paddingClass="py-24 lg:py-32"
+    style={style}
+>
+    <TimelineDolly client:visible tabs={tabs} />
+</Section>

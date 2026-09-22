@@ -2,7 +2,7 @@ import type { Encuadre, AjusteCarrusel } from './ajusteImagen';
 import type { TarjetaImagen } from '@components/global/Hero/types';
 
 const BASE =
-  'https://fsuxvbuupswucnsvrdce.supabase.co/storage/v1/object/public/media';
+  'https://xfkfvabjxgfwjktaxhcs.supabase.co/storage/v1/object/public/media';
 
 /** URL pública de un archivo del bucket (codifica espacios, tildes, paréntesis…). */
 const file = (path: string): string => encodeURI(`${BASE}/${path}`);
@@ -41,6 +41,9 @@ export interface ParAntesDespues {
   titulo: string;
   antes: string;
   despues: string;
+  /** Dimensiones reales del "antes" cuando se conocen (evita `inferSize` en remotos). */
+  antesWidth?: number;
+  antesHeight?: number;
   despuesHeight?: number;
   afterFit?: 'cover' | 'contain' | 'fill' | 'none';
   afterPosition?: string;
@@ -119,6 +122,9 @@ export const MEDIA = {
       titulo: 'Plaza de las Banderas',
       antes: antes('trabajos_plaza_de_las_banderas_931.webp'),
       despues: ahora('IMG_5929.webp'),
+      // Mismo archivo que temarioDims['ciudad-jardin-hoy'] (placas 3122×1939).
+      antesWidth: 3122,
+      antesHeight: 1939,
       // 6240×4160: alto real a 1200px (evita el sliver de inferSize en webp remotos).
       despuesHeight: 800,
     },
@@ -126,6 +132,9 @@ export const MEDIA = {
       titulo: 'Parque Vial',
       antes: antes('parque_vial.webp'),
       despues: ahora('DJI_0169.webp'),
+      // Mismo archivo que temarioDims['ciudad-jardin-90'] (parque_vial 4378×3014).
+      antesWidth: 4378,
+      antesHeight: 3014,
       // 4000×3000: alto real a 1200px de ancho.
       despuesHeight: 900,
     },

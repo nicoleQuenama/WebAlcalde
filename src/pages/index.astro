@@ -3,6 +3,7 @@ import {
   getOptimizedImageSrc,
   getExactSizeImageSrc,
   getComparadorImageSrc,
+  COMPARADOR_ANCHO,
 } from "@lib/imageOptimize";
 import Layout from "@layouts/Layout.astro";
 import { MEDIA } from "@lib/media";
@@ -59,10 +60,18 @@ const posterBiografia = await getExactSizeImageSrc(
 const videoBiografia = MEDIA.biografia.video;
 
 // ── ANTES / DESPUÉS ───────────────────────────────────────────────────
+// El "antes" se optimiza con altura proporcional cuando se conocen sus
+// dimensiones reales (sin `inferSize` en remotos); si no, getComparadorImageSrc
+// devuelve el original sin optimizar en vez de fetchear dimensiones.
 const pares: ParComparador[] = await Promise.all(
   MEDIA.antesDespues.map(async (p) => ({
     titulo: p.titulo,
-    antes: await getComparadorImageSrc(p.antes),
+    antes: await getComparadorImageSrc(
+      p.antes,
+      p.antesWidth && p.antesHeight
+        ? Math.max(1, Math.round((COMPARADOR_ANCHO * p.antesHeight) / p.antesWidth))
+        : undefined,
+    ),
     despues: await getComparadorImageSrc(p.despues, p.despuesHeight),
     afterFit: p.afterFit,
     afterPosition: p.afterPosition,
