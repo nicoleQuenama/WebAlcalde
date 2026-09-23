@@ -12,6 +12,7 @@ import styles from './FlipBook.module.css';
 import ThreeBook from './ThreeBook/ThreeBook';
 import type { FlipBookProps, MediaItem, TocItem, TocGroup, PageFlipLike, Phase, OpenSize, Rect } from '../../types/flipBook';
 import { CLOSE_TIMEOUT_MS, OPEN_TIMEOUT_MS, TEXT_SIZES } from '../../constants/flipBook';
+import { PLAY_ICON } from '@constants/book/book3D';
 import {
   loadFlipBook,
   getCachedFlipBook,
@@ -681,7 +682,7 @@ export default function FlipBook({
                   </div>
                 ) : (
                   <div className={styles.mediaPlaceholder}>
-                    <span className={styles.mediaIcon}>▶</span>
+                    <span className={styles.mediaIcon}>{PLAY_ICON}</span>
                     <span>Video en pantalla completa</span>
                   </div>
                 )}

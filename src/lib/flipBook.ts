@@ -85,7 +85,7 @@ export const computeOpenSize = (width: number, height: number): OpenSize => {
 
 /**
  * Índice del libro digital: portada + capítulos de apertura + una entrada
- * por era/sección, en el mismo orden de páginas que arma `Book3D.tsx`.
+ * por era/sección, en el mismo orden de páginas que arma `Book.tsx`.
  */
 export function buildLibroToc(capitulos: Capitulo[], eras: EraTemario[]): TocGroup[] {
   let page = 1;

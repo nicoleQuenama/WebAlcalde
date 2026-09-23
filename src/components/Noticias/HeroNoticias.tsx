@@ -52,11 +52,13 @@ export default function HeroNoticias({ noticias }: Props) {
 
   return (
     <>
-      <div className="flex overflow-hidden w-full [mask-image:linear-gradient(to_right,transparent_0%,black_8%,black_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_8%,black_92%,transparent_100%)]">
+      {/* Contenedor principal con máscara de degradado */}
+      <div className="flex overflow-hidden w-full mask-[linear-gradient(to_right,transparent_0%,black_8%,black_92%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_8%,black_92%,transparent_100%)]">
 
+        {/* Carrusel*/}
         <div
           ref={trackRef}
-          className="flex w-full overflow-x-auto gap-6 py-4 px-[10%] select-none cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex w-full overflow-x-auto gap-6 py-4 px-[10%] select-none cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] scrollbar-none"
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
           onMouseUp={onMouseUp}
@@ -82,7 +84,7 @@ export default function HeroNoticias({ noticias }: Props) {
                 loading="lazy"
                 decoding="async"
               />
-              <span className="absolute inset-x-0 bottom-0 rounded-b-[1.5rem] bg-gradient-to-t from-black/75 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white pointer-events-none">
+              <span className="absolute inset-x-0 bottom-0 rounded-b-[1.5rem] bg-linear-to-t from-black/75 to-transparent px-5 pb-4 pt-10 text-sm font-semibold uppercase tracking-[0.18em] text-white pointer-events-none">
                 {noticia.label}
               </span>
             </article>

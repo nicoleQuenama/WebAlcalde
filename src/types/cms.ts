@@ -1,20 +1,6 @@
-import type { FieldSpec, PaginaConfig, SeccionConfig } from '@lib/cms/campos';
+import type { DatosPagina } from '@lib/cms/datosPagina';
 
-export interface SeccionData extends SeccionConfig {
-  valor?: Record<string, unknown>;
-  items?: { clave: string; data: Record<string, unknown> }[];
-}
-
-export interface DatosPagina {
-  pagina: PaginaConfig;
-  ordenLayout: string[];
-  secciones: SeccionData[];
-}
-
-export interface InitData extends DatosPagina {
-  secreto: string;
-  paginas: { pagina: string; titulo: string; ruta: string }[];
-}
+export type { SeccionData, DatosPagina } from '@lib/cms/datosPagina';
 
 export type Obra = { nombre?: string; anio?: string; detalle?: string; video?: boolean };
 
