@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { NavItem } from "../../../types/nav";
-import { MEDIA } from "../../../lib/media";
-import  "../../styles/global.css";
+import type { NavItem } from "@types/nav";
+import { MEDIA } from "@lib/media";
+import  "@styles/global.css";
 
 interface Props {
   enlaces: NavItem[];
@@ -56,6 +56,7 @@ export default function HeaderMovil({ enlaces }: Props) {
                 text-purple-100
                 hover:text-white
                 transition-colors duration-300
+                text-7xl
                 group">
               {enlace.nombre}
               <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-purple-300 transition-all duration-300 group-hover:w-full rounded-full"></span>
