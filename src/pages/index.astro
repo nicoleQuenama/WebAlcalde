@@ -1,47 +1,78 @@
 ---
-import { getOptimizedImageSrc, getExactSizeImageSrc, getComparadorImageSrc } from '@lib/imageOptimize';
-import Layout from '@layouts/Layout.astro';
-import { MEDIA } from '@lib/media';
-import { efectivo, efectivoOrden, getTemarioEfectivo } from '@lib/cms/resolve';
-import { buildLibroToc } from '@lib/flipBook';
+import {
+  getOptimizedImageSrc,
+  getExactSizeImageSrc,
+  getComparadorImageSrc,
+  COMPARADOR_ANCHO,
+} from "@lib/imageOptimize";
+import Layout from "@layouts/Layout.astro";
+import { MEDIA } from "@lib/media";
+import { efectivo, efectivoOrden, getTemarioEfectivo } from "@lib/cms/resolve";
+import { buildLibroToc } from "@lib/flipBook";
 import {
   DEFAULT_HOME_HERO,
   DEFAULT_HOME_ANTES_DESPUES,
   DEFAULT_HOME_BIOGRAFIA,
   DEFAULT_FLIPBOOK_META,
   DEFAULT_HOME_LAYOUT,
-} from '@lib/cms/defaults';
-import Hero from '@components/global/Hero/Hero.astro';
-import BiographyVideo from '@components/Home/BiographyVideo/index.astro';
-import AntesDespues from '@components/Home/AntesDespues/AntesDespues.astro';
-import LibroIntro from '@components/Home/LibroIntro/LibroIntro.astro';
+} from "@lib/cms/defaults";
+import Hero from "@components/global/Hero/Hero.astro";
+import BiographyVideo from "@components/Home/BiographyVideo/index.astro";
+import AntesDespues from "@components/Home/AntesDespues/AntesDespues.astro";
+import LibroIntro from "@components/Home/LibroIntro/LibroIntro.astro";
 // Ruta relativa: el alias `@types` choca hoy con ts6137 en todo el repo (bug preexistente).
-import type { ParComparador } from '../types/comparador';
-import '@styles/sobre.css';
+import type { ParComparador } from "../types/comparador";
+import "@styles/sobre.css";
+import TikTokWidget from "@components/global/TikTokWidget/TikTokWidget.astro";
 
 // ── CMS (beta, en memoria) ───────────────────────────────────────────
-const heroTexto = efectivo('home_hero', 'principal', DEFAULT_HOME_HERO);
-const antesDespuesTexto = efectivo('home_antes_despues', 'principal', DEFAULT_HOME_ANTES_DESPUES);
-const biografiaTexto = efectivo('home_biografia', 'principal', DEFAULT_HOME_BIOGRAFIA);
-const libro = efectivo('flipbook_meta', 'principal', DEFAULT_FLIPBOOK_META);
-const orden = efectivoOrden('home_layout', DEFAULT_HOME_LAYOUT);
+const heroTexto = efectivo("home_hero", "principal", DEFAULT_HOME_HERO);
+const antesDespuesTexto = efectivo(
+  "home_antes_despues",
+  "principal",
+  DEFAULT_HOME_ANTES_DESPUES,
+);
+const biografiaTexto = efectivo(
+  "home_biografia",
+  "principal",
+  DEFAULT_HOME_BIOGRAFIA,
+);
+const libro = efectivo("flipbook_meta", "principal", DEFAULT_FLIPBOOK_META);
+const orden = efectivoOrden("home_layout", DEFAULT_HOME_LAYOUT);
 const ordenDe = (clave: string) => {
   const i = orden.indexOf(clave);
   return i === -1 ? 999 : i;
 };
 
 // Panorámica DJI_0001-Pano.webp = 5570×3481 → alto real a 900px de ancho (fallback si no hay carrusel).
-const fondoSrc = await getExactSizeImageSrc(MEDIA.hero.home.panoramica, 900, 562, 72);
+const fondoSrc = await getExactSizeImageSrc(
+  MEDIA.hero.home.panoramica,
+  900,
+  562,
+  72,
+);
 
 // ── VIDEO BIOGRAFÍA ───────────────────────────────────────────────────
-const posterBiografia = await getExactSizeImageSrc(MEDIA.biografia.poster, 2549, 3568);
+const posterBiografia = await getExactSizeImageSrc(
+  MEDIA.biografia.poster,
+  2549,
+  3568,
+);
 const videoBiografia = MEDIA.biografia.video;
 
 // ── ANTES / DESPUÉS ───────────────────────────────────────────────────
+// El "antes" se optimiza con altura proporcional cuando se conocen sus
+// dimensiones reales (sin `inferSize` en remotos); si no, getComparadorImageSrc
+// devuelve el original sin optimizar en vez de fetchear dimensiones.
 const pares: ParComparador[] = await Promise.all(
   MEDIA.antesDespues.map(async (p) => ({
     titulo: p.titulo,
-    antes: await getComparadorImageSrc(p.antes),
+    antes: await getComparadorImageSrc(
+      p.antes,
+      p.antesWidth && p.antesHeight
+        ? Math.max(1, Math.round((COMPARADOR_ANCHO * p.antesHeight) / p.antesWidth))
+        : undefined,
+    ),
     despues: await getComparadorImageSrc(p.despues, p.despuesHeight),
     afterFit: p.afterFit,
     afterPosition: p.afterPosition,
@@ -68,59 +99,54 @@ const toc = buildLibroToc(capitulos, eras);
 ---
 
 <Layout title="Manfred Reyes Villa — Cocha, la mejor ciudad de Bolivia">
-    <div style="display:flex; flex-direction:column;">
+  <div style="display:flex; flex-direction:column;">
     <!-- ═══ HERO (mismo diseño que /sobre, con el texto del home) ═══ -->
     <Hero
-        fondoSrc={fondoSrc}
-        fotosFondo={MEDIA.hero.home.fondo}
-        eyebrow={heroTexto.eyebrow}
-        titulo={heroTexto.titulo}
-        style={`order:${ordenDe('hero')}`}
-        dominio="home_hero"
+      fondoSrc={fondoSrc}
+      fotosFondo={MEDIA.hero.home.fondo}
+      eyebrow={heroTexto.eyebrow}
+      titulo={heroTexto.titulo}
+      style={`order:${ordenDe("hero")}`}
+      dominio="home_hero"
     />
 
     <!-- ═══ BIOGRAFÍA ═══ -->
     <BiographyVideo
-        videoBiografia={videoBiografia}
-        posterBiografia={posterBiografia}
-        eyebrow={biografiaTexto.eyebrow}
-        titulo={biografiaTexto.titulo}
-        parrafo={biografiaTexto.parrafo}
-        cta1Label={biografiaTexto.cta1Label}
-        cta1Href={biografiaTexto.cta1Href}
-        cta2Label={biografiaTexto.cta2Label}
-        cta2Href={biografiaTexto.cta2Href}
-        style={`order:${ordenDe('biografia')}`}
-        dominio="home_biografia"
+      videoBiografia={videoBiografia}
+      posterBiografia={posterBiografia}
+      eyebrow={biografiaTexto.eyebrow}
+      titulo={biografiaTexto.titulo}
+      parrafo={biografiaTexto.parrafo}
+      cta1Label={biografiaTexto.cta1Label}
+      cta1Href={biografiaTexto.cta1Href}
+      cta2Label={biografiaTexto.cta2Label}
+      cta2Href={biografiaTexto.cta2Href}
+      style={`order:${ordenDe("biografia")}`}
+      dominio="home_biografia"
     />
 
     <!-- ═══ ANTES / DESPUÉS ═══ -->
     <AntesDespues
-        kicker={antesDespuesTexto.kicker}
-        titulo={antesDespuesTexto.titulo}
-        parrafo={antesDespuesTexto.parrafo}
-        pares={pares}
-        style={`order:${ordenDe('antes_despues')}`}
-        dominio="home_antes_despues"
+      kicker={antesDespuesTexto.kicker}
+      titulo={antesDespuesTexto.titulo}
+      parrafo={antesDespuesTexto.parrafo}
+      pares={pares}
+      style={`order:${ordenDe("antes_despues")}`}
+      dominio="home_antes_despues"
     />
 
     <!-- ═══ INTRODUCCIÓN AL LIBRO DIGITAL ═══ -->
     <LibroIntro
-        libro={libro}
-        capitulos={capitulos}
-        eras={eras}
-        fotos={fotos}
-        videos={videos}
-        toc={toc}
-        style={`order:${ordenDe('libro')}`}
-        dominio="flipbook_meta"
+      libro={libro}
+      capitulos={capitulos}
+      eras={eras}
+      fotos={fotos}
+      videos={videos}
+      toc={toc}
+      style={`order:${ordenDe("libro")}`}
+dominio="flipbook_meta"
     />
+  </div>
 
-    <section>
-      <section>
-        <script src="https://elfsightcdn.com/platform.js" async></script>
-        <div class="elfsight-app-5ca2e603-6ff5-4c5f-bf69-4689838a733c" data-elfsight-app-lazy></div>
-      </section>
-    </section>
-    </div>
+  <TikTokWidget />
 </Layout>

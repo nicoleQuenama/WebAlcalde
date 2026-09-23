@@ -1,9 +1,22 @@
 ---
-// /noticias — página de noticias.
+// /noticias — página de noticias (contenido desde PostgreSQL + overrides CMS).
 import Layout from '@layouts/Layout.astro';
 import NoticiasHero from '@components/Noticias/index.astro';
+import { getNoticias, getNoticiasHero, type NoticiaFeed } from '@lib/db';
+import { efectivo, efectivoLista } from '@lib/cms/resolve';
+import { DEFAULT_NOTICIAS_HERO } from '@lib/cms/defaults';
+
+const NOTICIAS_HERO = efectivo(
+  'noticias_hero',
+  'principal',
+  (await getNoticiasHero()) ?? DEFAULT_NOTICIAS_HERO,
+);
+const NOTICIAS = efectivoLista(
+  'noticias',
+  (await getNoticias()) as unknown as Record<string, unknown>[],
+) as unknown as NoticiaFeed[];
 ---
 
 <Layout title="Noticias — Manfred Reyes Villa">
-  <NoticiasHero />
+  <NoticiasHero hero={NOTICIAS_HERO} noticias={NOTICIAS} />
 </Layout>

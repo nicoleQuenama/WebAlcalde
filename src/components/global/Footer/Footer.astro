@@ -7,12 +7,10 @@ const anioActual = new Date().getFullYear();
 ---
 
 <footer class="relative overflow-hidden bg-primary-deepest text-white">
-    <!-- Barra de acento superior -->
     <div class="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-primary via-accent to-primary" aria-hidden="true"></div>
 
     <div class="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-6 py-14 sm:px-6 lg:px-8 lg:py-16">
 
-        <!-- ═══ Navegación ═══ -->
         <nav class="mb-7 w-full" aria-label="Pie de página">
             <ul class="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium">
                 {SITE_MENU.map((link) => (
@@ -28,7 +26,6 @@ const anioActual = new Date().getFullYear();
             </ul>
         </nav>
 
-        <!-- ═══ Redes sociales ═══ -->
         <div class="mb-7 flex flex-wrap justify-center gap-4">
             {SOCIAL_ICONS.map((icon) => (
                 <a
@@ -49,8 +46,7 @@ const anioActual = new Date().getFullYear();
                 </a>
             ))}
         </div>
-
-        <!-- ═══ Copyright ═══ -->
+        
         <p class="text-center text-xs text-purple-200/60">
             © {anioActual} Manfred Reyes Villa — Cochabamba. Todos los derechos reservados.
         </p>

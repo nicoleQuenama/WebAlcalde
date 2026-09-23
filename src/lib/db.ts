@@ -62,6 +62,20 @@ export interface Proyecto {
   encuadre?: Encuadre;
 }
 
+export interface NoticiaFeed {
+  id: number | string;
+  /** Título corto para las cards del hero (carrusel). */
+  label: string;
+  /** URL pública de la imagen (MEDIA raw — no se optimiza). */
+  src: string;
+  /** Título completo (cards del feed + modal). */
+  titulo: string;
+  categoria: string;
+  /** Fecha "YYYY-MM-DD" para ordenar y formatear. */
+  fecha: string;
+  resumen: string;
+}
+
 export type TipoHito = 'historia' | 'reconocimiento';
 
 export interface Hito {
@@ -221,6 +235,100 @@ const PROYECTOS: Proyecto[] = [
     imagen: MEDIA.proyectos.parqueVial,
     w: 4378,
     h: 3014,
+  },
+];
+
+// ── Seed: noticias (dominios `noticias` y `noticias_hero` de /noticias) ────
+// Las imágenes quedan como MEDIA raw (sin getImage/ajusteImagen), igual que
+// la implementación actual del feed.
+
+const NOTICIAS_HERO = {
+  kicker: '',
+  titulo: 'Conoce las\nnuevas noticias',
+  bajada:
+    'Mantente informado sobre los últimos proyectos, obras entregadas y el avance de nuestra ciudad hacia el futuro.',
+};
+
+const NOTICIAS: NoticiaFeed[] = [
+  {
+    id: 1,
+    label: 'Playa Turquesa',
+    src: MEDIA.proyectos.playaTurquesa,
+    titulo: 'Playa Turquesa: el espacio recreativo favorito de Cochabamba',
+    categoria: 'Espacio público',
+    fecha: '2026-09-14',
+    resumen:
+      'El Complejo Recreacional Coña Coña se consolida como el destino de recreación y turismo para las familias cochabambinas, con playa artificial, plaza de comidas y amplias áreas verdes.',
+  },
+  {
+    id: 2,
+    label: 'Laguna Alalay',
+    src: MEDIA.proyectos.lagunaAlalay,
+    titulo: 'Recuperación de la Laguna Alalay avanza con fuerza',
+    categoria: 'Medio Ambiente',
+    fecha: '2026-09-12',
+    resumen:
+      'El proyecto de dragado y recuperación del mayor espejo de agua de la ciudad continúa avanzando, con sendas, forestación y control del deterioro ambiental.',
+  },
+  {
+    id: 3,
+    label: 'Plaza de las Banderas',
+    src: MEDIA.proyectos.plazaBanderas,
+    titulo: 'Plaza de las Banderas: espacio renovado para la ciudad',
+    categoria: 'Espacio público',
+    fecha: '2026-09-10',
+    resumen:
+      'El remozado y mejoramiento de la plaza y sus fuentes se enmarca dentro del plan de recuperación de espacios de encuentro ciudadano.',
+  },
+  {
+    id: 4,
+    label: 'Parque Vial',
+    src: MEDIA.proyectos.parqueVial,
+    titulo: 'Parque Vial: pulmón verde de Cochabamba',
+    categoria: 'Ciudad Jardín',
+    fecha: '2026-09-08',
+    resumen:
+      'El parque renovado dentro del Plan Maestro de Forestación representa un hito en la recuperación de áreas verdes de la llajta.',
+  },
+  {
+    id: 5,
+    label: 'Salud Municipal',
+    src: MEDIA.temario.salud,
+    titulo: 'Avances en salud municipal para nuestra comunidad',
+    categoria: 'Salud',
+    fecha: '2026-09-05',
+    resumen:
+      'La inversión en infraestructura y equipamiento médico marca la diferencia en la atención a la población de Cochabamba.',
+  },
+  {
+    id: 6,
+    label: 'Educación',
+    src: MEDIA.temario.educacion,
+    titulo: 'Educación integral: construyendo el futuro',
+    categoria: 'Educación',
+    fecha: '2026-09-01',
+    resumen:
+      'La construcción, ampliación y mejoramiento de infraestructuras educativas beneficia a miles de estudiantes con ambientes dignos y modernos.',
+  },
+  {
+    id: 7,
+    label: 'Infraestructura Vial',
+    src: MEDIA.temario.vialidad,
+    titulo: 'Cochabamba conectada: infraestructura vial moderna',
+    categoria: 'Obras Públicas',
+    fecha: '2026-08-28',
+    resumen:
+      'Puentes, distribuidores, pavimento rígido y asfaltos para una ciudad que crece y necesita desplazarse mejor.',
+  },
+  {
+    id: 8,
+    label: 'Ecología',
+    src: MEDIA.temario.ecologia,
+    titulo: 'Compromiso con el futuro ecológico de la ciudad',
+    categoria: 'Medio Ambiente',
+    fecha: '2026-08-25',
+    resumen:
+      'Cochabamba avanza hacia un futuro más verde, limpio y sostenible con la protección del medio ambiente como prioridad.',
   },
 ];
 
@@ -1106,6 +1214,16 @@ async function sembrar(): Promise<void> {
     }
   }
 
+  // Noticias: hero (single-row) + lista de noticias
+  if (await estaVacio('noticias_hero')) {
+    await guardar('noticias_hero', 'principal', NOTICIAS_HERO as unknown as Mapa, 0);
+  }
+  if (await estaVacio('noticias')) {
+    for (const [i, n] of NOTICIAS.entries()) {
+      await guardar('noticias', String(n.id), n as unknown as Mapa, i);
+    }
+  }
+
   // Historia: intro + filtros + hitos
   if (await estaVacio('historia_intro')) {
     await guardar('historia_intro', 'principal', HISTORIA_INTRO as unknown as Mapa, 0);
@@ -1133,7 +1251,8 @@ export async function asegurarSembrada(): Promise<void> {
   if (
     (await estaVacio('capitulo')) ||
     (await estaVacio('era')) ||
-    (await estaVacio('hito'))
+    (await estaVacio('hito')) ||
+    (await estaVacio('noticias'))
   ) {
     await sembrar();
   }
@@ -1183,6 +1302,17 @@ export async function getProyectosTitulo() {
 export async function getProyectos(): Promise<Proyecto[]> {
   await asegurarSembrada();
   return (await leer('proyecto')).map((r) => r.data as unknown as Proyecto);
+}
+
+export async function getNoticiasHero() {
+  await asegurarSembrada();
+  const [row] = await leer('noticias_hero');
+  return row?.data as unknown as typeof NOTICIAS_HERO;
+}
+
+export async function getNoticias(): Promise<NoticiaFeed[]> {
+  await asegurarSembrada();
+  return (await leer('noticias')).map((r) => r.data as unknown as NoticiaFeed);
 }
 
 export async function getHistoriaIntro() {

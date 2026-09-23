@@ -8,6 +8,7 @@
     "paths": {
       "@lib/*": ["./src/lib/*"],
       "@lib": ["./src/lib"],
+      "@components": ["./src/components"],
       "@components/*": ["./src/components/*"],
       "@constants/*": ["./src/constants/*"],
       "@types/*": ["./src/types/*"],
@@ -17,6 +18,7 @@
       "@layouts/*": ["./src/layouts/*"],
       "@admin/*": ["./src/admin/*"],
       "@utils/*": ["./src/utils/*"],
+      "@hooks": ["./src/hooks"],
       "@hooks/*": ["./src/hooks/*"],
     }
   }

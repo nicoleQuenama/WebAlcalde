@@ -1,9 +1,9 @@
 import { memo } from 'react';
-import type { NoticiaFeed } from '@types/noticiaFeed';
+import type { NoticiaFeed } from '@lib/db';
 
 const NewsFeedCard = memo(function NewsFeedCard({ noticia }: { noticia: NoticiaFeed }) {
   return (
-    <article className="noticia-card">
+    <article className="noticia-card" data-cms-dominio="noticias" data-cms-clave={noticia.id}>
       <div 
         className="noticia-card__imagen"
         style={{ backgroundImage: `url(${noticia.src})` }}
@@ -11,12 +11,12 @@ const NewsFeedCard = memo(function NewsFeedCard({ noticia }: { noticia: NoticiaF
       <div className="noticia-card__overlay" />
       <div className="noticia-card__contenido">
         <div className="noticia-card__titulo-wrap">
-          <span className="text-[0.625rem] font-bold uppercase tracking-[0.1em] text-[var(--color-accent)] [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]">{noticia.categoria}</span>
-          <h3 className="mt-1.5 text-[1.125rem] font-bold leading-tight text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.5)] line-clamp-2">{noticia.titulo}</h3>
+          <span className="text-[0.625rem] font-bold uppercase tracking-[0.1em] text-[var(--color-accent)] [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]" data-cms-campo="categoria">{noticia.categoria}</span>
+          <h3 className="mt-1.5 text-[1.125rem] font-bold leading-tight text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.5)] line-clamp-2" data-cms-campo="titulo">{noticia.titulo}</h3>
         </div>
         <div className="noticia-card__detalles">
           <div className="noticia-card__detalles-inner">
-            <p className="noticia-card__resumen">{noticia.resumen}</p>
+            <p className="noticia-card__resumen" data-cms-campo="resumen" data-cms-multilinea>{noticia.resumen}</p>
             <div className="noticia-card__footer">
               <time className="text-[0.625rem] font-semibold tracking-[0.05em] text-white/85">
                 {new Date(noticia.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}

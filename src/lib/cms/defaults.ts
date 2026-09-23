@@ -54,6 +54,13 @@ export const DEFAULT_SOBRE_HERO = {
   quote: 'Una vida dedicada a Cochabamba',
 };
 
+export const DEFAULT_NOTICIAS_HERO = {
+  kicker: '',
+  titulo: 'Conoce las\nnuevas noticias',
+  bajada:
+    'Mantente informado sobre los últimos proyectos, obras entregadas y el avance de nuestra ciudad hacia el futuro.',
+};
+
 /** El párrafo real sale de `getCapitulos()` (capítulo "presentación"); acá solo lo fijo/editable. */
 export const DEFAULT_SOBRE_BIOGRAFIA = {
   eyebrow: 'Biografía',
@@ -65,3 +72,4 @@ export const DEFAULT_SOBRE_BIOGRAFIA = {
 export const DEFAULT_HOME_LAYOUT = ['hero', 'biografia', 'antes_despues', 'libro'];
 export const DEFAULT_GESTION_LAYOUT = ['hero', 'capitulos', 'eras', 'proyectos_titulo', 'proyectos', 'mapa'];
 export const DEFAULT_SOBRE_LAYOUT = ['hero', 'biografia', 'institutional', 'timeline'];
+export const DEFAULT_NOTICIAS_LAYOUT = ['hero', 'lista_noticias'];

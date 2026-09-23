@@ -2,18 +2,25 @@
 import './noticias.css';
 import HeroNoticias from './HeroNoticias';
 import Feed from './SectionNoticias/Feed.tsx';
-import { MEDIA } from '@lib/media';
+import type { NoticiaFeed } from '@lib/db';
 
-const noticiasData = [
-  { id: 1, src: MEDIA.proyectos.playaTurquesa, titulo: 'Playa Turquesa' },
-  { id: 2, src: MEDIA.proyectos.lagunaAlalay, titulo: 'Laguna Alalay' },
-  { id: 3, src: MEDIA.proyectos.plazaBanderas, titulo: 'Plaza de las Banderas' },
-  { id: 4, src: MEDIA.proyectos.parqueVial, titulo: 'Parque Vial' },
-  { id: 5, src: MEDIA.temario.salud, titulo: 'Salud Municipal' },
-];
+interface HeroData {
+  kicker?: string;
+  titulo: string;
+  bajada: string;
+}
+
+interface Props {
+  hero: HeroData;
+  noticias: NoticiaFeed[];
+}
+
+const { hero, noticias } = Astro.props;
+const heroSlides = noticias.slice(0, 5);
+const [tituloLinea1, tituloLinea2] = hero.titulo.split('\n');
 ---
 
-<section class="relative overflow-hidden text-white">
+<section class="relative overflow-hidden text-white" data-cms-dominio="noticias_hero">
 
   <div class="absolute inset-0 bg-gradient-to-br from-[#2a1252] via-[#3d1f6d] to-[#1e0e3a]"></div>
 
@@ -27,13 +34,18 @@ const noticiasData = [
     <div class="w-full lg:flex lg:items-center lg:gap-16">
 
       <div class="max-w-2xl mx-auto text-center lg:ml-0 lg:w-[42%] lg:text-left">
-        <h1 class="animate-[heroSlideUp_0.7s_cubic-bezier(0.22,1,0.36,1)_0.25s_both] mt-8 font-[var(--font-roboto-condensed)] text-[2.25rem] font-bold leading-none text-white/90 md:text-5xl xl:text-6xl">
-          Conoce las<br />
-          <span class="text-[#a895d0]">nuevas noticias</span>
+        {hero.kicker && (
+          <p class="animate-[heroSlideUp_0.7s_cubic-bezier(0.22,1,0.36,1)_0.05s_both] text-xs font-bold uppercase tracking-[0.4em] text-accent-soft" data-cms-campo="kicker">
+            {hero.kicker}
+          </p>
+        )}
+        <h1 data-cms-campo="titulo" class="animate-[heroSlideUp_0.7s_cubic-bezier(0.22,1,0.36,1)_0.25s_both] mt-8 font-[var(--font-roboto-condensed)] text-[2.25rem] font-bold leading-none text-white/90 md:text-5xl xl:text-6xl">
+          {tituloLinea1}<br />
+          <span class="text-accent-soft">{tituloLinea2 ?? ''}</span>
         </h1>
 
-        <p class="animate-[heroSlideUp_0.7s_cubic-bezier(0.22,1,0.36,1)_0.4s_both] mt-6 max-w-[28rem] font-[var(--font-roboto-condensed)] text-base leading-relaxed font-bold text-[rgba(138,122,181,0.65)]">
-          Mantente informado sobre los últimos proyectos, obras entregadas y el avance de nuestra ciudad hacia el futuro.
+        <p class="animate-[heroSlideUp_0.7s_cubic-bezier(0.22,1,0.36,1)_0.4s_both] mt-6 max-w-[28rem] font-[var(--font-roboto-condensed)] text-base leading-relaxed font-bold text-[rgba(138,122,181,0.65)]" data-cms-campo="bajada" data-cms-multilinea>
+          {hero.bajada}
         </p>
 
         <div class="animate-[heroSlideUp_0.7s_cubic-bezier(0.22,1,0.36,1)_0.55s_both] mt-8">
@@ -47,7 +59,7 @@ const noticiasData = [
       </div>
 
       <div class="relative mt-14 w-full lg:mt-0 lg:w-[58%]">
-        <HeroNoticias client:load noticias={noticiasData} />
+        <HeroNoticias client:load noticias={heroSlides} />
       </div>
 
     </div>
@@ -55,5 +67,5 @@ const noticiasData = [
 </section>
 
 <div class="bg-white">
-  <Feed client:load />
+  <Feed client:load noticias={noticias} />
 </div>

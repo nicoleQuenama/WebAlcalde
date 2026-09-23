@@ -7,7 +7,7 @@ proyecto Supabase `fsuxvbuupswucnsvrdce.supabase.co`. La base de la URL se
 hardcodea en `src/lib/media.ts`:
 
 ```
-https://fsuxvbuupswucnsvrdce.supabase.co/storage/v1/object/public/media/<carpeta>/<archivo>
+https://xfkfvabjxgfwjktaxhcs.supabase.co/storage/v1/object/public/media/<carpeta>/<archivo>
 ```
 
 `media.ts` expone la constante `MEDIA` con las URLs ya armadas y los datos de
