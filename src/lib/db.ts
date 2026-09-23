@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
 import { Pool } from 'pg';
 import { MEDIA } from './media';
+import { CATEGORIAS_ORDEN } from '@constants/proyectoCategorias';
 import type { Encuadre, AjusteCarrusel } from './ajusteImagen';
 
 // ── Tipos del contenido editorial ────────────────────────────────────────────
@@ -49,17 +50,40 @@ export interface EraTemario extends Capitulo {
   secciones: SeccionTemario[];
 }
 
+export interface ProyectoMedia {
+  tipo: 'foto' | 'video';
+  /** URL raw en MEDIA (foto o mp4). */
+  src: string;
+  /** Dimensiones reales de la foto (para optimizarla sin deformarla). */
+  w?: number;
+  h?: number;
+  alt?: string;
+  /** Poster del video. Si falta, el SSR usa la imagen de la obra como fallback. */
+  poster?: string;
+  /** Dimensiones del poster (si difiere de w/h de la obra). */
+  posterW?: number;
+  posterH?: number;
+}
+
 export interface Proyecto {
   titulo: string;
+  /** Slug de agrupación del visor (`puentes`, `salud`… ver @constants/proyectoCategorias). */
   categoria: string;
   descripcion: string;
   estado: 'En ejecución' | 'Concluido' | 'En diseño';
-  imagen: string;
+  /** URL de la foto en MEDIA. Opcional: muchas obras todavía no tienen imagen. */
+  imagen?: string;
   /** Dimensiones reales de la foto (para optimizarla sin deformarla). */
-  w: number;
-  h: number;
+  w?: number;
+  h?: number;
   /** Encuadre de la card (misma lógica que el hero, ver ajusteImagen). */
   encuadre?: Encuadre;
+  /**
+   * Mini galería de la obra (fotos/videos con assets reales del bucket).
+   * Campo SOLO-seed: no se expone en el CMS inline ni en campos.ts/editorApp.ts
+   * (editable únicamente desde el seed + reseed). Ausente o [] = galería oculta.
+   */
+  media?: ProyectoMedia[];
 }
 
 export interface NoticiaFeed {
@@ -190,51 +214,175 @@ const GESTION_HERO = {
 const PROYECTOS_TITULO = {
   kicker: 'Proyectos',
   titulo: 'Obras de la gestión',
-  bajada: 'Tocá una tarjeta para abrir la galería con todas las imágenes del proyecto.',
+  bajada: 'Elegí una categoría y recorré las obras de a una con las flechas.',
 };
 
-// ⚠️ Revisá estados y descripciones antes de publicar. Las 4 obras tienen foto
-//    real del bucket (imagenes/cocha-antes-y-ahora): son proyectos del temario.
+/** Copy anterior (carrusel de tarjetas) — se migra solo en DBs sembradas antes del visor. */
+const PROYECTOS_TITULO_BAJADA_LEGADA =
+  'Tocá una tarjeta para abrir la galería con todas las imágenes del proyecto.';
+
+// Las 4 primeras obras tienen foto real del bucket (imagenes/cocha-antes-y-ahora);
+// el resto todavía no tiene imagen y el visor las muestra con placeholder.
+// ⚠️ Revisá estados y descripciones antes de publicar.
 const PROYECTOS: Proyecto[] = [
   {
     titulo: 'Complejo Recreacional Coña Coña — Playa Turquesa',
-    categoria: 'Espacio público',
+    categoria: 'recreacion',
     descripcion:
       'Espacio recreativo y de turismo para las familias, con playa artificial, plaza de comidas y áreas verdes.',
     estado: 'Concluido',
     imagen: MEDIA.proyectos.playaTurquesa,
     w: 1600,
     h: 1600,
+    media: [
+      { tipo: 'foto', src: MEDIA.proyectos.playaTurquesa, w: 1600, h: 1600, alt: 'Playa Turquesa' },
+      { tipo: 'foto', src: MEDIA.antesDespues[0].despues, w: 5472, h: 3648, alt: 'Coña Coña — Playa Turquesa' },
+      {
+        tipo: 'video',
+        src: MEDIA.libro.videos[0].src,
+        poster: MEDIA.proyectos.playaTurquesa,
+        w: 1600,
+        h: 1600,
+        alt: 'Video de la Playa Turquesa',
+      },
+    ],
   },
   {
     titulo: 'Recuperación de la Laguna Alalay',
-    categoria: 'Medio ambiente',
+    categoria: 'lagunas',
     descripcion:
       'Dragado y recuperación del mayor espejo de agua de la ciudad: sendas, forestación y control del deterioro ambiental.',
     estado: 'En ejecución',
     imagen: MEDIA.proyectos.lagunaAlalay,
     w: 2048,
     h: 1280,
+    media: [
+      { tipo: 'foto', src: MEDIA.proyectos.lagunaAlalay, w: 2048, h: 1280, alt: 'Laguna Alalay hoy' },
+      { tipo: 'foto', src: MEDIA.antesDespues[1].antes, alt: 'Laguna Alalay en 1917' },
+      {
+        tipo: 'video',
+        src: MEDIA.libro.videos[1].src,
+        poster: MEDIA.proyectos.lagunaAlalay,
+        w: 2048,
+        h: 1280,
+        alt: 'Video de la Laguna Alalay',
+      },
+    ],
   },
   {
     titulo: 'Plaza de las Banderas',
-    categoria: 'Espacio público',
+    categoria: 'areas verdes',
     descripcion:
       'Remozado y mejoramiento de la plaza y sus fuentes, dentro del plan de recuperación de espacios de encuentro.',
     estado: 'Concluido',
     imagen: MEDIA.proyectos.plazaBanderas,
     w: 3122,
     h: 1939,
+    media: [
+      { tipo: 'foto', src: MEDIA.proyectos.plazaBanderas, w: 3122, h: 1939, alt: 'Plaza de las Banderas' },
+      { tipo: 'foto', src: MEDIA.antesDespues[2].despues, w: 6240, h: 4160, alt: 'Plaza de las Banderas renovada' },
+    ],
   },
   {
     titulo: 'Parque Vial',
-    categoria: 'Ciudad Jardín',
+    categoria: 'areas verdes',
     descripcion:
       'Parque renovado dentro del Plan Maestro de Forestación y de recuperación de áreas verdes de la llajta.',
     estado: 'Concluido',
     imagen: MEDIA.proyectos.parqueVial,
     w: 4378,
     h: 3014,
+    media: [
+      { tipo: 'foto', src: MEDIA.proyectos.parqueVial, w: 4378, h: 3014, alt: 'Parque Vial' },
+      { tipo: 'foto', src: MEDIA.antesDespues[3].despues, w: 4000, h: 3000, alt: 'Parque Vial desde el aire' },
+    ],
+  },
+  {
+    titulo: 'Puente Cala Cala',
+    categoria: 'puentes',
+    descripcion:
+      'Pionero en Bolivia: en 1993 el primer paso a desnivel de la ciudad ordenó el tránsito hacia el norte y cambió la forma de cruzar Cochabamba.',
+    estado: 'Concluido',
+  },
+  {
+    titulo: 'Puente Muyurina',
+    categoria: 'puentes',
+    descripcion:
+      'Pasaje a desnivel de 2004 que liberó el cruce de la Av. Ayacucho y conectó los barrios del este con el centro de la ciudad.',
+    estado: 'Concluido',
+  },
+  {
+    titulo: 'Cristo de la Concordia',
+    categoria: 'destacados',
+    descripcion:
+      'Inaugurado en 1994 sobre el cerro de San Pedro, se convirtió en el símbolo y el rostro de Cochabamba ante el mundo.',
+    estado: 'Concluido',
+  },
+  {
+    titulo: 'Primer Teleférico de Bolivia',
+    categoria: 'destacados',
+    descripcion:
+      'Desde 1999 une el centro con el Cristo de la Concordia: transporte, atractivo turístico y un nuevo mirador de la llajta.',
+    estado: 'Concluido',
+  },
+  {
+    titulo: 'Planta Criogénica Municipal de Oxígeno',
+    categoria: 'salud',
+    descripcion:
+      'Primera planta de su tipo en un municipio boliviano, instalada en el Hospital del Norte para garantizar oxígeno médico ininterrumpido.',
+    estado: 'Concluido',
+  },
+  {
+    titulo: 'Planta de Tratamiento de Aguas Residuales de Albarrancho',
+    categoria: 'agua',
+    descripcion:
+      'La primera de Bolivia y una de las más grandes de Latinoamérica: sanea el agua que sale de la ciudad hacia el río Rocha.',
+    estado: 'Concluido',
+  },
+  {
+    titulo: 'Parque de la Integración',
+    categoria: 'recreacion',
+    descripcion:
+      'Atractivo recreacional del distrito 9, en la zona sur: piscina, plaza de comidas y juegos para las familias.',
+    estado: 'Concluido',
+  },
+  {
+    titulo: 'Plan Maestro de Ciclovías',
+    categoria: 'futuro ecologico',
+    descripcion:
+      'Puente metálico, puentes cajón y micropavimento rojo: una red segura para una movilidad sostenible en toda la ciudad.',
+    estado: 'En ejecución',
+  },
+  {
+    titulo: 'Túnel de la Integración',
+    categoria: 'infraestructura vial',
+    descripcion:
+      'Nuevo paso bajo la serranía entre el distrito 7 y Sacaba: recorta minutos de viaje y descongestiona la entrada sur de Cochabamba.',
+    estado: 'Concluido',
+  },
+  {
+    titulo: 'Contenedores soterrados',
+    categoria: 'progreso',
+    descripcion:
+      'Sistema moderno de recolección de residuos bajo tierra, obra pionera en Bolivia que ordena el centro histórico.',
+    estado: 'Concluido',
+  },
+  {
+    titulo: 'FEXCO — Feria Exposición Internacional de Cochabamba',
+    categoria: 'a.p.p.s',
+    descripcion:
+      'A través de alianzas público-privadas se renovaron el pórtico de acceso, el Pabellón Kanata y el Pabellón del Emprendedor.',
+    estado: 'En ejecución',
+    media: [
+      {
+        tipo: 'video',
+        src: MEDIA.libro.videos[3].src,
+        poster: MEDIA.temario.alianzas,
+        posterW: 1032,
+        posterH: 1207,
+        alt: 'Video de la FEXCO Arena',
+      },
+    ],
   },
 ];
 
@@ -1147,6 +1295,66 @@ async function estaVacio(dominio: string): Promise<boolean> {
 
 // ── Siembra desde el seed de este archivo ────────────────────────────────────
 
+/**
+ * Merge idempotente per-clave del dominio `proyecto`:
+ * - clave inexistente → la inserta (así un re-seed agrega obras nuevas sin TRUNCATE);
+ * - clave existente → NO se toca (respeta overrides de publicación/CMS);
+ * - única excepción: si la fila guardada tiene el mismo título que el seed pero
+ *   una `categoria` legada fuera del orden actual del visor, se migra solo ese
+ *   campo (el resto de la fila editada se conserva tal cual).
+ * Al final migra la bajada legada de `proyectos_titulo` si todavía tiene el
+ * copy del carrusel anterior.
+ */
+async function sembrarProyectos(): Promise<void> {
+  const filas = await leer('proyecto');
+  const existentes = new Map(filas.map((r) => [r.clave, r]));
+  const ordenCategorias = new Set(CATEGORIAS_ORDEN);
+
+  for (const [i, p] of PROYECTOS.entries()) {
+    const clave = String(i);
+    const guardada = existentes.get(clave);
+    if (!guardada) {
+      await guardar('proyecto', clave, p as unknown as Mapa, i);
+      continue;
+    }
+    // Migración idempotente de `media` (galería): SOLO si la fila guardada aún no
+    // tiene la key. Si existe (aunque sea []), no se sobrescribe. Los campos
+    // titulo/descripcion editados nunca se tocan.
+    const conMedia =
+      !('media' in guardada.data) && Array.isArray(p.media)
+        ? { ...guardada.data, media: p.media }
+        : guardada.data;
+    // Migración legacy de `categoria` (DBs sembradas antes del visor): solo si el
+    // título sigue siendo el del seed (o sea, no fue editado por el CMS).
+    const cat = conMedia.categoria;
+    if (
+      conMedia.titulo === p.titulo &&
+      typeof cat === 'string' &&
+      cat.length > 0 &&
+      !ordenCategorias.has(cat)
+    ) {
+      await guardar(
+        'proyecto',
+        clave,
+        { ...conMedia, categoria: p.categoria },
+        guardada.orden,
+      );
+    } else if (conMedia !== guardada.data) {
+      await guardar('proyecto', clave, conMedia, guardada.orden);
+    }
+  }
+
+  const [tituloRow] = await leer('proyectos_titulo');
+  if (tituloRow && tituloRow.data.bajada === PROYECTOS_TITULO_BAJADA_LEGADA) {
+    await guardar(
+      'proyectos_titulo',
+      'principal',
+      { ...tituloRow.data, bajada: PROYECTOS_TITULO.bajada },
+      tituloRow.orden,
+    );
+  }
+}
+
 async function sembrar(): Promise<void> {
   await getAlmacen().asegurarTabla();
 
@@ -1204,15 +1412,11 @@ async function sembrar(): Promise<void> {
     await guardar('gestion_hero', 'principal', GESTION_HERO as unknown as Mapa, 0);
   }
 
-  // Título de la sección de proyectos + lista de proyectos
+  // Título de la sección de proyectos + lista de proyectos (merge per-clave)
   if (await estaVacio('proyectos_titulo')) {
     await guardar('proyectos_titulo', 'principal', PROYECTOS_TITULO as unknown as Mapa, 0);
   }
-  if (await estaVacio('proyecto')) {
-    for (const [i, p] of PROYECTOS.entries()) {
-      await guardar('proyecto', String(i), p as unknown as Mapa, i);
-    }
-  }
+  await sembrarProyectos();
 
   // Noticias: hero (single-row) + lista de noticias
   if (await estaVacio('noticias_hero')) {
@@ -1256,6 +1460,11 @@ export async function asegurarSembrada(): Promise<void> {
   ) {
     await sembrar();
   }
+  // Obras del visor por categoría: corre SIEMPRE (merge per-clave idempotente).
+  // Inserta claves faltantes y agrega `media` solo a filas que no tienen la key
+  // (DBs sembradas antes de la galería), sin tocar titulo/descripcion editados.
+  // Costo trivial: itera las 15 claves y hace UPDATE solo si hay algo que migrar.
+  await sembrarProyectos();
 }
 
 // Hook para astro:server:setup — fuerza el sembrado al levantar `astro dev`
