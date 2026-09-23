@@ -1,8 +1,10 @@
 ---
 import HeaderMovil from './HeaderMovil.tsx';
 import { SITE_MENU } from '@constants/nav';
+
+const enlacesHeader = SITE_MENU.filter((item) => item.ruta !== '/noticias');
 ---
 
 <header>
-<HeaderMovil enlaces={SITE_MENU} client:load />
+<HeaderMovil enlaces={enlacesHeader} client:load />
 </header>

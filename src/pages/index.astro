@@ -23,6 +23,7 @@ import LibroIntro from "@components/Home/LibroIntro/LibroIntro.astro";
 // Ruta relativa: el alias `@types` choca hoy con ts6137 en todo el repo (bug preexistente).
 import type { ParComparador } from "../types/comparador";
 import "@styles/sobre.css";
+import TikTokWidget from "@components/global/TikTokWidget/TikTokWidget.astro";
 
 // ── CMS (beta, en memoria) ───────────────────────────────────────────
 const heroTexto = efectivo("home_hero", "principal", DEFAULT_HOME_HERO);
@@ -146,4 +147,6 @@ const toc = buildLibroToc(capitulos, eras);
 dominio="flipbook_meta"
     />
   </div>
+
+  <TikTokWidget />
 </Layout>
