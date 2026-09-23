@@ -94,7 +94,7 @@ export const MEDIA = {
   },
 
   // ── Comparador antes / después (home) ─────────────────────────────
-  // ⚠️ Los pares 3 y 4 son una asociación tentativa: revisar contra las fotos.
+  // Los pares 3 y 4 son una asociación tentativa: revisar contra las fotos.
   antesDespues: [
     {
       titulo: 'Coña Coña — Playa Turquesa',
