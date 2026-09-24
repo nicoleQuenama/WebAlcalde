@@ -54,6 +54,13 @@ export const DEFAULT_SOBRE_HERO = {
   quote: 'Una vida dedicada a Cochabamba',
 };
 
+export const DEFAULT_SOBRE_BIOGRAFIA = {
+  eyebrow: 'Biografía',
+  titulo: 'Una vida dedicada a Cochabamba',
+  ctaLabel: 'Ver la gestión completa',
+  ctaHref: '/gestion#presentacion',
+};
+
 export const DEFAULT_NOTICIAS_HERO = {
   kicker: '',
   titulo: 'Conoce las\nnuevas noticias',

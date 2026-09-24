@@ -317,7 +317,6 @@ const PROYECTOS: Proyecto[] = [
     h: 3014,
     media: [
       { tipo: 'foto', src: MEDIA.proyectos.parqueVial, w: 4378, h: 3014, alt: 'Parque Vial' },
-      { tipo: 'foto', src: MEDIA.antesDespues[3].despues, w: 4000, h: 3000, alt: 'Parque Vial desde el aire' },
     ],
   },
   {
@@ -1073,7 +1072,7 @@ const HISTORIA: Hito[] = [
       'Integra la IULA y es nombrado representante oficial de la Red Latinoamericana de ' +
       'Asociaciones Municipales ante la WACLAC (World Association of Cities and Local ' +
       'Authorities Coordination), con base en Ginebra, Suiza.',
-    imagen: MEDIA.premios[3],
+    imagen: MEDIA.premios[2],
     imagenW: 4284,
     imagenH: 3416,
     encuadre: 'centro',
