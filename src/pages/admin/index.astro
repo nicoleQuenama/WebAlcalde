@@ -1,5 +1,6 @@
 ---
 import AdminLayout from '@layouts/AdminLayout.astro';
+import { MEDIA } from '@lib/media';
 import { obtenerTokenDeRequest, usuarioValido } from '@lib/auth';
 
 const sesionToken = obtenerTokenDeRequest(Astro.request);
@@ -12,66 +13,140 @@ const rutaBuzon = secreto ? `/admin/buzon/${secreto}` : '/admin/login';
 ---
 
 <AdminLayout title="Panel de administración">
-    <main class="relative flex min-h-svh w-full items-center justify-center overflow-hidden bg-primary px-6 py-12">
-        <div class="absolute inset-0 bg-linear-to-br from-hero-from via-hero-via to-hero-to" aria-hidden="true"></div>
+    <main class="relative flex min-h-svh w-full items-center justify-center overflow-hidden px-6 py-12">
+        <!-- ========================================== -->
+        <!-- 1. FONDO MORADO (Manteniendo la colorimetría) -->
+        <!-- ========================================== -->
+        <div class="absolute inset-0 bg-gradient-to-br from-hero-from via-hero-via to-hero-to" aria-hidden="true"></div>
         <div class="absolute inset-0 bg-primary/40 mix-blend-multiply" aria-hidden="true"></div>
 
-        <div class="relative z-10 w-full max-w-md">
-            <div class="rounded-3xl bg-white p-8 text-center shadow-2xl shadow-black/30 sm:p-10">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-primary">
-                    Administración
-                </p>
-                <h1 class="mt-3 text-2xl font-bold tracking-tight text-slate-900">
-                    Panel de administración
-                </h1>
-                <p class="mt-3 text-sm leading-relaxed text-slate-500">
-                    {autenticado
-                        ? 'Has ingresado correctamente. Elige una sección para continuar.'
-                        : 'Acceso restringido. Inicia sesión para entrar al panel.'}
-                </p>
+        <!-- Orbes decorativos -->
+        <div class="absolute top-[-10%] right-[-5%] h-[500px] w-[500px] rounded-full bg-accent/20 blur-[100px]" aria-hidden="true"></div>
+        <div class="absolute bottom-[-10%] left-[-5%] h-[600px] w-[600px] rounded-full bg-primary-light/30 blur-[120px]" aria-hidden="true"></div>
 
-                <div class="mt-8 flex flex-col gap-3">
+        <!-- ========================================== -->
+        <!-- 2. TARJETA PRINCIPAL (CLARA)               -->
+        <!-- ========================================== -->
+        <div class="relative z-10 w-full max-w-md animate-fadeInUp opacity-0 motion-reduce:animate-none motion-reduce:opacity-100">
+            <div class="rounded-[2rem] border border-white/20 bg-white/10 p-8 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] backdrop-blur-xl sm:p-10">
+
+                <!-- Icono/Avatar de Usuario -->
+                <div class="mb-6 flex justify-center animate-fadeInUp opacity-0 motion-reduce:animate-none motion-reduce:opacity-100 [animation-delay:0.1s]">
+                    <div class="flex h-24 w-24 items-center justify-center rounded-full border border-white/15 bg-white/10 shadow-inner backdrop-blur-md">
+                        <svg class="h-12 w-12 text-white/90" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Título y Estado -->
+                <div class="mb-10 text-center animate-fadeInUp opacity-0 motion-reduce:animate-none motion-reduce:opacity-100 [animation-delay:0.2s]">
+                    <h1 class="text-2xl font-semibold tracking-wide text-white">
+                        Panel de control
+                    </h1>
+                    <p class="mt-2 text-sm text-white/70">
+                        {autenticado
+                            ? 'Has ingresado correctamente. Elige una sección para continuar.'
+                            : 'Acceso restringido. Inicia sesión para entrar al panel.'}
+                    </p>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- 3. ACCIONES Y BOTONES                      -->
+                <!-- ========================================== -->
+                <div class="space-y-4 animate-fadeInUp opacity-0 motion-reduce:animate-none motion-reduce:opacity-100 [animation-delay:0.3s]">
                     {autenticado ? (
                         <>
+                            {/* Botón: Editar contenido */}
                             {hayEditor && (
                                 <a
                                     href={rutaEditor}
-                                    class="rounded-xl bg-primary px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30"
+                                    class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                                 >
-                                    Editar contenido
+                                    <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-white">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 text-left">
+                                        <p class="text-sm font-semibold text-slate-900">Editar contenido</p>
+                                        <p class="mt-0.5 text-xs text-slate-400">Cambia textos, imágenes y secciones del sitio</p>
+                                    </div>
+                                    <svg class="h-5 w-5 flex-shrink-0 text-slate-300 transition-all duration-200 group-hover:translate-x-1 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                    </svg>
                                 </a>
                             )}
+
+                            {/* Botón: Buzón ciudadano */}
                             <a
                                 href={rutaBuzon}
-                                class="rounded-xl bg-primary px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30"
+                                class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-accent-soft/70 hover:shadow-lg hover:shadow-accent-soft/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                             >
-                                Ver buzón ciudadano
+                                <div class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-accent/40 text-primary-deep transition-colors duration-300 group-hover:bg-accent group-hover:text-primary-deep">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1 text-left">
+                                    <p class="text-sm font-semibold text-slate-900">Buzón ciudadano</p>
+                                    <p class="mt-0.5 text-xs text-slate-400">Revisa sugerencias y felicitaciones</p>
+                                </div>
+                                <svg class="h-5 w-5 flex-shrink-0 text-slate-300 transition-all duration-200 group-hover:translate-x-1 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                </svg>
                             </a>
-                            <form method="post" action="/api/auth/logout">
-                                <button
-                                    type="submit"
-                                    class="w-full rounded-xl border border-red-200 px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-red-600 transition-colors hover:border-red-400 hover:text-red-700"
-                                >
-                                    Cerrar sesión
-                                </button>
-                            </form>
+
+                            {/* Botón: Cerrar sesión */}
+                            <div class="pt-4">
+                                <form method="post" action="/api/auth/logout">
+                                    <button
+                                        type="submit"
+                                        class="group flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-medium text-slate-500 transition-all duration-300 hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2"
+                                    >
+                                        <svg class="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                                        </svg>
+                                        Cerrar sesión
+                                    </button>
+                                </form>
+                            </div>
                         </>
                     ) : (
-                        <a
-                            href="/admin/login"
-                            class="rounded-xl bg-primary px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white transition-all hover:-translate-y-0.5 hover:bg-primary-deep hover:shadow-lg hover:shadow-primary/30"
-                        >
-                            Iniciar sesión
-                        </a>
+                        <>
+                            {/* Botón Principal: Iniciar sesión */}
+                            <a
+                                href="/admin/login"
+                                class="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-primary-light px-6 py-4 text-sm font-semibold tracking-wider text-white shadow-lg shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 hover:brightness-110 active:translate-y-0 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                            >
+                                <!-- Brillo que barre el botón -->
+                                <span class="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-500 group-hover:translate-x-full" aria-hidden="true"></span>
+                                <span class="relative z-10 flex items-center gap-2">
+                                    INICIAR SESIÓN
+                                </span>
+                            </a>
+                        </>
                     )}
-                    <a
-                        href="/"
-                        class="rounded-xl border border-slate-300 px-6 py-3 text-sm font-bold uppercase tracking-[0.14em] text-slate-600 transition-colors hover:border-primary hover:text-primary"
-                    >
-                        Volver al sitio
-                    </a>
+
+                    {/* Enlace: Volver al sitio */}
+                    <div class="pt-2">
+                        <a
+                            href="/"
+                            class="group flex w-full items-center justify-center gap-2 py-2 text-xs font-medium text-white/60 transition-colors duration-300 hover:text-white focus:outline-none focus-visible:underline"
+                        >
+                            <svg class="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                            </svg>
+                            Volver al sitio web
+                        </a>
+                    </div>
                 </div>
             </div>
+
+            <!-- Footer -->
+            <p class="mt-8 text-center text-xs text-white/50 animate-fadeIn opacity-0 motion-reduce:animate-none motion-reduce:opacity-100 [animation-delay:0.45s]">
+                © {new Date().getFullYear()} Alcaldía de Cochabamba
+            </p>
         </div>
     </main>
 </AdminLayout>
