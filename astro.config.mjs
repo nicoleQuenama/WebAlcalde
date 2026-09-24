@@ -33,7 +33,7 @@ export default defineConfig({
         'astro:server:setup': async ({ server }) => {
           server?.httpServer?.once('listening', async () => {
             try {
-              const { initDbOnStartup } = await import('./src/lib/db.ts');
+              const { initDbOnStartup } = await server.ssrLoadModule('./src/lib/db.ts');
               await initDbOnStartup();
             } catch (e) {
               console.warn('[init-db] seeding diferido al primer request:', e.message);
