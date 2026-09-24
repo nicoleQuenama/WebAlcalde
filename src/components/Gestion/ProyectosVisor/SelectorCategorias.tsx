@@ -48,8 +48,8 @@ export default function SelectorCategorias({ categorias, activa, onCambiar }: Pr
   const clasePill = (activa: boolean) =>
     `${CLASE_PILL_BASE} ${
       activa
-        ? 'border-white bg-white text-slate-950 shadow-lg shadow-white/10'
-        : 'border-white/15 bg-white/[0.04] text-white/70 hover:border-white/40 hover:bg-white/10 hover:text-white'
+        ? 'border-white bg-[#493C83]/20 text-slate-950 shadow-lg shadow-white/10'
+        : 'border-white/15 bg-[#493C83] text-white/90 hover:border-white/40 hover:bg-[#493C83]/80 hover:text-white'
     }`;
 
   return (
@@ -107,20 +107,20 @@ export default function SelectorCategorias({ categorias, activa, onCambiar }: Pr
               <div
                 role="menu"
                 aria-label="Más categorías de proyectos"
-                className="relative overflow-hidden rounded-2xl border border-white/15 bg-slate-900/95 shadow-2xl shadow-black/80 backdrop-blur-xl"
+                className="relative overflow-hidden rounded-2xl border border-white/15 bg-[#493C83]/95 shadow-2xl shadow-black/80 backdrop-blur-xl"
               >
                 {/* Header del dropdown */}
                 <div className="flex items-center justify-between border-b border-white/10 px-4 pb-2 pt-3">
                   <span className="text-label font-bold uppercase tracking-[0.18em] text-slate-400">
                     Todas las categorías
                   </span>
-                  <span className="text-label text-slate-500 tabular-nums">
+                  <span className="text-md text-slate-200 tabular-nums">
                     {resto.length} disponibles
                   </span>
                 </div>
 
                 {/* Grid de 2 columnas en mobile, 3 en sm+ */}
-                <div className="grid max-h-[300px] grid-cols-2 gap-1.5 overflow-y-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid-cols-3">
+                <div className="grid max-h-75 grid-cols-2 gap-1.5 overflow-y-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid-cols-3">
                   {resto.map((c) => {
                     const estaActiva = c.id === activa;
                     return (
@@ -133,7 +133,7 @@ export default function SelectorCategorias({ categorias, activa, onCambiar }: Pr
                         onClick={() => seleccionar(c.id)}
                         className={`flex cursor-pointer items-center justify-between gap-2 rounded-xl px-3 py-2 text-left text-caption font-medium transition-all ${
                           estaActiva
-                            ? 'border border-accent/40 bg-accent/20 font-bold text-white'
+                            ? 'border border-accent/40 bg-[#493C83] font-bold text-white'
                             : 'border border-transparent text-slate-300 hover:border-white/10 hover:bg-white/5 hover:text-white'
                         }`}
                       >

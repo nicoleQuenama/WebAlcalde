@@ -91,19 +91,19 @@ const ordenDe = (clave: string) => {
 ---
 
 <Layout title="Gestión — Cocha, la mejor ciudad de Bolivia">
-	<main style="display:flex; flex-direction:column;">
-		
-
-		<section id="proyectos" class="scroll-mt-20 bg-primary text-white" style={`order:${ordenDe('proyectos')}`}>
-			<div class="mx-auto max-w-6xl px-6 py-24 lg:px-8 lg:py-32">
+	<main class="flex flex-col">
+		<section id="proyectos" class="scroll-mt-20" style={`order:${ordenDe('proyectos')}`}>
+      <div class="mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
 				<header class="max-w-2xl" data-cms-dominio="proyectos_titulo">
-					<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-accent" data-cms-campo="kicker">
-						{PROYECTOS_TITULO.kicker}
-					</p>
+					<p class="text-[11px] font-semibold uppercase tracking-[0.34em] text-black" data-cms-campo="kicker">
+            {PROYECTOS_TITULO.kicker}
+          </p>
 					<h2 class="mt-4 text-[1.9rem] font-bold leading-[1.08] tracking-tight sm:text-4xl lg:text-[2.75rem]" data-cms-campo="titulo">
-						{PROYECTOS_TITULO.titulo}
+            {PROYECTOS_TITULO.titulo}
 					</h2>
-					<p class="mt-5 text-base leading-relaxed text-white/65 lg:text-lg" data-cms-campo="bajada" data-cms-multilinea>{PROYECTOS_TITULO.bajada}</p>
+					<p class="mt-5 text-base leading-relaxed text-black lg:text-lg" data-cms-campo="bajada" data-cms-multilinea>
+            {PROYECTOS_TITULO.bajada}
+          </p>
 				</header>
 
 				<!-- Visor por categoría (pills/dropdown + prev/next) -->

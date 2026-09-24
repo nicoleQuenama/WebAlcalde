@@ -2,7 +2,6 @@ import { useState } from 'react';
 import SelectorCategorias from './SelectorCategorias';
 import GaleriaMedia from './GaleriaMedia';
 import ArrowButton from '@components/ui/ArrowButton/ArrowButton';
-import { ESTADO_COLORES } from '@constants/proyectoEstado';
 import { SECCION_POR_CATEGORIA } from '@constants/proyectoSecciones';
 import type { ProyectosVisorProps } from './types';
 
@@ -57,14 +56,14 @@ export default function ProyectosVisor({ categorias }: ProyectosVisorProps) {
     <div className="mx-auto flex w-full flex-col items-center">
       <SelectorCategorias categorias={categorias} activa={categoria.id} onCambiar={cambiarCategoria} />
 
-      <div className="relative mt-8 flex w-full items-center gap-2 sm:gap-4 md:gap-6">
+      <div className="relative mt-8 w-full px-16 md:px-20">
         {total > 1 && (
           <ArrowButton
             direction="left"
-            variant="hero"
+            variant="carousel"
             onClick={anterior}
             aria-label={`Obra anterior en ${categoria.label}`}
-            className="z-10 shrink-0 transition-transform hover:scale-110 active:scale-95"
+            className="left-0 z-10 transition-transform hover:scale-110 active:scale-95"
           />
         )}
 
@@ -72,15 +71,15 @@ export default function ProyectosVisor({ categorias }: ProyectosVisorProps) {
           id="proyectos-panel"
           role="tabpanel"
           aria-label={`Proyectos: ${categoria.label}`}
-          className="min-w-0 flex-1"
+          className="w-full"
         >
           <article
             key={obra.id}
-            className="grid overflow-hidden rounded-[2.2rem] border border-white/10 bg-gradient-to-br from-slate-900/90 via-slate-900/60 to-slate-950/90 shadow-2xl backdrop-blur-xl md:grid-cols-12 md:h-[34rem]"
+            className="grid overflow-hidden rounded-[2.2rem] border border-white/15 bg-[#493C83] shadow-2xl backdrop-blur-xl md:grid-cols-12 md:h-[34rem]"
             data-cms-dominio="proyecto"
             data-cms-clave={obra.id}
           >
-            <div className="relative aspect-[16/10] w-full bg-slate-950 md:col-span-7 md:aspect-auto md:h-full">
+            <div className="relative aspect-[16/10] w-full bg-[#493C83] md:col-span-7 md:aspect-auto md:h-full">
               {esVideo && itemMedia ? (
                 <video
                   key={indiceMedia}
@@ -113,7 +112,7 @@ export default function ProyectosVisor({ categorias }: ProyectosVisorProps) {
               ) : (
                 <div
                   aria-hidden="true"
-                  className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-white/10 via-slate-900 to-slate-950"
+                  className="absolute inset-0 flex items-center justify-center bg-[#493C83] text-white"
                 >
                   <span className="select-none text-8xl font-black tracking-tighter text-white/10">
                     {inicialesDe(obra.titulo)}
@@ -122,7 +121,7 @@ export default function ProyectosVisor({ categorias }: ProyectosVisorProps) {
               )}
 
               {/* Degradado inferior para contraste de la mini galería */}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
 
               {/* Mini galería */}
               {obra.media.length > 1 && (
@@ -142,17 +141,19 @@ export default function ProyectosVisor({ categorias }: ProyectosVisorProps) {
                     className="inline-flex min-w-0 flex-1 items-center gap-2 text-caption font-bold uppercase tracking-[0.24em] text-accent"
                     data-cms-campo="titulo"
                   >
-                    <span className="truncate">{obra.titulo}</span>
+                    <span className="truncate">
+                  {tituloSeccion}
+                    </span>
                   </span>
 
                 </div>
 
                 <h3 className="line-clamp-2 font-roboto-condensed text-title font-bold tracking-tight text-white sm:text-title-md lg:text-title-lg">
-                  {tituloSeccion}
+                      {obra.titulo}
                 </h3>
 
                 <p
-                  className="line-clamp-4 text-body text-slate-300/90 lg:line-clamp-5 lg:text-body-lg"
+                  className="line-clamp-4 text-body text-white lg:line-clamp-5 lg:text-body-lg"
                   data-cms-campo="descripcion"
                   data-cms-multilinea
                 >
@@ -164,7 +165,7 @@ export default function ProyectosVisor({ categorias }: ProyectosVisorProps) {
               <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-5">
                 <p
                   aria-live="polite"
-                  className="text-caption font-semibold uppercase tracking-[0.22em] text-slate-400"
+                  className="text-caption font-semibold uppercase tracking-[0.22em] text-white"
                 >
                   Obra <span className="font-bold text-white">{indice + 1}</span> de {total}
                 </p>
@@ -190,10 +191,10 @@ export default function ProyectosVisor({ categorias }: ProyectosVisorProps) {
         {total > 1 && (
           <ArrowButton
             direction="right"
-            variant="hero"
+            variant="carousel"
             onClick={siguiente}
             aria-label={`Obra siguiente en ${categoria.label}`}
-            className="z-10 shrink-0 transition-transform hover:scale-110 active:scale-95"
+            className="right-0 z-10 transition-transform hover:scale-110 active:scale-95"
           />
         )}
       </div>
