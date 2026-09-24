@@ -14,7 +14,7 @@ const fondos = await Promise.all(
   fotos.map(async (img) =>
     (
       await getImage({
-        src: img.src,
+        src: "/cocha.jpg",
         width: 1800,
         ...(img.w && img.h ? { height: Math.max(1, Math.round((1800 * img.h) / img.w)) } : {}),
         fit: 'cover',

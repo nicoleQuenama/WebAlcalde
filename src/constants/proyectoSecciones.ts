@@ -1,11 +1,3 @@
-/**
- * Cabezal editorial de cada categoría del visor de proyectos (/gestion).
- * Los valores replican los títulos reales de las secciones del seed
- * (`src/lib/db.ts`, dominio `seccion`) para que el visor diga lo mismo
- * que las eras; las categorías sin sección equivalente usan un título
- * editorial corto. Fallback en la isla: `categoria.label`.
- */
-
 export const SECCION_POR_CATEGORIA: Record<string, string> = {
   puentes: 'Pioneros en pasos a desnivel y puentes',
   'areas verdes': 'Ciudad Jardín: áreas verdes y parques',
