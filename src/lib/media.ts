@@ -15,6 +15,10 @@ const antes = (archivo: string) => file(`imagenes/cocha-antes-y-ahora/${archivo}
 const ahora = (archivo: string) => file(`imagenes/cocha-antes-y-ahora/ahora/${archivo}`);
 const premio = (archivo: string) => file(`imagenes/premios-manfred/${archivo}`);
 const video = (archivo: string) => file(`videos/${archivo}`);
+const alcalde = (nombre: string) => encodeURI(`/alcalde/${nombre}`);
+const proyAntes = (archivo: string) => encodeURI(`/proyectos/antes/${archivo}`);
+const proy = (archivo: string) => encodeURI(`/proyectos/${archivo}`);
+const awards = (archivo: string) => encodeURI(`/premios/${archivo}`)
 
 export interface FotoMedia {
   src: string;
@@ -52,9 +56,8 @@ export interface ParAntesDespues {
 
 export const MEDIA = {
   // ── Identidad ─────────────────────────────────────────────────────
-  logo: raiz('LOGO ALCALDE'),
+  logo: '/LOGO ALCALDE.png',
   logoFirma: home('logo firma MRVai_Mesa de trabajo 1'),
-  /** Portada del libro digital (queda local: no está en el bucket). */
   portadaLibro: '/cocha.jpg',
 
   // ── Hero ─────────────────────────────────────────────────────────
@@ -65,9 +68,10 @@ export const MEDIA = {
       panoramica: ahora('DJI_0001-Pano.webp'),
       /** Fotos a pantalla completa del carrusel de fondo del hero. */
       fondo: [
-        { src: home('IMG_8396'), w: 5958, h: 4074 },
-        { src: raiz('IMG_2941'), w: 12480, h: 8320 },
-        { src: premio('puente'), w: 1034, h: 676 },
+        { src: alcalde('señora.webp'), w: 1920, h: 1080 },
+        { src: alcalde('colegio.webp'), w: 1920, h: 1080 },
+        { src: alcalde('perrito.webp'), w: 1920, h: 1080 },
+        { src: alcalde('niños.webp'), w: 1920, h: 1080 },
       ],
     } satisfies {
       panoramica: string;
@@ -79,10 +83,10 @@ export const MEDIA = {
       /** Panorámica desenfocada de fondo. */
       panoramica: ahora('DJI_0001-Pano.webp'),
       carrusel: [
-        { id: 'gente-1', src: raiz('DSC_0802'), titulo: 'Manfred Reyes Villa', w: 2549, h: 3568, encuadre: 'rostro', zoomOut: true },
-        { id: 'gente-2', src: raiz('IMG_2941'), titulo: 'Cerca de la gente', w: 12480, h: 8320, ajuste: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 } },
-        { id: 'gente-3', src: raiz('DSC_0807'), titulo: 'Alcalde de Cochabamba', w: 2832, h: 3826, encuadre: 'rostro', zoomOut: true },
-        { id: 'gente-4', src: premio('01 ALCALDE FRANCIA OK.webp'), titulo: 'Reconocimiento internacional', w: 1032, h: 1207, encuadre: 'rostro', zoomOut: true },
+        { id: 'gente-1', src: alcalde('señora.webp'), titulo: 'Manfred Reyes Villa', w: 2549, h: 3568, encuadre: 'rostro', zoomOut: true },
+        { id: 'gente-2', src: alcalde('colegio.webp'), titulo: 'Cerca de la gente', w: 12480, h: 8320, ajuste: { objectFit: 'cover', objectPosition: '46% 40%', scale: 1.18 } },
+        { id: 'gente-3', src: alcalde('perrito.webp'), titulo: 'Alcalde de Cochabamba', w: 2832, h: 3826, encuadre: 'rostro', zoomOut: true },
+        { id: 'gente-4', src: alcalde('niños.webp'), titulo: 'Reconocimiento internacional', w: 1032, h: 1207, encuadre: 'rostro', zoomOut: true },
       ] satisfies TarjetaImagen[],
     },
   },
@@ -90,7 +94,7 @@ export const MEDIA = {
   // ── Video de biografía (home, debajo del hero) ────────────────────
   biografia: {
     video: video('Biografia.mp4'),
-    poster: raiz('DSC_0802'),
+    poster: alcalde('señora.webp'),
   },
 
   // ── Comparador antes / después (home) ─────────────────────────────
@@ -98,8 +102,8 @@ export const MEDIA = {
   antesDespues: [
     {
       titulo: 'Coña Coña — Playa Turquesa',
-      antes: antes('1_cona_cona_antes.jpg.webp'),
-      despues: ahora('6P9A2287.webp'),
+      antes: proyAntes('coñaAntes.jpeg'),
+      despues: proy('playaTurquesa.JPG'),
       afterFit: 'cover',
       afterPosition: '49.8886431283711% 5.852502603736161%',
       afterScale: 1.17,
@@ -109,34 +113,24 @@ export const MEDIA = {
     },
     {
       titulo: 'Laguna Alalay',
-      antes: antes(
-        'Laguna_Alalay..._la_antigua_Loma_del_Burro_final_avenida_6_de_Agosto_y_el_actual_Circuito_Bolivia_en_1917._(2).jfif.webp',
+      antes: proyAntes(
+        'lalayAntes.jpeg',
       ),
-      despues: ahora(
-        'Laguna_Alalay_el_proyecto_de_recuperacion_ambiental_mas_grande_del_pais.jpg.webp',
+      despues: proy(
+        'lagunaAlalay.jpeg',
       ),
       // 2048×1280 (horizontal): alto real a 1200px de ancho.
       despuesHeight: 750,
     },
     {
       titulo: 'Plaza de las Banderas',
-      antes: antes('trabajos_plaza_de_las_banderas_931.webp'),
-      despues: ahora('IMG_5929.webp'),
+      antes: proyAntes('noseAntes.jpg'),
+      despues: proy('plazaBanderas.jpg'),
       // Mismo archivo que temarioDims['ciudad-jardin-hoy'] (placas 3122×1939).
       antesWidth: 3122,
       antesHeight: 1939,
       // 6240×4160: alto real a 1200px (evita el sliver de inferSize en webp remotos).
       despuesHeight: 800,
-    },
-    {
-      titulo: 'Parque Vial',
-      antes: antes('parque_vial.webp'),
-      despues: ahora('DJI_0169.webp'),
-      // Mismo archivo que temarioDims['ciudad-jardin-90'] (parque_vial 4378×3014).
-      antesWidth: 4378,
-      antesHeight: 3014,
-      // 4000×3000: alto real a 1200px de ancho.
-      despuesHeight: 900,
     },
   ] satisfies ParAntesDespues[],
 
@@ -221,33 +215,21 @@ export const MEDIA = {
 
   // ── Reconocimientos (pestaña "Reconocimiento" de la línea de tiempo) ─
   premios: [
-    premio('01 ALCALDE FRANCIA OK.webp'),
-    premio('IMG_8681.JPG.webp'),
-    premio('IMG_8694.webp'),
-    premio('IMG_8708.webp'),
-    premio('IMG_8717.webp'),
-    premio('480695433_1190684485949460_3538349140350047919_n.jpg.webp'),
-    premio('481212888_1190684419282800_2460303940024493103_n.jpg.webp'),
-    premio('481666493_1194378768913365_510148177602297366_n.jpg.webp'),
-    premio('483432485_1196960938655148_9214361404396313873_n.jpg.webp'),
-    premio('632658652_1476789234005649_799437477301930877_n.jpg.webp'),
-    premio('778967012_4515158455421443_1166667027159226541_n.jfif.webp'),
-    premio('780748679_1533102162196461_3375322350896480518_n.jpg.webp'),
-    premio('20210114_113124 (1).jpg.webp'),
-    premio('20210114_143933.jpg.webp'),
-    premio('20210115_171725.jpg.webp'),
+    awards('premio1.JPG'),
+    awards('premio2.JPG'),
+    awards('premio3.jpeg')
   ],
 
   // ── Línea de tiempo (/sobre) — solo hitos con foto disponible ──────
   historia: {
     /** 1993–2000 · alcalde por cuatro periodos */
-    prefecto: raiz('DSC_0807'),
+    prefecto: alcalde('policia.jpeg'),
     /** 2005 · primer prefecto electo */
-    regreso2020: raiz('apoyo de la gente al alcalde'),
+    regreso2020: alcalde('alcalde.jpg'),
     /** 2021 · alcalde por quinta vez */
-    alcalde2021: raiz('DSC_0802'),
+    alcalde2021: alcalde('cinta.jpg'),
     /** hoy · trabajar por Cochabamba */
-    ciudadInteligente: home('DJI_0187'),
+    ciudadInteligente: alcalde('señora.webp'),
   },
 };
 
