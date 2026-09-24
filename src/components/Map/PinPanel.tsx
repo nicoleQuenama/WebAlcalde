@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './Map.module.css';
-import type { PinDatos, PinPanelProps } from '@types/pin';
+import type { PinDatos, PinPanelProps } from '@type/pin';
 
 export default function PinPanel({ pin, onCerrar }: PinPanelProps) {
   const total = pin.imagenes.length;

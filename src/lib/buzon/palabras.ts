@@ -1,18 +1,3 @@
-/**
- * Filtro de lenguaje para el Buzón Ciudadano.
- *
- * Lista local (español > inglés) con normalización de tildes y leet-speak
- * ("p3nd3j0" → "pendejo"). Además de la coincidencia exacta con límite de
- * palabra, el filtro detecta:
- *   - errores de tipeo ("pendeji" → "pendejo", por distancia de edición);
- *   - letras separadas a propósito ("p e n d e j o").
- *
- * La validación real ocurre en el servidor (src/pages/api/buzon.ts); el
- * navegador usa la misma función solo para avisar antes de enviar. Ampliá
- * PALABRAS_INAPROPIADAS cuando detectes términos nuevos: con que sumes la
- * palabra en texto plano alcanza.
- */
-
 const LEET: Record<string, string> = {
   '4': 'a',
   '@': 'a',
@@ -40,15 +25,9 @@ function quitarAcentos(texto: string): string {
   return texto.replace(ACENTO_RE, (c) => ACENTOS[c] ?? c);
 }
 
-/**
- * Normaliza un texto para compararlo contra la lista:
- * minúsculas, sin tildes, leet → letras y signos → espacios (conserva los
- * espacios para que el límite de palabra funcione), y colapsa letras
- * repetidas ("pendejoooo" → "pendejo").
- */
 export function normalizar(texto: string): string {
   return quitarAcentos(texto.toLowerCase())
-    .replace(/[^a-z0-9]+/g, ' ')  // todo lo que no es letra/número pasa a ser un espacio
+    .replace(/[^a-z0-9]+/g, ' ') 
     .replace(/[a-z0-9]/g, (c) => LEET[c] ?? c)
     .replace(/(.)\1+/g, '$1')
     .replace(/\s+/g, ' ')
@@ -98,11 +77,6 @@ function escapeRegExp(texto: string): string {
   return texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/**
- * Distancia de edición entre `a` y `b` (Damerau–Levenshtein), con corto
- * cálculo si la distancia mínima supera `umbral`. Devuelve true si la
- * distancia real es ≤ `umbral`.
- */
 function distanciaEdicion(a: string, b: string, umbral: number): boolean {
   if (Math.abs(a.length - b.length) > umbral) return false;
   if (a.length > b.length) [a, b] = [b, a];

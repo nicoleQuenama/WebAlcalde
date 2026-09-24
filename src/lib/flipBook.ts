@@ -1,10 +1,6 @@
 import { Children, isValidElement, type ReactNode, type ReactElement, type ComponentType } from 'react';
 import { FIT, WIDTH_BOOST } from '@constants/flipBook';
-// Ruta relativa (no alias `@types`): el alias choca hoy con la resolución de
-// tipos de TS (ts6137) en todo el repo — mismo bug ya presente en otros
-// archivos que sí usan `@types/*`. Se mantiene relativo para no sumar un
-// error nuevo al build mientras ese bug de raíz no se resuelve aparte.
-import type { OpenSize, Rect, TocGroup } from '../types/flipBook';
+import type { OpenSize, Rect, TocGroup } from '@type/flipBook';
 import type { Capitulo, EraTemario } from '@lib/db';
 
 export const TITLE_RE = /(^|\s)(cover-title|back-title|page-title)($|\s)/;
@@ -85,7 +81,7 @@ export const computeOpenSize = (width: number, height: number): OpenSize => {
 
 /**
  * Índice del libro digital: portada + capítulos de apertura + una entrada
- * por era/sección, en el mismo orden de páginas que arma `Book3D.tsx`.
+ * por era/sección, en el mismo orden de páginas que arma `Book.tsx`.
  */
 export function buildLibroToc(capitulos: Capitulo[], eras: EraTemario[]): TocGroup[] {
   let page = 1;

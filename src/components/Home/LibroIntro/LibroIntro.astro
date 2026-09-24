@@ -1,30 +1,28 @@
 ---
 import Section from '@components/global/Section/Section.component.astro';
 import FlipBook from '@components/FlipBook/FlipBook';
-import Book, { type IMG, type Video } from '@components/Home/BookSection/Book3D';
+import Book, { type IMG, type Video } from '@components/Home/BookSection';
 import type { Capitulo, EraTemario } from '@lib/db';
-// Ruta relativa: el alias `@types` choca hoy con ts6137 en todo el repo (bug preexistente).
-import type { TocGroup } from '../../../types/flipBook';
-import type { DEFAULT_FLIPBOOK_META } from '@lib/cms/defaults';
+import type { TocGroup } from '@type/flipBook';
+import type { DEFAULT_FLIPBOOK_META } from '@cms/sitio/defaults';
 
 interface Props {
     libro: typeof DEFAULT_FLIPBOOK_META;
-    capitulos: Capitulo[];
+    chapters: Capitulo[];
     eras: EraTemario[];
-    fotos: IMG[];
+    photos: IMG[];
     videos: Video[];
     toc: TocGroup[];
     style?: string;
     dominio?: string;
 }
 
-const { libro, capitulos, eras, fotos, videos, toc, style, dominio } = Astro.props;
+const { libro, chapters, eras, photos, videos, toc, style, dominio } = Astro.props;
 ---
 
 <Section
     subtitle={libro.kicker}
     description={libro.parrafo}
-    theme="purple"
     paddingClass="py-16 lg:py-20"
     headerGapClass="mb-8"
     style={style}
@@ -43,9 +41,9 @@ const { libro, capitulos, eras, fotos, videos, toc, style, dominio } = Astro.pro
     >
         <Book
             coverImage={libro.coverImage}
-            capitulos={capitulos}
+            chapters={chapters}
             eras={eras}
-            fotos={fotos}
+            photos={photos}
             videos={videos}
             meta={libro}
         />

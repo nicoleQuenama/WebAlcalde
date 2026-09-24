@@ -44,10 +44,11 @@ exigen sesión **y** el header `X-Admin-Secret` con `ADMIN_SECRET_PATH`.
 
 ### Editor CMS: estado REAL
 
-El editor es un **prototipo en memoria** (`src/lib/cms/store.ts`): los cambios
-se aplican a las páginas solo mientras el proceso de Node corre y **se pierden
-al reiniciar**. No escribe a Postgres. No lo uses como editor de producción
-todavía; sirve para probar la UX de edición.
+El editor **persiste en PostgreSQL** (tabla `cms_bloque`, vía el servicio del CMS
+en `src/cms/`). Los cambios se escriben con `POST /api/admin/contenido/<dominio>`
+y se leen en cada render; sobreviven a reinicios. Las colecciones usan los mismos
+ids históricos (`home_hero`, `capitulo`, `proyecto`, …) que el `data-cms-dominio`
+del DOM.
 
 ## Buzón Ciudadano
 

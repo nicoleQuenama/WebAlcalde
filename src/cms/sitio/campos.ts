@@ -1,10 +1,41 @@
 /**
- * Metadata de campos para el editor CMS (beta). Solo describe FORMA (qué
- * campos tiene cada tipo de bloque y cómo mostrarlos) — los VALORES actuales
- * se calculan en `src/pages/admin/[secret].astro` a partir del contenido real
- * de cada página (mismos getters/constantes que usan index/gestion/sobre) más
- * los overrides del store en memoria.
+ * Metadata declarativa de campos para el editor CMS y el resolver genérico de
+ * páginas. Cada `SeccionConfig` declara su FUENTE de datos (colección + default
+ * computado por contexto) y un único `resolverSeccion()` (en `datosPagina.ts`)
+ * lo materializa para todas las páginas. Sin strings de dominios dispersos:
+ * cada colección solo aparece en su declaración.
  */
+
+import {
+  getCapitulos,
+  getEras,
+  getGestionHero,
+  getNoticias,
+  getNoticiasHero,
+  getProyectos,
+  getProyectosTitulo,
+  type Capitulo,
+  type EraTemario,
+  type GestionHero,
+  type NoticiaFeed,
+  type NoticiasHero,
+  type Proyecto,
+  type ProyectosTitulo,
+} from '@lib/db';
+import { INSTITUTIONAL_CARDS } from '@constants/institutionalProfile/content';
+import {
+  DEFAULT_HOME_ANTES_DESPUES,
+  DEFAULT_HOME_BIOGRAFIA,
+  DEFAULT_HOME_HERO,
+  DEFAULT_FLIPBOOK_META,
+  DEFAULT_GESTION_LAYOUT,
+  DEFAULT_HOME_LAYOUT,
+  DEFAULT_NOTICIAS_HERO,
+  DEFAULT_NOTICIAS_LAYOUT,
+  DEFAULT_SOBRE_BIOGRAFIA,
+  DEFAULT_SOBRE_HERO,
+  DEFAULT_SOBRE_LAYOUT,
+} from './defaults';
 
 export type TipoCampo = 'text' | 'textarea' | 'url' | 'imagen' | 'select' | 'obras';
 
@@ -17,25 +48,58 @@ export interface FieldSpec {
 
 export type TipoSeccion = 'single' | 'lista' | 'placeholder';
 
+/** Puente único del resolver a los getters del dominio (de `src/lib/db`). */
+export interface ContextoSitio {
+  getCapitulos(): Promise<Capitulo[]>;
+  getEras(): Promise<EraTemario[]>;
+  getGestionHero(): Promise<GestionHero>;
+  getProyectosTitulo(): Promise<ProyectosTitulo>;
+  getProyectos(): Promise<Proyecto[]>;
+  getNoticiasHero(): Promise<NoticiasHero | undefined>;
+  getNoticias(): Promise<NoticiaFeed[]>;
+}
+
+/** Declara de dónde sale el contenido editable de una sección. */
+export type FuenteSeccion =
+  | {
+      tipo: 'fila';
+      coleccion: string;
+      clave: string;
+      porDefecto: (ctx: ContextoSitio) => Promise<Record<string, unknown>>;
+    }
+  | {
+      tipo: 'lista';
+      coleccion: string;
+      porDefecto: (ctx: ContextoSitio) => Promise<Record<string, unknown>[]>;
+    }
+  | { tipo: 'layoutEmulado' };
+
 export interface SeccionConfig {
   /** Clave de la sección "macro" dentro del layout de la página (orden top-level). */
   key: string;
   titulo: string;
   tipo: TipoSeccion;
-  /** Dominio del store (`home_hero`, `proyecto`, etc.) — no aplica a placeholders. */
-  dominio?: string;
+  fuente: FuenteSeccion;
   campos?: FieldSpec[];
   /** Si es true: solo edición de texto, sin agregar/quitar/reordenar ítems (protege mecánicas que dependen de la posición/cantidad, ej. el libro). */
   bloqueado?: boolean;
   notaPlaceholder?: string;
 }
 
+export type PaginaId = 'inicio' | 'gestion' | 'sobre' | 'noticias';
+
 export interface PaginaConfig {
-  pagina: 'inicio' | 'gestion' | 'sobre';
+  pagina: PaginaId;
   titulo: string;
   ruta: string;
   layoutDominio: string;
+  layoutPorDefecto: string[];
   secciones: SeccionConfig[];
+}
+
+/** Adapta un objeto tipado del dominio al mapa opaco que espera el resolver. */
+function asMap<T extends object>(x: T): Record<string, unknown> {
+  return x as unknown as Record<string, unknown>;
 }
 
 const CAMPOS_PROYECTO: FieldSpec[] = [
@@ -77,18 +141,33 @@ const CAMPOS_INSTITUTIONAL: FieldSpec[] = [
   { name: 'body', label: 'Texto', type: 'textarea' },
 ];
 
+const CAMPOS_NOTICIA: FieldSpec[] = [
+  { name: 'label', label: 'Etiqueta corta (cards del hero)', type: 'text' },
+  { name: 'titulo', label: 'Título', type: 'text' },
+  { name: 'categoria', label: 'Categoría', type: 'text' },
+  { name: 'fecha', label: 'Fecha (YYYY-MM-DD)', type: 'text' },
+  { name: 'resumen', label: 'Resumen', type: 'textarea' },
+  { name: 'src', label: 'Imagen', type: 'imagen' },
+];
+
 export const PAGINAS: PaginaConfig[] = [
   {
     pagina: 'inicio',
     titulo: 'Inicio',
     ruta: '/',
     layoutDominio: 'home_layout',
+    layoutPorDefecto: DEFAULT_HOME_LAYOUT,
     secciones: [
       {
         key: 'hero',
         titulo: 'Hero',
         tipo: 'single',
-        dominio: 'home_hero',
+        fuente: {
+          tipo: 'fila',
+          coleccion: 'home_hero',
+          clave: 'principal',
+          porDefecto: async () => DEFAULT_HOME_HERO,
+        },
         campos: [
           { name: 'eyebrow', label: 'Texto superior', type: 'text' },
           { name: 'titulo', label: 'Título', type: 'text' },
@@ -98,7 +177,12 @@ export const PAGINAS: PaginaConfig[] = [
         key: 'biografia',
         titulo: 'Biografía',
         tipo: 'single',
-        dominio: 'home_biografia',
+        fuente: {
+          tipo: 'fila',
+          coleccion: 'home_biografia',
+          clave: 'principal',
+          porDefecto: async () => DEFAULT_HOME_BIOGRAFIA,
+        },
         campos: [
           { name: 'eyebrow', label: 'Etiqueta', type: 'text' },
           { name: 'titulo', label: 'Título', type: 'text' },
@@ -113,7 +197,12 @@ export const PAGINAS: PaginaConfig[] = [
         key: 'antes_despues',
         titulo: 'Antes y después',
         tipo: 'single',
-        dominio: 'home_antes_despues',
+        fuente: {
+          tipo: 'fila',
+          coleccion: 'home_antes_despues',
+          clave: 'principal',
+          porDefecto: async () => DEFAULT_HOME_ANTES_DESPUES,
+        },
         campos: [
           { name: 'kicker', label: 'Etiqueta', type: 'text' },
           { name: 'titulo', label: 'Título', type: 'text' },
@@ -124,7 +213,12 @@ export const PAGINAS: PaginaConfig[] = [
         key: 'libro',
         titulo: 'Libro digital',
         tipo: 'single',
-        dominio: 'flipbook_meta',
+        fuente: {
+          tipo: 'fila',
+          coleccion: 'flipbook_meta',
+          clave: 'principal',
+          porDefecto: async () => DEFAULT_FLIPBOOK_META,
+        },
         campos: [
           { name: 'kicker', label: 'Etiqueta de la sección', type: 'text' },
           { name: 'parrafo', label: 'Párrafo de la sección', type: 'textarea' },
@@ -148,12 +242,18 @@ export const PAGINAS: PaginaConfig[] = [
     titulo: 'Gestión',
     ruta: '/gestion',
     layoutDominio: 'gestion_layout',
+    layoutPorDefecto: DEFAULT_GESTION_LAYOUT,
     secciones: [
       {
         key: 'hero',
         titulo: 'Hero de gestión',
         tipo: 'single',
-        dominio: 'gestion_hero',
+        fuente: {
+          tipo: 'fila',
+          coleccion: 'gestion_hero',
+          clave: 'principal',
+          porDefecto: async (ctx) => asMap(await ctx.getGestionHero()),
+        },
         campos: [
           { name: 'kicker', label: 'Etiqueta', type: 'text' },
           { name: 'titulo', label: 'Título', type: 'text' },
@@ -165,7 +265,11 @@ export const PAGINAS: PaginaConfig[] = [
         key: 'capitulos',
         titulo: 'Capítulos de apertura',
         tipo: 'lista',
-        dominio: 'capitulo',
+        fuente: {
+          tipo: 'lista',
+          coleccion: 'capitulo',
+          porDefecto: async (ctx) => (await ctx.getCapitulos()).map((c) => asMap({ ...c })),
+        },
         campos: CAMPOS_CAPITULO,
         bloqueado: true,
       },
@@ -173,21 +277,40 @@ export const PAGINAS: PaginaConfig[] = [
         key: 'eras',
         titulo: 'Eras de obras',
         tipo: 'lista',
-        dominio: 'era',
+        fuente: {
+          tipo: 'lista',
+          coleccion: 'era',
+          porDefecto: async (ctx) => {
+            const eras = await ctx.getEras();
+            return eras.map(({ secciones: _s, ...resto }) => asMap(resto));
+          },
+        },
         campos: CAMPOS_ERA,
       },
       {
         key: 'secciones',
         titulo: 'Secciones de las eras (con sus obras)',
         tipo: 'lista',
-        dominio: 'seccion',
+        fuente: {
+          tipo: 'lista',
+          coleccion: 'seccion',
+          porDefecto: async (ctx) => {
+            const eras = await ctx.getEras();
+            return eras.flatMap((era) => era.secciones.map((s) => asMap({ ...s, eraId: era.id })));
+          },
+        },
         campos: CAMPOS_SECCION,
       },
       {
         key: 'proyectos_titulo',
         titulo: 'Encabezado de proyectos',
         tipo: 'single',
-        dominio: 'proyectos_titulo',
+        fuente: {
+          tipo: 'fila',
+          coleccion: 'proyectos_titulo',
+          clave: 'principal',
+          porDefecto: async (ctx) => asMap(await ctx.getProyectosTitulo()),
+        },
         campos: [
           { name: 'kicker', label: 'Etiqueta', type: 'text' },
           { name: 'titulo', label: 'Título', type: 'text' },
@@ -198,7 +321,12 @@ export const PAGINAS: PaginaConfig[] = [
         key: 'proyectos',
         titulo: 'Tarjetas de proyecto',
         tipo: 'lista',
-        dominio: 'proyecto',
+        fuente: {
+          tipo: 'lista',
+          coleccion: 'proyecto',
+          porDefecto: async (ctx) =>
+            (await ctx.getProyectos()).map((p, i) => asMap({ ...p, id: String(i) })),
+        },
         campos: CAMPOS_PROYECTO,
       },
     ],
@@ -206,14 +334,20 @@ export const PAGINAS: PaginaConfig[] = [
   {
     pagina: 'sobre',
     titulo: 'Sobre',
-    ruta: '/sobre',
+    ruta: '/about',
     layoutDominio: 'sobre_layout',
+    layoutPorDefecto: DEFAULT_SOBRE_LAYOUT,
     secciones: [
       {
         key: 'hero',
         titulo: 'Hero',
         tipo: 'single',
-        dominio: 'sobre_hero',
+        fuente: {
+          tipo: 'fila',
+          coleccion: 'sobre_hero',
+          clave: 'principal',
+          porDefecto: async () => DEFAULT_SOBRE_HERO,
+        },
         campos: [
           { name: 'eyebrow', label: 'Texto superior', type: 'text' },
           { name: 'titulo', label: 'Título', type: 'text' },
@@ -224,7 +358,15 @@ export const PAGINAS: PaginaConfig[] = [
         key: 'biografia',
         titulo: 'Biografía',
         tipo: 'single',
-        dominio: 'sobre_biografia',
+        fuente: {
+          tipo: 'fila',
+          coleccion: 'sobre_biografia',
+          clave: 'principal',
+          porDefecto: async (ctx) => {
+            const presentacion = (await ctx.getCapitulos()).find((c) => c.id === 'presentacion');
+            return asMap({ ...DEFAULT_SOBRE_BIOGRAFIA, parrafo: presentacion?.bajada ?? '' });
+          },
+        },
         campos: [
           { name: 'eyebrow', label: 'Etiqueta', type: 'text' },
           { name: 'titulo', label: 'Título', type: 'text' },
@@ -237,7 +379,11 @@ export const PAGINAS: PaginaConfig[] = [
         key: 'institutional',
         titulo: 'Misión y visión',
         tipo: 'lista',
-        dominio: 'sobre_institutional',
+        fuente: {
+          tipo: 'lista',
+          coleccion: 'sobre_institutional',
+          porDefecto: async () => INSTITUTIONAL_CARDS.map((c) => asMap({ ...c })),
+        },
         campos: CAMPOS_INSTITUTIONAL,
         bloqueado: true,
       },
@@ -245,7 +391,44 @@ export const PAGINAS: PaginaConfig[] = [
         key: 'timeline',
         titulo: 'Línea de tiempo',
         tipo: 'placeholder',
+        fuente: { tipo: 'layoutEmulado' },
         notaPlaceholder: 'Interactiva (scroll 3D) — no editable en esta beta.',
+      },
+    ],
+  },
+  {
+    pagina: 'noticias',
+    titulo: 'Noticias',
+    ruta: '/noticias',
+    layoutDominio: 'noticias_layout',
+    layoutPorDefecto: DEFAULT_NOTICIAS_LAYOUT,
+    secciones: [
+      {
+        key: 'hero',
+        titulo: 'Hero de noticias',
+        tipo: 'single',
+        fuente: {
+          tipo: 'fila',
+          coleccion: 'noticias_hero',
+          clave: 'principal',
+          porDefecto: async (ctx) => asMap((await ctx.getNoticiasHero()) ?? DEFAULT_NOTICIAS_HERO),
+        },
+        campos: [
+          { name: 'kicker', label: 'Etiqueta', type: 'text' },
+          { name: 'titulo', label: 'Título', type: 'text' },
+          { name: 'bajada', label: 'Bajada', type: 'textarea' },
+        ],
+      },
+      {
+        key: 'lista_noticias',
+        titulo: 'Lista de noticias',
+        tipo: 'lista',
+        fuente: {
+          tipo: 'lista',
+          coleccion: 'noticias',
+          porDefecto: async (ctx) => (await ctx.getNoticias()).map((n) => asMap({ ...n, id: String(n.id) })),
+        },
+        campos: CAMPOS_NOTICIA,
       },
     ],
   },
@@ -253,4 +436,17 @@ export const PAGINAS: PaginaConfig[] = [
 
 export function paginaPorId(id: string): PaginaConfig | undefined {
   return PAGINAS.find((p) => p.pagina === id);
+}
+
+/** Cablea `ContextoSitio` con los getters reales del dominio (`src/lib/db`). */
+export function crearContextoSitio(): ContextoSitio {
+  return {
+    getCapitulos: () => getCapitulos(),
+    getEras: () => getEras(),
+    getGestionHero: () => getGestionHero(),
+    getProyectosTitulo: () => getProyectosTitulo(),
+    getProyectos: () => getProyectos(),
+    getNoticiasHero: () => getNoticiasHero(),
+    getNoticias: () => getNoticias(),
+  };
 }

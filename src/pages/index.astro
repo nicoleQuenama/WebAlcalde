@@ -7,7 +7,8 @@ import {
 } from "@lib/imageOptimize";
 import Layout from "@layouts/Layout.astro";
 import { MEDIA } from "@lib/media";
-import { efectivo, efectivoOrden, getTemarioEfectivo } from "@lib/cms/resolve";
+import { getServicioCMS } from "@cms";
+import { getTemarioEfectivo } from "@cms/sitio/temario";
 import { buildLibroToc } from "@lib/flipBook";
 import {
   DEFAULT_HOME_HERO,
@@ -15,30 +16,30 @@ import {
   DEFAULT_HOME_BIOGRAFIA,
   DEFAULT_FLIPBOOK_META,
   DEFAULT_HOME_LAYOUT,
-} from "@lib/cms/defaults";
+} from "@cms/sitio/defaults";
 import Hero from "@components/global/Hero/Hero.astro";
 import BiographyVideo from "@components/Home/BiographyVideo/index.astro";
 import AntesDespues from "@components/Home/AntesDespues/AntesDespues.astro";
 import LibroIntro from "@components/Home/LibroIntro/LibroIntro.astro";
-// Ruta relativa: el alias `@types` choca hoy con ts6137 en todo el repo (bug preexistente).
-import type { ParComparador } from "../types/comparador";
+import type { ParComparador } from "@type/comparador";
 import "@styles/sobre.css";
 import TikTokWidget from "@components/global/TikTokWidget/TikTokWidget.astro";
 
-// ── CMS (beta, en memoria) ───────────────────────────────────────────
-const heroTexto = efectivo("home_hero", "principal", DEFAULT_HOME_HERO);
-const antesDespuesTexto = efectivo(
+// ── CMS (servicio persistente) ─────────────────────────────────────
+const cms = getServicioCMS();
+const heroTexto = await cms.efectivo("home_hero", "principal", DEFAULT_HOME_HERO);
+const antesDespuesTexto = await cms.efectivo(
   "home_antes_despues",
   "principal",
   DEFAULT_HOME_ANTES_DESPUES,
 );
-const biografiaTexto = efectivo(
+const biografiaTexto = await cms.efectivo(
   "home_biografia",
   "principal",
   DEFAULT_HOME_BIOGRAFIA,
 );
-const libro = efectivo("flipbook_meta", "principal", DEFAULT_FLIPBOOK_META);
-const orden = efectivoOrden("home_layout", DEFAULT_HOME_LAYOUT);
+const libro = await cms.efectivo("flipbook_meta", "principal", DEFAULT_FLIPBOOK_META);
+const orden = await cms.efectivoOrden("home_layout", DEFAULT_HOME_LAYOUT);
 const ordenDe = (clave: string) => {
   const i = orden.indexOf(clave);
   return i === -1 ? 999 : i;
@@ -138,13 +139,13 @@ const toc = buildLibroToc(capitulos, eras);
     <!-- ═══ INTRODUCCIÓN AL LIBRO DIGITAL ═══ -->
     <LibroIntro
       libro={libro}
-      capitulos={capitulos}
+      chapters={capitulos}
       eras={eras}
-      fotos={fotos}
+      photos={fotos}
       videos={videos}
       toc={toc}
       style={`order:${ordenDe("libro")}`}
-dominio="flipbook_meta"
+      dominio="flipbook_meta"
     />
   </div>
 

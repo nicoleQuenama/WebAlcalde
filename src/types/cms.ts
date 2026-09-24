@@ -1,20 +1,6 @@
-import type { FieldSpec, PaginaConfig, SeccionConfig } from '@lib/cms/campos';
+import type { DatosPagina } from '@cms/sitio';
 
-export interface SeccionData extends SeccionConfig {
-  valor?: Record<string, unknown>;
-  items?: { clave: string; data: Record<string, unknown> }[];
-}
-
-export interface DatosPagina {
-  pagina: PaginaConfig;
-  ordenLayout: string[];
-  secciones: SeccionData[];
-}
-
-export interface InitData extends DatosPagina {
-  secreto: string;
-  paginas: { pagina: string; titulo: string; ruta: string }[];
-}
+export type { SeccionData, DatosPagina } from '@cms/sitio';
 
 export type Obra = { nombre?: string; anio?: string; detalle?: string; video?: boolean };
 
@@ -30,4 +16,14 @@ export interface Portapapeles {
   tipo: 'item' | 'seccion';
   seccionKey?: string;
   seccionTitulo?: string;
+}
+
+/**
+ * Payload del editor: `DatosPagina` de la página inicial + datos de sesión
+ * (secreto) y el índice de páginas editables con su ruta real (para saber a
+ * qué página navegó el iframe dentro de la vista previa).
+ */
+export interface InitData extends DatosPagina {
+  secreto: string;
+  paginas: Array<{ pagina: string; titulo: string; ruta: string }>;
 }

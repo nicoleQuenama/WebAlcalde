@@ -1,8 +1,7 @@
 ---
 import Section from '@components/global/Section/Section.component.astro';
 import ComparadorAntesDespues from '@components/Home/ComparingProjects/ProjectSlide.tsx';
-// Ruta relativa: el alias `@types` choca hoy con ts6137 en todo el repo (bug preexistente).
-import type { ParComparador } from '../../../types/comparador';
+import type { ParComparador } from '@type/comparador';
 
 interface Props {
     kicker: string;
