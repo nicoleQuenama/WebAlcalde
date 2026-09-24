@@ -1,12 +1,12 @@
 /**
- * Valores por defecto del contenido que hoy vive hardcodeado en las páginas
- * (no en `src/lib/db.ts`). Es la ÚNICA fuente de verdad para ese texto: tanto
- * las páginas reales (`index.astro`, etc.) como el editor CMS (`/admin/[secret]`)
- * importan de acá, para que no se puedan desincronizar.
+ * Valores por defecto del contenido que vive hardcodeado en las páginas
+ * (fuera de `src/cms/sitio/colecciones.ts`). Es la ÚNICA fuente de verdad para
+ * ese texto: tanto las páginas reales (`index.astro`, etc.) como el editor CMS
+ * (`/admin/[secret]`) importan de acá, para que no se puedan desincronizar.
  */
 
 export const DEFAULT_HOME_HERO = {
-  eyebrow: 'Cocha, la mejor ciudad de Bolivia',
+  eyebrow: 'El Valor del Trabajo, la Cercanía y el Compromiso',
   titulo: 'Manfred Reyes Villa',
 };
 
@@ -18,14 +18,14 @@ export const DEFAULT_HOME_ANTES_DESPUES = {
 
 export const DEFAULT_HOME_BIOGRAFIA = {
   eyebrow: 'Manfred Reyes Villa',
-  titulo: 'Biografía',
+  titulo: '¿Quién soy?',
   parrafo:
     'Manfred Reyes Villa es un líder político boliviano con una trayectoria dedicada al desarrollo ' +
     'de Cochabamba. Con experiencia en gestión pública y un compromiso inquebrantable con el ' +
     'progreso de su ciudad, ha impulsado proyectos fundamentales que transforman la vida de los ' +
     'cochabambinos.',
   cta1Label: 'Más sobre mí',
-  cta1Href: '/sobre',
+  cta1Href: '/about',
   cta2Label: 'Gestión completa',
   cta2Href: '/gestion',
 };
@@ -59,14 +59,6 @@ export const DEFAULT_NOTICIAS_HERO = {
   titulo: 'Conoce las\nnuevas noticias',
   bajada:
     'Mantente informado sobre los últimos proyectos, obras entregadas y el avance de nuestra ciudad hacia el futuro.',
-};
-
-/** El párrafo real sale de `getCapitulos()` (capítulo "presentación"); acá solo lo fijo/editable. */
-export const DEFAULT_SOBRE_BIOGRAFIA = {
-  eyebrow: 'Biografía',
-  titulo: 'Una vida dedicada a Cochabamba',
-  ctaLabel: 'Ver la gestión completa',
-  ctaHref: '/gestion#presentacion',
 };
 
 export const DEFAULT_HOME_LAYOUT = ['hero', 'biografia', 'antes_despues', 'libro'];

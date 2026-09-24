@@ -1,5 +1,5 @@
-import type { EditorContexto } from '@types/cms/editorContext';
-import type { SeccionData } from '@types/cms';
+import type { EditorContexto } from '@type/cms/editorContext';
+import type { SeccionData } from '@type/cms';
 import {
   COLOR_ACCENT,
   COLOR_ACCENT_SOFT,

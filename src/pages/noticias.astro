@@ -3,18 +3,19 @@
 import Layout from '@layouts/Layout.astro';
 import NoticiasHero from '@components/Noticias/index.astro';
 import { getNoticias, getNoticiasHero, type NoticiaFeed } from '@lib/db';
-import { efectivo, efectivoLista } from '@lib/cms/resolve';
-import { DEFAULT_NOTICIAS_HERO } from '@lib/cms/defaults';
+import { getServicioCMS } from '@cms';
+import { DEFAULT_NOTICIAS_HERO } from '@cms/sitio/defaults';
 
-const NOTICIAS_HERO = efectivo(
+const cms = getServicioCMS();
+const NOTICIAS_HERO = await cms.efectivo(
   'noticias_hero',
   'principal',
   (await getNoticiasHero()) ?? DEFAULT_NOTICIAS_HERO,
 );
-const NOTICIAS = efectivoLista(
+const NOTICIAS = (await cms.efectivoLista(
   'noticias',
   (await getNoticias()) as unknown as Record<string, unknown>[],
-) as unknown as NoticiaFeed[];
+)) as unknown as NoticiaFeed[];
 ---
 
 <Layout title="Noticias — Manfred Reyes Villa">

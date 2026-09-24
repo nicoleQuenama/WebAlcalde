@@ -1,5 +1,5 @@
-import type { FieldSpec } from '@lib/cms/campos';
-import type { Obra } from '@types/cms';
+import type { FieldSpec } from '@cms/sitio';
+import type { Obra } from '@type/cms';
 import { activarDragReorder, clonarData, el } from './helpers';
 import type { ContextoCampo } from './forms';
 

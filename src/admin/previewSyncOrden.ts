@@ -1,5 +1,5 @@
-import type { DatosPagina, SeccionData } from '@lib/cms/datosPagina';
-import type { FieldSpec } from '@lib/cms/campos';
+import type { DatosPagina, SeccionData } from '@cms/sitio';
+import type { FieldSpec } from '@cms/sitio';
 import {
   COLOR_ACCENT,
   COLOR_ACCENT_SOFT,

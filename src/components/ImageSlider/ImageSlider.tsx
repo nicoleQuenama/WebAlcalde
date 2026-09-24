@@ -21,16 +21,15 @@ export default function ImageSlider({
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
 
-  // Dispara la pista visual (hintSlide) cuando el slider entra al viewport.
+  // Dispara la pista visual (hintSlide) cada vez que el slider entra al viewport,
+  // y la apaga al salir, para que se repita si se vuelve a la sección (mientras no
+  // haya interacción). El observer queda activo; solo se limpia al desmontar.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) {
-          setInView(true);
-          io.disconnect();
-        }
+      ([entry]) => {
+        setInView(Boolean(entry?.isIntersecting));
       },
       { rootMargin: '150px' },
     );

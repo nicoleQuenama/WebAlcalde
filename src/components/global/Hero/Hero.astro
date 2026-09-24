@@ -11,7 +11,7 @@ const usaCarrusel = !!fotosFondo && fotosFondo.length > 0;
 ---
 
 <section
-    class="relative flex min-h-[100svh] w-full items-center justify-center bg-primary px-0 pb-16 pt-24 lg:pt-28"
+    class="relative flex min-h-svh w-full items-center justify-center bg-primary px-0 pb-16 pt-24 lg:pt-28"
     style={style}
     data-cms-dominio={dominio}
 >
@@ -25,7 +25,7 @@ const usaCarrusel = !!fotosFondo && fotosFondo.length > 0;
             ></div>
         )}
         <div class="absolute inset-0 bg-primary/25 mix-blend-multiply"></div>
-        <div class="absolute inset-0 bg-gradient-to-br from-hero-from via-hero-via to-hero-to opacity-30"></div>
+        <div class="absolute inset-0 bg-linear-to-br from-hero-from via-hero-via to-hero-to opacity-30"></div>
     </div>
 
     <!-- Contenido -->

@@ -7,43 +7,19 @@ import ProyectosVisor from '@components/Gestion/ProyectosVisor/ProyectosVisor';
 import type { VisorCategoria, VisorMedia, VisorObra } from '@components/Gestion/ProyectosVisor/types';
 import { ajusteImagen } from '@lib/ajusteImagen';
 import { CATEGORIAS_LABELS, CATEGORIAS_ORDEN } from '@constants/proyectoCategorias';
-import {
-  getCapitulos,
-  getGestionHero,
-  getEras,
-  getProyectos,
-  getProyectosTitulo,
-  type EraTemario,
-  type SeccionTemario,
-} from '@lib/db';
-import { efectivo, efectivoLista, efectivoOrden } from '@lib/cms/resolve';
-import { DEFAULT_GESTION_LAYOUT } from '@lib/cms/defaults';
+import { getProyectos, getProyectosTitulo } from '@lib/db';
+import { getServicioCMS } from '@cms';
+import { DEFAULT_GESTION_LAYOUT } from '@cms/sitio/defaults';
 
-// ── HERO DE GESTIÓN ──────────────────────────────────────────────────
-const GESTION_HERO = efectivo('gestion_hero', 'principal', await getGestionHero());
-
-// ── CAPÍTULOS DE APERTURA ────────────────────────────────────────────
-const capitulosApertura = efectivoLista('capitulo', await getCapitulos());
-
-// ── ERAS DE OBRAS ────────────────────────────────────────────────────
-const erasCompletas = await getEras();
-const erasBase = erasCompletas.map(({ secciones: _s, ...resto }) => resto);
-const seccionesBase: (SeccionTemario & { eraId: string })[] = erasCompletas.flatMap((era) =>
-  era.secciones.map((s) => ({ ...s, eraId: era.id })),
-);
-const erasEfectivas = efectivoLista('era', erasBase);
-const seccionesEfectivas = efectivoLista('seccion', seccionesBase);
-const ERAS: EraTemario[] = erasEfectivas.map((era) => ({
-  ...era,
-  secciones: seccionesEfectivas.filter((s) => s.eraId === era.id),
-})) as EraTemario[];
+// ── CMS (servicio persistente) ──────────────────────────────────────
+const cms = getServicioCMS();
 
 // ── PROYECTOS (visor por categoría) ──────────────────────────────────
-const PROYECTOS = efectivoLista(
+const PROYECTOS = await cms.efectivoLista(
   'proyecto',
   (await getProyectos()).map((p, i) => ({ ...p, id: String(i) })),
 );
-const PROYECTOS_TITULO = efectivo('proyectos_titulo', 'principal', await getProyectosTitulo());
+const PROYECTOS_TITULO = await cms.efectivo('proyectos_titulo', 'principal', await getProyectosTitulo());
 
 // Obras listas para la isla: imagen pre-optimizada (si la hay), encuadre y la
 // mini galería (media). Fotos → optimizadas (thumb 220 + principal 900); videos
@@ -104,8 +80,8 @@ const CATEGORIAS_VISOR: VisorCategoria[] = categoriasOrden.map((id) => ({
   obras: obrasVisor.filter((o) => o.categoria === id),
 }));
 
-// ── ORDEN DE SECCIONES (CMS beta) ────────────────────────────────────
-const orden = efectivoOrden('gestion_layout', DEFAULT_GESTION_LAYOUT);
+// ── ORDEN DE SECCIONES (CMS) ────────────────────────────────────────
+const orden = await cms.efectivoOrden('gestion_layout', DEFAULT_GESTION_LAYOUT);
 const ordenDe = (clave: string) => {
   const i = orden.indexOf(clave);
   return i === -1 ? 999 : i;

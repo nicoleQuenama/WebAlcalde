@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { HeaderMovilProps } from "@types/header";
+import type { HeaderMovilProps } from "@type/header";
 import { MEDIA } from "@lib/media";
 
 export default function HeaderMovil({ enlaces }: HeaderMovilProps) {

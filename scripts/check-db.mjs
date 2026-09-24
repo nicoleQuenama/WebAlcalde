@@ -10,12 +10,12 @@ const pool = new pg.Pool({ connectionString: url, max: 2, ssl: { rejectUnauthori
 try {
   const t = await pool.query("SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name");
   console.log('Tablas:', t.rows.map(r=>r.table_name).join(', ') || '(ninguna)');
-  for (const tbl of ['contenido','buzon','usuario','sesion']) {
+  for (const tbl of ['cms_bloque','buzon','usuario','sesion']) {
     try {
       const c = await pool.query(`SELECT count(*)::int as n FROM ${tbl}`);
       console.log(`  ${tbl}: ${c.rows[0].n} filas`);
     } catch(e){ console.log(`  ${tbl}: no existe (${e.message})`) }
   }
-  const doms = await pool.query("SELECT dominio, count(*)::int as n FROM contenido GROUP BY dominio ORDER BY dominio");
-  console.log('Dominios contenido:', doms.rows);
+  const cols = await pool.query("SELECT coleccion, count(*)::int as n FROM cms_bloque GROUP BY coleccion ORDER BY coleccion");
+  console.log('Colecciones cms_bloque:', cols.rows);
 } catch(e){ console.error(e); } finally { await pool.end(); }

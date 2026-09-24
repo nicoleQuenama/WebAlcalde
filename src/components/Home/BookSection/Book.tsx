@@ -1,5 +1,5 @@
 import { DEFAULT_META } from '@constants/book/book3D';
-import type { BookProps } from '@types/book3D';
+import type { BookProps } from '@type/book3D';
 import { deriveBookPages, eraIntroPhoto, sectionVideo } from '@lib/book3D';
 import CoverPage from '@components/Home/BookSection/CoverPage';
 import PresentationPage from '@components/Home/BookSection/PresentationPage';

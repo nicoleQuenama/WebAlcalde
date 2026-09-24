@@ -1,9 +1,10 @@
 
 import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
-import { Pool } from 'pg';
 import { MEDIA } from './media';
 import { CATEGORIAS_ORDEN } from '@constants/proyectoCategorias';
+import { obtenerPool } from '@lib/pg';
+import { getServicioCMS } from '@cms';
 import type { Encuadre, AjusteCarrusel } from './ajusteImagen';
 
 // ── Tipos del contenido editorial ────────────────────────────────────────────
@@ -123,6 +124,28 @@ export interface Hito {
 }
 
 export interface IntroHistoria {
+  kicker: string;
+  titulo: string;
+  bajada: string;
+}
+
+/** Hero de la página de gestión (fila única de la colección `gestion_hero`). */
+export interface GestionHero {
+  kicker: string;
+  periodo: string;
+  titulo: string;
+  bajada: string;
+}
+
+/** Encabezado de la sección de proyectos (fila única de `proyectos_titulo`). */
+export interface ProyectosTitulo {
+  kicker: string;
+  titulo: string;
+  bajada: string;
+}
+
+/** Hero de la página de noticias (fila única de `noticias_hero`). */
+export interface NoticiasHero {
   kicker: string;
   titulo: string;
   bajada: string;
@@ -1073,18 +1096,14 @@ const HISTORIA: Hito[] = [
 
 // ── Persistencia: PostgreSQL (única opción) ───────────────────────────────────
 
-// URL de conexión (Postgres local o administrado, p. ej. Supabase). Es
-// obligatoria: sin ella el servidor no arranca (no hay fallback a SQLite).
-const DATABASE_URL: string | undefined =
-  import.meta.env.DATABASE_URL || process.env.DATABASE_URL;
+// La URL de conexión y el pool compartido viven en `src/lib/pg.ts`
+// (`obtenerPool()`): auth/buzón (este archivo) y CMS (`src/cms/core/postgres.ts`)
+// usan la misma conexión. La tabla de contenido ahora es `cms_bloque`
+// (migrada automáticamente desde `contenido` por el servicio CMS).
 
 type Mapa = Record<string, unknown>;
 
 interface Almacen {
-  asegurarTabla(): Promise<void>;
-  guardar(dominio: string, clave: string, data: string, orden: number): Promise<void>;
-  leer(dominio: string): Promise<{ clave: string; orden: number; data: string }[]>;
-  contar(dominio: string): Promise<number>;
   asegurarTablaBuzon(): Promise<void>;
   guardarMensaje(mensaje: BuzonMensaje): Promise<void>;
   listarMensajes(): Promise<BuzonMensaje[]>;
@@ -1099,63 +1118,9 @@ interface Almacen {
 }
 
 class AlmacenPostgres implements Almacen {
-  private _pool: Pool | null = null;
-
-  constructor(private readonly url: string) {}
-
-  private pool(): Pool {
-    if (!this._pool) {
-      // Supabase (pooler o direct) requiere SSL. Lo activamos automáticamente
-      // cuando la URL apunta a supabase.co / pooler.supabase.com o incluye
-      // sslmode=require. Para localhost no se fuerza SSL.
-      const needsSSL =
-        /supabase\.co/.test(this.url) || /sslmode=require/.test(this.url);
-      this._pool = new Pool({
-        connectionString: this.url,
-        max: 10,
-        ...(needsSSL ? { ssl: { rejectUnauthorized: false } } : {}),
-      });
-    }
-    return this._pool;
-  }
-
-  async asegurarTabla(): Promise<void> {
-    await this.pool().query(`
-      CREATE TABLE IF NOT EXISTS contenido (
-        dominio TEXT NOT NULL,
-        clave   TEXT NOT NULL,
-        orden   INTEGER NOT NULL DEFAULT 0,
-        data    TEXT NOT NULL,
-        PRIMARY KEY (dominio, clave)
-      );
-    `);
-  }
-
-  async guardar(dominio: string, clave: string, data: string, orden: number): Promise<void> {
-    await this.pool().query(
-      `INSERT INTO contenido (dominio, clave, orden, data)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (dominio, clave) DO UPDATE SET
-         orden = EXCLUDED.orden,
-         data  = EXCLUDED.data`,
-      [dominio, clave, orden, data],
-    );
-  }
-
-  async leer(dominio: string): Promise<{ clave: string; orden: number; data: string }[]> {
-    const res = await this.pool().query<{ clave: string; orden: number; data: string }>(
-      `SELECT clave, orden, data FROM contenido WHERE dominio = $1 ORDER BY orden`,
-      [dominio],
-    );
-    return res.rows;
-  }
-
-  async contar(dominio: string): Promise<number> {
-    const res = await this.pool().query<{ n: number }>(
-      `SELECT COUNT(*)::int AS n FROM contenido WHERE dominio = $1`,
-      [dominio],
-    );
-    return res.rows[0].n;
+  /** Usa el pool compartido de `@lib/pg` (misma conexión que el CMS). */
+  private pool() {
+    return obtenerPool();
   }
 
   async asegurarTablaBuzon(): Promise<void> {
@@ -1268,29 +1233,28 @@ class AlmacenPostgres implements Almacen {
 let _almacen: Almacen | null = null;
 
 function getAlmacen(): Almacen {
-  if (!DATABASE_URL) {
-    throw new Error(
-      '[db] Falta DATABASE_URL en el entorno. Configurá la conexión a Postgres ' +
-        'en .env o como variable de entorno.',
-    );
-  }
   if (!_almacen) {
-    _almacen = new AlmacenPostgres(DATABASE_URL);
+    obtenerPool(); // falla temprano si falta DATABASE_URL en el entorno
+    _almacen = new AlmacenPostgres();
   }
   return _almacen;
 }
 
-async function guardar(dominio: string, clave: string, data: Mapa, orden = 0): Promise<void> {
-  await getAlmacen().guardar(dominio, clave, JSON.stringify(data), orden);
+// ── Contenido editorial: delega al servicio CMS (tabla `cms_bloque`) ──────────
+// Los valores de `coleccion` son los ids históricos del sitio ('capitulo',
+// 'era', 'seccion', 'proyecto', …) — no cambian, solo cambia la tabla.
+
+async function guardar(coleccion: string, clave: string, data: Mapa, orden = 0): Promise<void> {
+  await getServicioCMS().guardar(coleccion, clave, data, orden);
 }
 
-async function leer(dominio: string): Promise<{ clave: string; data: Mapa; orden: number }[]> {
-  const filas = await getAlmacen().leer(dominio);
-  return filas.map((r) => ({ clave: r.clave, orden: r.orden, data: JSON.parse(r.data) as Mapa }));
+async function leer(coleccion: string): Promise<{ clave: string; data: Mapa; orden: number }[]> {
+  const bloques = await getServicioCMS().listar(coleccion);
+  return bloques.map((b) => ({ clave: b.bloqueId, orden: b.orden, data: b.data as Mapa }));
 }
 
-async function estaVacio(dominio: string): Promise<boolean> {
-  return (await getAlmacen().contar(dominio)) === 0;
+async function estaVacio(coleccion: string): Promise<boolean> {
+  return (await getServicioCMS().contar(coleccion)) === 0;
 }
 
 // ── Siembra desde el seed de este archivo ────────────────────────────────────
@@ -1356,7 +1320,7 @@ async function sembrarProyectos(): Promise<void> {
 }
 
 async function sembrar(): Promise<void> {
-  await getAlmacen().asegurarTabla();
+  await getServicioCMS().asegurarTabla();
 
   // Capítulos de apertura
   if (await estaVacio('capitulo')) {
@@ -1449,7 +1413,7 @@ async function sembrar(): Promise<void> {
 export async function asegurarSembrada(): Promise<void> {
   // Asegura todas las tablas principales antes de sembrar, así `npm run dev`
   // deja la DB lista en Supabase sin esperar al primer request.
-  await getAlmacen().asegurarTabla();
+  await getServicioCMS().asegurarTabla();
   await getAlmacen().asegurarTablaBuzon();
   await getAlmacen().asegurarTablaAuth();
   if (
@@ -1496,16 +1460,16 @@ export async function getEras(): Promise<EraTemario[]> {
   })) as EraTemario[];
 }
 
-export async function getGestionHero() {
+export async function getGestionHero(): Promise<GestionHero> {
   await asegurarSembrada();
   const [row] = await leer('gestion_hero');
-  return row?.data as unknown as typeof GESTION_HERO;
+  return row?.data as unknown as GestionHero;
 }
 
-export async function getProyectosTitulo() {
+export async function getProyectosTitulo(): Promise<ProyectosTitulo> {
   await asegurarSembrada();
   const [row] = await leer('proyectos_titulo');
-  return row?.data as unknown as typeof PROYECTOS_TITULO;
+  return row?.data as unknown as ProyectosTitulo;
 }
 
 export async function getProyectos(): Promise<Proyecto[]> {
@@ -1513,10 +1477,10 @@ export async function getProyectos(): Promise<Proyecto[]> {
   return (await leer('proyecto')).map((r) => r.data as unknown as Proyecto);
 }
 
-export async function getNoticiasHero() {
+export async function getNoticiasHero(): Promise<NoticiasHero | undefined> {
   await asegurarSembrada();
   const [row] = await leer('noticias_hero');
-  return row?.data as unknown as typeof NOTICIAS_HERO;
+  return row?.data as unknown as NoticiasHero;
 }
 
 export async function getNoticias(): Promise<NoticiaFeed[]> {

@@ -1,7 +1,7 @@
 import styles from './Book.module.css';
 import { createClasses } from '@lib/book3D';
 import { REVEAL_EFFECT } from '@constants/book/book3D';
-import type { BookMeta } from '@types/book3D';
+import type { BookMeta } from '@type/book3D';
 
 /** Contraportada: título y texto final sobre la tapa dura de cierre. */
 export default function BackCoverPage({ meta }: { meta: Required<BookMeta> }) {

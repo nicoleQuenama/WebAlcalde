@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { calcularDatosPagina } from '@lib/cms/datosPagina';
+import { calcularDatosPagina } from '@cms/sitio';
 import { obtenerTokenDeRequest, usuarioValido } from '@lib/auth';
 
 /**

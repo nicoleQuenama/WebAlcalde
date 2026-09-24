@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro';
-import { getBloques, setBloque, eliminarBloque, reordenar } from '@lib/cms/store';
+import { getServicioCMS } from '@cms';
 import { obtenerTokenDeRequest, usuarioValido } from '@lib/auth';
 
 /**
- * CRUD "mock" del CMS: escribe en el store en memoria (src/lib/cms/store.ts),
- * nunca en la DB real (src/lib/db.ts). Simula un guardado sin persistir a
- * disco — se pierde al reiniciar el servidor, a propósito.
+ * CRUD del CMS sobre PostgreSQL (`cms_bloque` vía `getServicioCMS`):
+ * escribe en la tabla real del sitio, igual que la siembra de `src/lib/db.ts`.
+ * Las colecciones se guardan por su `dominio` (el mismo que identifica
+ * `data-cms-dominio` en el DOM y que declaran las `fuente.coleccion`).
  *
  * Doble verificación: exige el header X-Admin-Secret (que coincide con la
  * variable de entorno que protege la ruta /admin/[secret]) Y una sesión de
@@ -34,7 +35,12 @@ export const GET: APIRoute = async ({ params, request }) => {
   if (!autorizado(request)) return json({ error: 'no autorizado' }, 401);
   if (!(await conSesion(request))) return json({ error: 'sesión inválida' }, 401);
   const dominio = params.dominio!;
-  return json({ dominio, bloques: getBloques(dominio) ?? [] });
+  const bloques = (await getServicioCMS().listar(dominio)).map((b) => ({
+    clave: b.bloqueId,
+    orden: b.orden,
+    data: b.data,
+  }));
+  return json({ dominio, bloques });
 };
 
 export const POST: APIRoute = async ({ params, request }) => {
@@ -45,8 +51,9 @@ export const POST: APIRoute = async ({ params, request }) => {
   if (!body || typeof body.clave !== 'string' || typeof body.data !== 'object') {
     return json({ error: 'body inválido: se espera { clave, data, orden? }' }, 400);
   }
-  const bloque = setBloque(dominio, body.clave, body.data, body.orden);
-  return json({ ok: true, bloque });
+  const orden = typeof body.orden === 'number' ? body.orden : 0;
+  await getServicioCMS().guardar(dominio, body.clave, body.data, orden);
+  return json({ ok: true });
 };
 
 export const DELETE: APIRoute = async ({ params, request }) => {
@@ -57,7 +64,7 @@ export const DELETE: APIRoute = async ({ params, request }) => {
   if (!body || typeof body.clave !== 'string') {
     return json({ error: 'body inválido: se espera { clave }' }, 400);
   }
-  const existia = eliminarBloque(dominio, body.clave);
+  const existia = await getServicioCMS().eliminar(dominio, body.clave);
   return json({ ok: existia });
 };
 
@@ -69,6 +76,6 @@ export const PATCH: APIRoute = async ({ params, request }) => {
   if (!body || typeof body.orden !== 'object') {
     return json({ error: 'body inválido: se espera { orden: Record<clave, numero> }' }, 400);
   }
-  reordenar(dominio, body.orden);
+  await getServicioCMS().reordenar(dominio, body.orden);
   return json({ ok: true });
 };

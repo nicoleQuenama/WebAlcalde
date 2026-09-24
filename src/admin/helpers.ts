@@ -1,11 +1,26 @@
-import type { FieldSpec } from '@lib/cms/campos';
-import type { DatosPagina, SeccionData } from '@types/cms';
+import type { FieldSpec } from '@cms/sitio';
+import type { DatosPagina, SeccionData } from '@type/cms';
+import type { EditorContexto } from '@type/cms/editorContext';
 
 /**
  * Helpers puros del editor CMS: construcción de DOM, clonado de datos y
  * generación de claves/dominios únicos para copiar, pegar y duplicar.
  * No tocan el estado del editor (van por `EditorContexto` en quien los usa).
  */
+
+/** Muestra un aviso temporal en la barra de estado y lo restaura según haya cambios sin guardar o no. */
+export function feedbackEstado(ctx: EditorContexto, texto: string, ms = 1500): void {
+  ctx.estadoEl.textContent = texto;
+  ctx.estadoEl.className = 'cms-estado';
+  setTimeout(() => {
+    if (ctx.hayCambiosSinGuardar) {
+      ctx.estadoEl.textContent = 'Cambios sin guardar';
+      ctx.estadoEl.className = 'cms-estado cms-estado--sucio';
+    } else {
+      ctx.estadoEl.textContent = 'Todo guardado';
+    }
+  }, ms);
+}
 
 type PropsDeEl<K extends keyof HTMLElementTagNameMap> = Partial<Omit<HTMLElementTagNameMap[K], 'style'>> & {
   className?: string;

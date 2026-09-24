@@ -2,7 +2,7 @@ import styles from './Book.module.css';
 import { createClasses } from '@lib/book3D';
 import { PLAY_ICON, REVEAL_EFFECT } from '@constants/book/book3D';
 import type { SeccionTemario } from '@lib/db';
-import type { IMG, Video } from '@types/book3D';
+import type { IMG, Video } from '@type/book3D';
 import Page from '@components/Home/BookSection/Page';
 import FigurePhoto from '@components/Home/BookSection/FigurePhoto';
 import WorksList from '@components/Home/BookSection/WorksList';

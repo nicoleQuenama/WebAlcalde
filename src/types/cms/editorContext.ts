@@ -1,4 +1,4 @@
-import type { FieldSpec } from '@lib/cms/campos';
+import type { FieldSpec } from '@cms/sitio';
 import type { EstadoPagina, Portapapeles, SeccionData } from '../cms';
 
 /**

@@ -26,5 +26,3 @@ export {
 export { ajusteImagen } from '@lib/ajusteImagen';
 
 export { buildLibroToc } from '@lib/flipBook';
-
-export { efectivo, efectivoLista, efectivoOrden, getTemarioEfectivo } from '@lib/cms/resolve';

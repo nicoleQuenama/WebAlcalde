@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import ImageSlider from '@components/ImageSlider/ImageSlider';
 import ArrowButton from '@components/ui/ArrowButton/ArrowButton';
-import type { ComparadorProps } from '@types/comparador.ts';
+import type { ComparadorProps } from '@type/comparador.ts';
 
 export default function ComparadorAntesDespues({ pares }: ComparadorProps) {
   const [i, setI] = useState(0);

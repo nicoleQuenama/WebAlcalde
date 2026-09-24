@@ -1,13 +1,13 @@
-import type { FieldSpec } from '@lib/cms/campos';
-import type { EditorContexto } from '@types/cms/editorContext';
-import type { SeccionData } from '@types/cms';
+import type { FieldSpec } from '@cms/sitio';
+import type { EditorContexto } from '@type/cms/editorContext';
+import type { SeccionData } from '@type/cms';
 import {
   COLOR_ACCENT,
   COLOR_ACCENT_SOFT,
   COLOR_BLANCO,
   COLOR_PRIMARY,
 } from '@constants/admin/editorColors';
-import { clonarData, clonarSeccion, el, nuevaClaveItem, tituloDeItem, valoresVacios } from './helpers';
+import { clonarData, clonarSeccion, el, feedbackEstado, nuevaClaveItem, tituloDeItem, valoresVacios } from './helpers';
 
 /**
  * Operaciones del portapapeles del editor: copiar/pegar/duplicar tarjetas y
@@ -52,16 +52,7 @@ export function actualizarBarraPortapapeles(ctx: EditorContexto): void {
 export function copiarItem(ctx: EditorContexto, dominio: string, data: Record<string, unknown>, campos: FieldSpec[]) {
   ctx.portapapeles = { dominio, data: clonarData(data), label: tituloDeItem(campos, data), tipo: 'item' };
   ctx.actualizarBarraPortapapeles();
-  ctx.estadoEl.textContent = `Copiado: ${ctx.portapapeles.label} — click derecho donde quieras pegar`;
-  ctx.estadoEl.className = 'cms-estado';
-  setTimeout(() => {
-    if (ctx.hayCambiosSinGuardar) {
-      ctx.estadoEl.textContent = 'Cambios sin guardar';
-      ctx.estadoEl.className = 'cms-estado cms-estado--sucio';
-    } else {
-      ctx.estadoEl.textContent = 'Todo guardado';
-    }
-  }, 2200);
+  feedbackEstado(ctx, `Copiado: ${ctx.portapapeles.label} — click derecho donde quieras pegar`, 2200);
 }
 
 export function copiarSeccion(ctx: EditorContexto, sec: SeccionData) {
@@ -71,16 +62,7 @@ export function copiarSeccion(ctx: EditorContexto, sec: SeccionData) {
   const dataEjemplo = sec.tipo === 'lista' ? (sec.items?.[0]?.data ?? valoresVacios(sec.campos ?? [])) : (sec.valor ?? {});
   ctx.portapapeles = { dominio, data: clonarData(dataEjemplo as Record<string, unknown>), label, tipo: 'seccion', seccionKey: sec.key, seccionTitulo: sec.titulo };
   ctx.actualizarBarraPortapapeles();
-  ctx.estadoEl.textContent = `Copiada sección: ${label} — abrí Estructura y pegá donde quieras`;
-  ctx.estadoEl.className = 'cms-estado';
-  setTimeout(() => {
-    if (ctx.hayCambiosSinGuardar) {
-      ctx.estadoEl.textContent = 'Cambios sin guardar';
-      ctx.estadoEl.className = 'cms-estado cms-estado--sucio';
-    } else {
-      ctx.estadoEl.textContent = 'Todo guardado';
-    }
-  }, 2800);
+  feedbackEstado(ctx, `Copiada sección: ${label} — abrí Estructura y pegá donde quieras`, 2800);
 }
 
 export function duplicarItem(ctx: EditorContexto, dominio: string, clave: string): boolean {
@@ -93,10 +75,7 @@ export function duplicarItem(ctx: EditorContexto, dominio: string, clave: string
   sec.items.splice(idx + 1, 0, { clave: nuevaClaveItem(), data: clonarData(src.data) });
   ctx.marcarSucio();
   ctx.syncPreviewOrden(dominio);
-  ctx.estadoEl.textContent = `Duplicado: ${tituloDeItem(sec.campos ?? [], src.data)}`;
-  setTimeout(() => {
-    ctx.estadoEl.textContent = 'Cambios sin guardar';
-  }, 1500);
+  feedbackEstado(ctx, `Duplicado: ${tituloDeItem(sec.campos ?? [], src.data)}`, 1500);
   return true;
 }
 
@@ -137,10 +116,7 @@ export function duplicarSeccion(ctx: EditorContexto, sec: SeccionData): boolean 
   if (sec.tipo === 'placeholder') return false;
   const nuevo = clonarSeccion(sec);
   registrarSeccionNueva(ctx, nuevo, idx + 1);
-  ctx.estadoEl.textContent = `Sección duplicada: ${nuevo.titulo}`;
-  setTimeout(() => {
-    ctx.estadoEl.textContent = 'Cambios sin guardar';
-  }, 1500);
+  feedbackEstado(ctx, `Sección duplicada: ${nuevo.titulo}`, 1500);
   return true;
 }
 

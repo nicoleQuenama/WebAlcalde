@@ -1,7 +1,7 @@
 import styles from './Book.module.css';
 import { createClasses } from '@lib/book3D';
 import { REVEAL_EFFECT } from '@constants/book/book3D';
-import type { IMG } from '@types/book3D';
+import type { IMG } from '@type/book3D';
 
 /** Cómo se enmarca la foto dentro de la página. */
 export type FigureVariant = 'portrait' | 'context';

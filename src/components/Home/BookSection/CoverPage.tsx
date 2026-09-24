@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import styles from './Book.module.css';
 import { createClasses } from '@lib/book3D';
 import { COVER_ALT, REVEAL_EFFECT } from '@constants/book/book3D';
-import type { BookMeta } from '@types/book3D';
+import type { BookMeta } from '@type/book3D';
 
 /** Portada del libro: imagen de tapa, badge, título multilínea y subtítulo. */
 export default function CoverPage({

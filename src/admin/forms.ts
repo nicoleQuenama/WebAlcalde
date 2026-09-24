@@ -1,4 +1,4 @@
-import type { FieldSpec, TipoCampo } from '@lib/cms/campos';
+import type { FieldSpec, TipoCampo } from '@cms/sitio';
 import { el } from './helpers';
 import { crearCampoObras } from './campoObras';
 

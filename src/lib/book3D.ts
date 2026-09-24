@@ -10,7 +10,7 @@ import {
   RESERVED_PORTRAITS,
   VIDEO_BY_SECTION,
 } from '@constants/book/book3D';
-import type { BookPages, IMG, Video } from '@types/book3D';
+import type { BookPages, IMG, Video } from '@type/book3D';
 import type { Capitulo } from '@lib/db';
 
 /**

@@ -11,7 +11,7 @@
       "@components": ["./src/components"],
       "@components/*": ["./src/components/*"],
       "@constants/*": ["./src/constants/*"],
-      "@types/*": ["./src/types/*"],
+      "@type/*": ["./src/types/*"],
       "@styles/*": ["./src/styles/*"],
       "@assets/*": ["./src/assets/*"],
       "@pages/*": ["./src/pages/*"],
@@ -20,6 +20,8 @@
       "@utils/*": ["./src/utils/*"],
       "@hooks": ["./src/hooks"],
       "@hooks/*": ["./src/hooks/*"],
+      "@cms/*": ["./src/cms/*"],
+      "@cms": ["./src/cms"],
     }
   }
 }

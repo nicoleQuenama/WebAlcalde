@@ -1,5 +1,5 @@
-import { DEFAULT_FLIPBOOK_META } from '@lib/cms/defaults';
-import type { BookMeta } from '@types/book3D';
+import { DEFAULT_FLIPBOOK_META } from '@cms/sitio/defaults';
+import type { BookMeta } from '@type/book3D';
 
 /**
  * Metadatos por defecto del libro. ÚNICA fuente de verdad: los valores se toman de

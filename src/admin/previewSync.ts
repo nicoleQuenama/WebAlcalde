@@ -1,5 +1,11 @@
-import type { EditorContexto } from '@types/cms/editorContext';
+import type { EditorContexto } from '@type/cms/editorContext';
 import { COLOR_ACCENT } from '@constants/admin/editorColors';
+import {
+  CAMPOS_IMG_BLOQUE,
+  CAMPOS_IMG_SECCION,
+  CAMPOS_MULTIMEDIA,
+  CAMPOS_VIDEO,
+} from '@constants/admin/camposMultimedia';
 import {
   aplicarOrdenLayout,
   crearFantasmasSeccion,
@@ -17,12 +23,7 @@ import {
  * `./previewSyncOrden`.
  */
 
-const CAMPOS_IMG_BLOQUE = new Set(['imagen', 'coverImage', 'src']);
-const CAMPOS_IMG_SECCION = new Set(['imagen', 'coverImage']);
-const CAMPOS_VIDEO = new Set(['video', 'src']);
-const CAMPOS_MULTIMEDIA = new Set([...CAMPOS_IMG_BLOQUE, ...CAMPOS_VIDEO, 'poster']);
-
-function esCampoMultimedia(campo: string): boolean {
+export function esCampoMultimedia(campo: string): boolean {
   return CAMPOS_MULTIMEDIA.has(campo);
 }
 

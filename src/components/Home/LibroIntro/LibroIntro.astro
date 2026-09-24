@@ -3,9 +3,8 @@ import Section from '@components/global/Section/Section.component.astro';
 import FlipBook from '@components/FlipBook/FlipBook';
 import Book, { type IMG, type Video } from '@components/Home/BookSection';
 import type { Capitulo, EraTemario } from '@lib/db';
-// Ruta relativa: el alias `@types` choca hoy con ts6137 en todo el repo (bug preexistente).
-import type { TocGroup } from '../../../types/flipBook';
-import type { DEFAULT_FLIPBOOK_META } from '@lib/cms/defaults';
+import type { TocGroup } from '@type/flipBook';
+import type { DEFAULT_FLIPBOOK_META } from '@cms/sitio/defaults';
 
 interface Props {
     libro: typeof DEFAULT_FLIPBOOK_META;
@@ -24,7 +23,6 @@ const { libro, chapters, eras, photos, videos, toc, style, dominio } = Astro.pro
 <Section
     subtitle={libro.kicker}
     description={libro.parrafo}
-    theme="purple"
     paddingClass="py-16 lg:py-20"
     headerGapClass="mb-8"
     style={style}

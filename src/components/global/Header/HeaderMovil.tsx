@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { NavItem } from "@types/nav";
+import type { NavItem } from "@type/nav";
 import { MEDIA } from "@lib/media";
 import  "@styles/global.css";
 

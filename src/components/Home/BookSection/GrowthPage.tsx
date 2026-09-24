@@ -6,7 +6,7 @@ import {
   TODAY_CITY_ALT,
 } from '@constants/book/book3D';
 import type { Capitulo } from '@lib/db';
-import type { IMG } from '@types/book3D';
+import type { IMG } from '@type/book3D';
 import Page from '@components/Home/BookSection/Page';
 
 /** "Cómo ha crecido Cochabamba": strip antes/después con dos fotos expandibles. */
